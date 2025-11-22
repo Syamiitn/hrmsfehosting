@@ -1,0 +1,83 @@
+.attendance-overview-page {
+    background-color: var(--background-color);
+
+    .stat-card {
+        background-color: var(--card-bg-color);
+        padding: 16px;
+        border-radius: 20px;
+
+        h2 {
+            color: var(--theme);
+        }
+
+        .icon {
+            color: var(--theme);
+            font-size: 26px;
+        }
+    }
+
+    .recent-attendance-card {
+        background-color: var(--card-bg-color);
+        padding: 16px;
+        border-radius: 20px;
+
+        .icon {
+            color: var(--theme);
+        }
+
+        .recent-attendance-info {
+            padding: 0px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    }
+
+    .attendance-exception {
+        background-color: var(--card-bg-color);
+        padding: 16px;
+        border-radius: 20px;
+
+        .icon {
+            color: var(--theme);
+            font-size: 20px;
+        }
+
+        .exception-info {
+            padding: 0px;
+            max-height: 300px;
+            overflow-y: auto;
+
+            .exception-label {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 10px;
+                border: 1px solid var(--border-color);
+                padding: 16px;
+                border-radius: 16px;
+            }
+
+            .icon-btn {
+                border: 1px solid var(--border-color);
+                padding: 3px 10px;
+                border-radius: 20px;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+
+                &:hover {
+                    background-color: var(--background-color);
+                }
+            }
+        }
+    }
+
+    .attendance-calendar-card {
+        background-color: var(--card-bg-color);
+        padding: 16px;
+        border-radius: 20px;
+
+        .icon {
+            color: var(--theme);
+        }
+    }
+}

@@ -1,0 +1,188 @@
+/* ====================== Layout ====================== */
+.subsidiary-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+ 
+/* ====================== Toolbar ====================== */
+.subsidiary-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+ 
+/* ====================== Table Container ====================== */
+.subsidiary-table {
+  border: 1px solid #e9ecf5;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02);
+}
+ 
+.subsidiary-header {
+  padding: 12px;
+  border-bottom: 1px solid #f0f2fa;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 52px;
+}
+ 
+.subsidiary-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+ 
+.subsidiary-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: #f2eeff;
+  color: #6c5ce7;
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  font-weight: 700;
+}
+ 
+.subsidiary-heading {
+  font-weight: 700;
+}
+ 
+.subsidiary-search {
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  width: 30%;
+  font-size: 13px;
+}
+ 
+/* ====================== Buttons ====================== */
+.btn-primary,
+.btn-secondary,
+.btn-danger,
+.btn-danger-outline {
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+ 
+.btn-primary {
+  border: 1px solid #5c4edc;
+  background: #6c5ce7;
+  color: #fff;
+}
+ 
+.btn-secondary {
+  border: 1px solid #e5e7eb;
+  background: #fff;
+}
+ 
+.btn-danger {
+  border: 1px solid #fecaca;
+  background: #fee2e2;
+  color: #b91c1c;
+}
+ 
+.btn-danger-outline {
+  border: 1px solid #fecaca;
+  background: #fff5f5;
+  color: #b91c1c;
+}
+ 
+.btn-danger.disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+ 
+/* ====================== Modal ====================== */
+.remove-info {
+  color: #6b7280;
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+ 
+.remove-company-list {
+  display: grid;
+  gap: 10px;
+}
+ 
+.no-company {
+  color: #6b7280;
+  font-size: 14px;
+}
+ 
+/* ====================== CardOption ====================== */
+.card-option {
+  width: 100%;
+  text-align: left;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+ 
+.card-option.selected {
+  border: 1px solid #5b4bdb;
+  background: #f5f3ff;
+}
+ 
+.card-option.disabled {
+  background: #f9fafb;
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+ 
+.card-option__header {
+  display: flex;
+  justify-content: space-between;
+}
+ 
+.card-option__name {
+  font-weight: 700;
+}
+ 
+.card-option__parent {
+  font-size: 11px;
+  background: #eef2ff;
+  border: 1px solid #e0e7ff;
+  border-radius: 999px;
+  padding: 2px 8px;
+  color: #4f46e5;
+}
+ 
+.card-option__meta {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 4px;
+}
+ 
+/* ====================== DataTable Overrides ====================== */
+.custom-datatable .rdt_TableHeadRow {
+  font-weight: 700;
+  font-size: 13px;
+  color: #374151;
+  background-color: #f9fafb;
+  border-top: 1px solid #f3f4f6;
+  border-bottom: 1px solid #f3f4f6;
+}
+ 
+.custom-datatable .rdt_TableRow {
+  min-height: 56px;
+  transition: background 0.2s ease;
+}
+ 
+.custom-datatable .rdt_TableRow:hover {
+  background-color: #f9faff !important;
+  border-bottom-color: #e5e7eb;
+  outline: 1px solid #e5e7eb;
+}
+ 

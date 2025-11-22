@@ -1,0 +1,243 @@
+/* ==============================
+   Layout tokens
+================================= */
+:root {
+    --sidebar-w-mobile: 170px;
+    --sidebar-w-md: 170px;
+    /* >= 992px */
+    --sidebar-w-lg: 170px;
+    /* >= 1200px */
+
+    --sidebar-radius: 16px;
+    --sidebar-z: 1000;
+    --submenu-z: 1100;
+
+    --tab-h: 60px;
+    /* row height */
+    --row-gap: 0px;
+    /* vertical gap between items */
+    --tab-pad-x: 12px;
+    /* inner horizontal padding */
+    --tab-popout: 30px;
+    /* how far the active tab protrudes to the right */
+}
+
+/* ==============================
+   Sidebar Base
+================================= */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: var(--sidebar-w-mobile);
+    height: 100vh;
+    z-index: var(--sidebar-z);
+    background: transparent;
+    transform: translateX(-100%);
+    display: grid;
+    grid-template-rows: auto 1fr;
+    padding: 5px;
+    box-sizing: border-box;
+    overflow: visible;
+
+    &.show {
+        transform: translateX(0);
+    }
+
+    @media (min-width: 992px) {
+        position: sticky;
+        top: 0;
+        transform: none !important;
+        width: var(--sidebar-w-md);
+        height: 100dvh;
+    }
+
+    @media (min-width: 1200px) {
+        width: var(--sidebar-w-lg);
+    }
+
+    .logo-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 13px 0px;
+        font-weight: 700;
+        font-size: 20px;
+        color: #fff;
+        border-radius: var(--sidebar-radius);
+        background-color: var(--theme-color);
+
+        h3 {
+            color: var(--color-white);
+        }
+    }
+
+    .sidebar-menu {
+        list-style: none;
+        margin: 3px 0 0 0;
+        padding: 20px 0 6px 10px;
+        border-radius: var(--sidebar-radius);
+        background-color: var(--theme-color);
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+
+        &::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            border-radius: 8px;
+        }
+
+        .menu-item {
+            position: relative;
+            display: grid;
+            grid-template-columns: 20px 1fr;
+            align-items: center;
+            gap: 5px;
+            height: var(--tab-h);
+            padding: 0 0 0 16px;
+            margin: var(--row-gap) 0;
+            color: var(--gray-400);
+            text-decoration: none;
+            line-height: 1;
+            border-radius: 999px;
+
+            /* Hover for non-active items */
+            &:not(.active):hover {
+                background-color: transparent !important;
+            }
+
+            &.active:hover {
+                color: var(--theme-color);
+                background: var(--background-color) !important;
+                cursor: default;
+            }
+
+            &.active {
+                background: var(--background-color);
+                color: var(--theme-color);
+                margin-right: -30px;
+                padding-right: 40px;
+
+                -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 164 81'><path d='M163 80.9995C162.605 74.7055 159.123 60.9187 144.412 60.1237H16C9.47472 58.4674 0 52.7324 0 41.9994C0.197736 36.368 2.31389 24.2479 17.5 21.8628H144.412C150.881 22.1816 162.552 18.6324 163 2.07042V0.0625C163.018 0.752162 163.018 1.42128 163 2.07042V80.9995Z' fill='%23000'/></svg>");
+                -webkit-mask-repeat: no-repeat;
+                -webkit-mask-position: left center;
+                -webkit-mask-size: 150.49999232px 80px;
+
+                mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-2 1.5 164 81'><path d='M163 80.9995C162.605 74.7055 159.123 60.9187 144.412 60.1237H16C9.47472 58.4674 0 52.7324 0 41.9994C0.197736 36.368 2.31389 24.2479 17.5 21.8628H144.412C150.881 22.1816 162.552 18.6324 163 2.07042V0.0625C163.018 0.752162 163.018 1.42128 163 2.07042V80.9995Z' fill='%23000'/></svg>");
+                mask-repeat: no-repeat;
+                mask-position: left center;
+                mask-size: 150.49999232px 80px;
+                transform: rotate(-0.006deg);
+                border: 1px solid var(--background-color);
+
+                &::before {
+                    content: none !important;
+                }
+
+                .menu-label {
+                    color: var(--theme-color);
+                }
+            }
+
+            .menu-icon {
+                font-size: 18px;
+                /* line-height: 1; */
+                color: currentColor;
+            }
+
+            .menu-label {
+                font-size: 14px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                color: var(--gray-400);
+            }
+        }
+    }
+}
+
+/* Mobile backdrop when sidebar is open */
+.sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, .45);
+    backdrop-filter: saturate(120%) blur(2px);
+    z-index: calc(var(--sidebar-z) - 1);
+}
+
+/* ==============================
+   Submenu
+================================= */
+.sub-menu,
+.sub-menu-label,
+.sub-menu-item {
+    list-style: none;
+    text-decoration: none;
+}
+
+.sub-menu {
+    margin: 0;
+    padding: 0;
+    display: none;
+    background-color: #2c2c3e;
+    border-radius: 10px;
+    overflow: hidden;
+
+    &.open {
+        display: block;
+    }
+
+    .sub-menu-item,
+    .sub-menu-label {
+        display: block;
+        padding: 8px 12px;
+        color: #fff;
+        cursor: pointer;
+        white-space: nowrap;
+        font-size: 13px;
+
+        &:hover {
+            background-color: #3a3a50;
+        }
+
+        &.active {
+            background-color: #3a3a50;
+        }
+
+        /* Active submenu items don’t change on hover */
+        &.active:hover {
+            background-color: #3a3a50;
+            cursor: default;
+        }
+    }
+}
+
+.has-submenu {
+    position: relative;
+    border-radius: 12px;
+}
+
+/* ==============================
+   Desktop Hover Behaviour
+================================= */
+@media (min-width: 992px) {
+    .has-submenu:hover>.sub-menu {
+        display: block;
+        position: absolute;
+        top: 2px;
+        left: 100%;
+        min-width: 200px;
+        z-index: var(--submenu-z);
+        background-color: #2c2c3e;
+        box-shadow: 0 10px 24px rgba(0, 0, 0, .25);
+    }
+
+    .sub-menu .has-submenu:hover>.sub-menu {
+        top: 0;
+        left: 100%;
+    }
+}

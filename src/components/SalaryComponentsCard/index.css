@@ -1,0 +1,33 @@
+.salary-card {
+    background: var(--card-bg-color);
+    border-radius: 16px;
+    box-shadow: var(--sh-1);
+
+    .icon {
+        color: var(--theme);
+    }
+
+    /* Salary cells */
+    .salary-cell {
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        background: var(--card-bg-color);
+        padding: 10px;
+        text-align: left;
+
+        .small {
+            color: var(--muted-text-color);
+        }
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .salary-card {
+        padding: 1rem !important;
+    }
+
+    .salary-cell {
+        padding: 0.75rem !important;
+    }
+}

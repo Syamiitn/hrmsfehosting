@@ -1,0 +1,42 @@
+.cv-container {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    margin: 10px 0;
+}
+
+.cv-box {
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+}
+
+/* Colors */
+.available {
+    background-color: var(--background-color);
+    /* light gray */
+}
+
+.requested {
+    background-color: var(--theme-violet-light);
+    /* purple */
+}
+
+.conflict {
+    background-color: var(--theme-rose-light);
+    /* red */
+}
+
+.cv-legend {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+    font-size: 14px;
+}
+
+.cv-legend .cv-box {
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+}

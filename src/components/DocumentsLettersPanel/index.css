@@ -1,0 +1,136 @@
+.Documents-card {
+  background: var(--card-bg-color);
+  border-radius: 16px;
+  box-shadow: var(--sh-1);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+/* Header */
+.Documents-card__bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 6px;
+  font-weight: 500;
+}
+.Documents-card__bar .ico {
+  display: flex;
+  align-items: center;
+
+  .icon {
+    color: var(--theme);
+  }
+}
+
+/* Documents list */
+.docs__list {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+}
+.docs__row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+.docs__row:last-child {
+  border-bottom: none;
+}
+.docs__row .link {
+  font-size: 13px;
+  color: var(--theme-color);
+}
+.docs__row .future {
+  font-size: 13px;
+  color: var(--muted-text-color);
+}
+
+/* Quick links */
+.quicklinks h6 {
+  margin: 10px 0 6px;
+}
+.quicklinks ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.quicklinks li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+}
+.quicklinks a {
+  color: var(--theme-color);
+  text-decoration: none;
+}
+.quicklinks a:hover {
+  text-decoration: underline;
+}
+.quicklinks ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.quicklinks__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+
+  .icon {
+    color: var(--theme);
+  }
+}
+
+.quicklinks__row .link {
+  background: none;
+  border: none;
+  color: var(--theme);
+  cursor: pointer;
+  padding: 0;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.quicklinks__row .link:hover {
+  text-decoration: underline;
+}
+
+/* Category badges */
+.badge {
+  margin-left: auto;
+  padding: 2px 8px;
+  font-size: 12px;
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+.badge--policy {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.badge--org {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.badge--location {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.badge--support {
+  background: #f3e8ff;
+  color: #7e22ce;
+}

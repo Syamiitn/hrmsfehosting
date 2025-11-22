@@ -1,0 +1,518 @@
+/* ================================================
+   SMART MENU - UNIVERSAL NAVIGATION SYSTEM
+   Supports: Tabs, Dropdown, Stepper Variants
+   Author: Nitesh Bellamkonda (HRMS Project)
+================================================ */
+
+/* ========== Base Reset & Global Styles ========== */
+.smartmenu-container {
+    width: 100%;
+    font-family: "Inter", sans-serif;
+    color: var(--muted-text-color);
+}
+
+/* Each menu variant uses the same structure internally */
+.smartmenu-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0px;
+    border-radius: 20px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.smartmenu-item.active {
+    background-color: var(--theme);
+    color: var(--color-white);
+}
+
+/* Nested submenu container */
+.smartmenu-submenu {
+    margin-top: 6px;
+    margin-left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* Utility for recursive depth indication */
+/* .menu-level-1 {} */
+
+.menu-level-2 {
+    font-size: 14px;
+    opacity: 0.95;
+}
+
+.menu-level-3 {
+    font-size: 13px;
+    opacity: 0.85;
+    margin-left: 10px;
+}
+
+/* ================================================
+   VARIANT: TABS
+================================================ */
+.variant-tabs {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Level 1 → Main tabs (pill style) */
+.variant-tabs .menu-level-1 {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.variant-tabs .menu-level-1 .tab-link {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    border: 1px solid var(--border-color);
+    padding: 5px 18px;
+    border-radius: 20px;
+    text-decoration: none;
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+.variant-tabs .menu-level-1 .tab-link:hover {
+    background: var(--card-bg-color);
+}
+
+.variant-tabs .menu-level-1 .tab-link.active {
+    background-color: var(--theme);
+    color: var(--background-color);
+    border-color: var(--theme);
+
+    .icon {
+        color: var(--background-color);
+    }
+}
+
+/* Level 2 → Subtabs */
+.variant-tabs .menu-level-2 {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 6px;
+    margin-left: 15px;
+}
+
+.variant-tabs .menu-level-2 .tab-link {
+    border: 1px dashed var(--border-color);
+    padding: 5px 14px;
+    font-size: 14px;
+    border-radius: 16px;
+}
+
+.variant-tabs .menu-level-2 .tab-link.active {
+    background-color: var(--theme);
+    border-color: var(--theme);
+    color: #fff;
+}
+
+/* Level 3 → Minimal underline style */
+.variant-tabs .menu-level-3 {
+    margin-left: 25px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.variant-tabs .menu-level-3 .tab-link {
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 3px 8px;
+    font-size: 13px;
+    opacity: 0.85;
+}
+
+.variant-tabs .menu-level-3 .tab-link.active {
+    border-color: var(--theme);
+    color: var(--theme);
+    opacity: 1;
+}
+
+.tab-link.active,
+.smartmenu-item.active-parent>.tab-link {
+    color: var(--theme-color);
+    font-weight: 600;
+    border-bottom: 2px solid var(--theme-color);
+}
+
+
+/* ===============================
+   HORIZONTAL SUB-SUB MENU LINE FIX
+=============================== */
+
+.tab-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 4px;
+    position: relative;
+}
+
+/* Wrapper ensures next line starts below, not beside */
+.nested-line-wrapper {
+    width: 100%;
+    display: block;
+    margin-top: 6px;
+}
+
+/* The actual sub-sub-menu line */
+.nested-line {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    border-top: 1px solid var(--border-color);
+    padding-top: 8px;
+    animation: slideDown 0.25s ease-in-out;
+}
+
+/* Sub-tab style */
+.sub-tab {
+    border: 1px dashed var(--border-color);
+    padding: 6px 14px;
+    border-radius: 16px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.sub-tab:hover {
+    background-color: var(--card-bg-color);
+}
+
+.sub-tab.active {
+    background-color: var(--theme);
+    color: #fff;
+    border-color: var(--theme);
+}
+
+/* Smooth slide-down animation */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* ======================================
+   SMART DROPDOWN MENU (Modern Version)
+====================================== */
+
+.dropdown-container {
+    position: relative;
+    width: 100%;
+    max-width: 250px;
+}
+
+.dropdown-box {
+    background: var(--card-bg-color);
+    border-radius: 8px;
+    padding: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* Each option wrapper */
+.dropdown-option {
+    position: relative;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+
+    &:hover {
+        background: var(--hover-bg);
+    }
+
+    &.open {
+        background: var(--hover-bg);
+    }
+
+    /* Active route item */
+    &.active>.dropdown-option-label,
+    .dropdown-option-label.active {
+        background-color: var(--theme);
+        color: var(--color-white) !important;
+        font-weight: 600;
+
+        .icon {
+            color: var(--color-white);
+        }
+
+        span {
+            color: var(--color-white);
+        }
+
+        .dropdown-arrow {
+            color: var(--color-white);
+        }
+    }
+}
+
+/* Label row */
+.dropdown-option-label {
+    padding: 6px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+
+    color: var(--text-color);
+    text-decoration: none;
+
+    &:hover {
+        background-color: var(--hover-bg);
+        color: var(--muted-text-color);
+
+        .icon {
+            color: var(--theme);
+        }
+    }
+}
+
+/* Menu icons */
+.menu-icon .icon {
+    color: var(--theme);
+}
+
+/* Arrow */
+.dropdown-arrow {
+    color: var(--text-color);
+    margin-left: 8px;
+    transition: transform 0.25s ease;
+
+    &.rotated {
+        transform: rotate(90deg);
+    }
+}
+
+/* Flyout (nested) */
+.dropdown-flyout {
+    position: absolute;
+    top: 0;
+    left: 100%;
+    min-width: 220px;
+    background: var(--card-bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 6px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+    animation: dropdownSlide 0.25s ease-in-out;
+    z-index: 1000;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .dropdown-container {
+        max-width: 100%;
+    }
+
+    .dropdown-flyout {
+        position: relative;
+        left: 0;
+        box-shadow: none;
+        border: none;
+        padding-left: 12px;
+        animation: none;
+    }
+}
+
+/* Smooth animation */
+@keyframes dropdownSlide {
+    from {
+        opacity: 0;
+        transform: translateX(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* ================================================
+   🪜 VARIANT: STEPPER (Progress / Multi-step Flow)
+================================================ */
+.variant-stepper {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    position: relative;
+}
+
+.stepper-container {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.stepper-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    text-align: center;
+    min-width: 70px;
+}
+
+/* Circle indicators */
+.stepper-circle {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: var(--border-color);
+    color: var(--text-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.stepper-circle:hover {
+    transform: scale(1.05);
+    background-color: var(--card-bg-color);
+}
+
+.stepper-circle.active {
+    background-color: var(--theme);
+    color: #fff;
+    transform: scale(1.1);
+}
+
+/* Label below each step */
+.stepper-label {
+    margin-top: 6px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Line between steps */
+.stepper-step:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    top: 15px;
+    right: -30px;
+    width: 40px;
+    height: 2px;
+    background-color: var(--border-color);
+    z-index: 0;
+}
+
+/* Sub-steps (nested under main steps) */
+.stepper-sub {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
+    font-size: 13px;
+}
+
+.stepper-sub .stepper-circle {
+    width: 22px;
+    height: 22px;
+    font-size: 11px;
+    border: 1px solid var(--border-color);
+    background: var(--card-bg-color);
+}
+
+/* ================================================
+   🎨 THEME UTILITIES
+================================================ */
+.smartmenu-item .menu-icon {
+    font-size: 16px;
+    color: var(--theme);
+}
+
+.smartmenu-item.active .menu-icon {
+    color: #fff;
+}
+
+/* ================================================
+   📱 RESPONSIVE BEHAVIOR
+================================================ */
+
+/* Tablets */
+@media (max-width: 992px) {
+
+    .variant-tabs .menu-level-1,
+    .variant-tabs .menu-level-2 {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+
+    .variant-tabs .menu-level-1::-webkit-scrollbar,
+    .variant-tabs .menu-level-2::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+/* Mobiles */
+@media (max-width: 768px) {
+    .variant-tabs .menu-level-1 {
+        flex-direction: column;
+    }
+
+    .dropdown-item .dropdown-sub {
+        position: relative;
+        left: 0;
+        box-shadow: none;
+        border: none;
+    }
+
+    .variant-stepper {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .stepper-step::after {
+        display: none;
+    }
+}
+
+/* ================================================
+   🧠 INTERACTIVE STATES (Optional Advanced)
+================================================ */
+.smartmenu-item:active {
+    transform: scale(0.98);
+}
+
+.tab-link:focus-visible,
+.stepper-circle:focus-visible {
+    outline: 2px solid var(--theme);
+    outline-offset: 2px;
+}
+
+/* ================================================
+   💫 LIGHT / DARK MODE SUPPORT (Optional)
+================================================ */
+body.light .smartmenu-container {
+    --card-bg-color: #f9f9f9;
+    --border-color: #dcdcdc;
+    --text-color: #222;
+    --color-white: #fff;
+}
+
+body.dark .smartmenu-container {
+    --card-bg-color: #2c2c2c;
+    --border-color: #444;
+    --text-color: #f1f1f1;
+    --color-white: #fff;
+}

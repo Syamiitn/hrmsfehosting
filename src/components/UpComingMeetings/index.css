@@ -1,0 +1,71 @@
+/* ==============================
+    Upcoming Meetings Component
+   ============================== */
+.meeting-card {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    margin-top: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    .meeting-item {
+        display: flex;
+        align-items: center;
+        background-color: var(--background-color);
+        padding: 5px;
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        cursor: pointer;
+        gap: 10px;
+
+        .meeting-date-container {
+            border: 1px solid var(--border-color);
+            background-color: var(--card-bg-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 5px 10px;
+            border-radius: 10px;
+
+            span {
+                font-size: 14px;
+                font-weight: 500;
+                text-transform: uppercase;
+                color: var(--light-text);
+            }
+
+            .date-number {
+                font-size: 18px;
+                font-weight: bold;
+                color: var(--heading-color);
+                line-height: 1;
+                margin-top: 5px;
+            }
+        }
+
+        .meeting-details-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+
+            .meeting-badge {
+                background-color: var(--background-color);
+            }
+
+            .badge-participants {
+                min-width: 90px;
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                justify-content: flex-start;
+            }
+        }
+    }
+}

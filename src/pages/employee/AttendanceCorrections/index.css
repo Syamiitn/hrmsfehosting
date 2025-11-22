@@ -1,0 +1,56 @@
+.attendance-corrections {
+    background-color: var(--background-color);
+
+    .submit-corrections-card {
+        background-color: var(--card-bg-color);
+        padding: 16px;
+        border-radius: 20px;
+
+        .icon {
+            color: var(--theme);
+            margin-top: 3px;
+        }
+    }
+
+    .correction-summary-card {
+        background-color: var(--card-bg-color);
+        padding: 16px;
+        border-radius: 20px;
+
+        .icon {
+            color: var(--theme);
+            font-size: 20px;
+        }
+
+        .correction-info {
+            width: 100%;
+        }
+    }
+
+    .pending-corrections {
+        background-color: var(--card-bg-color);
+        padding: 16px;
+        border-radius: 20px;
+
+        .icon {
+            color: var(--theme);
+            font-size: 20px;
+        }
+
+        .pending-labels {
+            margin: 0px;
+            padding: 0px;
+            list-style: none;
+
+            .label {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                border: 1px solid var(--border-color);
+                padding: 20px;
+                border-radius: 10px;
+            }
+        }
+    }
+}

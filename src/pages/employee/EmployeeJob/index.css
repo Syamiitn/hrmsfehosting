@@ -1,0 +1,67 @@
+.ej-page {
+    --bg-canvas: #f7f8fb;
+    --bg-surface: #ffffff;
+    --text-1: #0f172a;
+    --text-2: #475569;
+    --line: #e8ebf3;
+    --accent: #6d4cff;
+    --accent-ghost: color-mix(in oklab, var(--accent) 18%, transparent);
+
+    --r-lg: 16px;
+    --r-md: 12px;
+    --sh-1: 0 8px 20px rgba(16, 24, 40, .06);
+    --sh-2: 0 16px 40px rgba(16, 24, 40, .12);
+
+    padding: 18px;
+    background: var(--bg-canvas);
+    color: var(--text-1);
+
+    /* Dark mode variables */
+    background-color: var(--background-color);
+    color: var(--muted-text-color);
+}
+
+.ej-page.theme--violet {
+    --accent: #7c4dff;
+}
+.ej-page.theme--blue {
+    --accent: #2e7dff;
+}
+.ej-page.theme--green {
+    --accent: #27ae60;
+}
+.ej-page.theme--rose {
+    --accent: #ad2e5c;
+}
+.ej-page.theme--orange {
+    --accent: #ff8f00;
+}
+
+.ej__head {
+    margin-bottom: 16px;
+}
+
+.ej__head h5 {
+    margin: 0 0 4px;
+    font-weight: 600;
+}
+
+.ej__head p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--text-2);
+}
+
+/* Optional grid helper if you want grid-based layout later */
+.ej-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 18px;
+    margin-bottom: 18px;
+}
+
+@media (max-width: 1020px) {
+    .ej-grid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,0 +1,32 @@
+.progressbar-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+    width: 100%;
+    position: relative;
+
+    .progressbar-label {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--muted-text-color);
+    }
+
+    .progressbar-track {
+        width: 100%;
+        overflow: hidden;
+        position: relative;
+        background-color: var(--background-color) !important;
+    }
+
+    .progressbar-fill {
+        height: 100%;
+        transition: width 0.4s ease;
+    }
+
+    .progressbar-value {
+        font-size: 12px;
+        color: var(--muted-text-color);
+        margin-top: 2px;
+        align-self: flex-end;
+    }
+}

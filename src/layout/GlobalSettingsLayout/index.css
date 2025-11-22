@@ -1,0 +1,398 @@
+.global {
+    display: flex;
+    height: 100vh;
+    font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial,
+        sans-serif;
+    color: var(--muted-text-color);
+    background: var(--background-color);
+    overflow: hidden;
+    /* prevents horizontal scrollbars */
+}
+
+/* === LEFT COLUMN === */
+.global__left {
+    width: 260px;
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    flex-shrink: 0;
+    /* prevents width collapse */
+}
+
+.global__back-btn {
+    font-size: 12px;
+    padding: 8px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border-color);
+    background: var(--card-bg-color);
+    cursor: pointer;
+}
+.global__back-btn:hover {
+    background: rgb(109, 40, 217);
+    cursor: pointer;
+    color: white;
+    text-decoration: none;
+}
+
+.global__left-header {
+    padding: 12px 12px 8px;
+    flex-shrink: 0;
+}
+
+.global__header-title {
+    font-weight: 700;
+    font-size: 18px;
+    margin-top: 12px;
+}
+
+.global__header-sub {
+    font-size: 12px;
+    opacity: 0.7;
+    margin-top: 2px;
+}
+
+.global__context-card {
+    margin: 12px;
+    padding: 12px;
+    border-radius: 15px;
+    background-color:oklab(0.94327 0.0118687 -0.0258415 / 0.5);
+    border: 1px solid #ececf5;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02);
+    flex-shrink: 0;
+}
+
+.global__context-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.global__dot {
+    width: 8px;
+    height: 8px;
+    background: #6c5ce7;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.global__context-title {
+    font-weight: 600;
+}
+
+.global__context-name {
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.global__context-sub {
+    font-size: 12px;
+    opacity: 0.75;
+}
+
+/* === Sidebar === */
+.global__sidebar {
+    padding-top: 8px;
+    flex-shrink: 0;
+}
+
+.global__sidebar-item {
+    padding: 12px 16px;
+    cursor: pointer;
+    border-radius: 15px;
+    margin: 4px 8px;
+    font-weight: 500;
+    border-left: 4px solid transparent;
+    background: transparent;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.global__sidebar-item--active {
+    background: #f6f7fb;
+    font-weight: 600;
+    border-left: 4px solid #6c5ce7;
+}
+
+/* === MIDDLE COLUMN === */
+.global__middle {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
+    /* ensures scroll happens only inside middle-scroll */
+}
+
+.global__middle-header {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px 20px;
+    background: #ffffff;
+    border-bottom: 1px solid #ececf5;
+    flex-shrink: 0;
+}
+
+.global__middle-left {
+    min-width: 0;
+}
+
+.global__middle-right {
+    margin-top: 21px;
+}
+
+.global__middle-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.global__middle-title {
+    font-weight: 800;
+    font-size: 22px;
+}
+
+.global__badge {
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: #f0eaff;
+    border: 1px solid #e4d9ff;
+    font-weight: 600;
+}
+
+.global__info-strip {
+    margin-top: 10px;
+    font-size: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: #fcf6ff;
+    border: 1px solid #eadcff;
+    max-width: 920px;
+}
+
+.global__switch-label {
+    font-size: 12px;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.global__select {
+    min-width: 260px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1px solid #dfe3f0;
+    background: #fff;
+}
+
+.global__middle-scroll {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 12px;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* === RIGHT COLUMN === */
+.global__right {
+    width: 300px;
+    border-left: 1px solid #e8e9f1;
+    padding: 12px;
+    background: #ffffff;
+    overflow-y: auto;
+    flex-shrink: 0;
+}
+
+.global__right-section {
+    border: 1px solid #ececf5;
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 12px;
+    background: #fff;
+}
+
+.global__right-title {
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.global__right-text {
+    font-size: 13px;
+    opacity: 0.85;
+}
+
+.global__right-list {
+    padding-left: 18px;
+    margin: 0;
+}
+
+/* === Misc === */
+.global__badge,
+.global__select,
+.global__context-card,
+.global__sidebar-item {
+    transition: all 0.15s ease;
+}
+
+/* Fix scrollbar width issue on some browsers */
+.global__middle-scroll::-webkit-scrollbar {
+    width: 8px;
+}
+
+.global__middle-scroll::-webkit-scrollbar-thumb {
+    background: #d0d0d0;
+    border-radius: 4px;
+}
+
+.global__middle-scroll::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* === LEFT COLUMN (Sidebar Container) === */
+.global__left {
+  width: 260px;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border-right: 1px solid #e8e9f1;
+  box-shadow: 2px 0 8px rgba(108, 92, 231, 0.08);
+  border-top-right-radius: 15px;
+  border-bottom-right-radius: 15px;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  overflow: hidden; /* important — keeps scroll inside sidebar only */
+}
+
+/* === HEADER (Sticky Top) === */
+.global__left-header {
+  padding: 12px 12px 8px;
+  flex-shrink: 0;
+  background: #ffffff;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+/* === CONTEXT CARD (Sticky Below Header) === */
+.global__context-card {
+  margin: 12px;
+  padding: 12px;
+  border-radius: 15px;
+  background: #f9f7ff;
+  border: 1px solid #e9e3ff;
+  box-shadow: 0 1px 6px rgba(108, 92, 231, 0.08);
+  flex-shrink: 0;
+  position: sticky;
+  top: 80px; /* keeps it below header */
+  z-index: 9;
+}
+
+/* === SIDEBAR SCROLL AREA === */
+.global__sidebar {
+  flex: 1; /* fill remaining height */
+  overflow-y: auto; /* enable vertical scroll */
+  overflow-x: hidden;
+  padding-top: 8px;
+  margin-top: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: #6c5ce7 #f3edff;
+}
+
+/* === Scrollbar (Webkit Browsers) === */
+.global__sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+.global__sidebar::-webkit-scrollbar-thumb {
+  background-color: #6c5ce7;
+  border-radius: 10px;
+}
+.global__sidebar::-webkit-scrollbar-track {
+  background: #f3edff;
+}
+
+/* === SIDEBAR ITEMS === */
+.global__sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-radius: 15px;
+  margin: 10px 12px;
+  font-weight: 500;
+  color: #2d2f39;
+  transition: all 0.2s ease;
+  background: transparent;
+  border-left: 4px solid transparent;
+}
+
+.global__sidebar-item:hover {
+  background:rgb(237, 233, 254);
+  color: #6c5ce7;
+  box-shadow: 0 2px 4px rgba(108, 92, 231, 0.1);
+}
+
+.global__sidebar-item--active {
+  background: rgb(109, 40, 217);
+  color: white;
+  font-weight: 600;
+  border-left: 4px solid #5b4edb;
+  box-shadow: 0 3px 6px rgba(108, 92, 231, 0.25);
+  .global__sidebar-item-title{
+ color: white;
+}
+}
+.global__sidebar-item--active:hover {
+  background: rgb(109, 40, 217);;
+  color: white;
+  font-weight: 600;
+  border-left: 4px solid #5b4edb;
+  box-shadow: 0 3px 6px rgba(108, 92, 231, 0.25);
+}
+
+/* === HEADER INFO WRAPPER === */
+.global__header-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* === ICON WRAPPER === */
+.global__icon-wrap {
+  width: 40px;
+  height: 40px;
+  background: #6c5ce7; /* purple circle */
+  position: relative;
+  top: 5px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(108, 92, 231, 0.25);
+}
+
+/* === TEXT SECTION === */
+.global__header-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.global__header-title {
+  font-weight: 700;
+  font-size: 16px;
+  color: #1f2430;
+}
+
+.global__header-sub {
+  font-size: 12px;
+  color: rgb(100, 116, 139);
+}
+

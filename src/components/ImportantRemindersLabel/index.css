@@ -1,0 +1,14 @@
+.reminder-label {
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    border-radius: 12px;
+    display: flex;
+    align-items: flex-start;
+    gap: 5px;
+
+    .dot-icon {
+        font-size: 16px;
+        margin-top: 2px;
+        color: var(--theme);
+    }
+}

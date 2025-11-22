@@ -1,0 +1,8 @@
+.recent-attendance-label {
+    border: 1px solid var(--border-color);
+    padding: 12px;
+    border-radius: 16px;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}

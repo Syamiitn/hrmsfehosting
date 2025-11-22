@@ -1,0 +1,206 @@
+.manager-ems-overview {
+    background-color: var(--background-color);
+
+    .header-container {
+        background-color: var(--card-bg-color);
+        padding: 10px 20px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            border: 1px solid var(--border-color);
+            color: var(--muted-text-color);
+            padding: 5px 15px;
+            border-radius: 16px;
+            cursor: pointer;
+
+            &:hover {
+                background-color: var(--theme);
+                border: var(--theme);
+                color: var(--color-white);
+            }
+        }
+
+        .info-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            .icon-container {
+                background-color: var(--theme);
+                padding: 8px;
+                border-radius: 10px;
+
+                .icon {
+                    color: var(--color-white);
+                    font-size: 26px;
+                }
+            }
+        }
+    }
+
+    .stat-card {
+        background-color: var(--card-bg-color);
+        padding: 16px;
+        border-radius: 16px;
+        display: flex;
+
+        .icon {
+            color: var(--theme);
+            font-size: 26px;
+        }
+    }
+
+    .approvals-requests-card {
+        background-color: var(--card-bg-color);
+        padding: 16px;
+        border-radius: 16px;
+
+        .icon {
+            color: var(--theme);
+        }
+
+        .tabs-bar {
+            padding: 0px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 20px;
+            background-color: var(--background-color);
+            padding: 5px 5px;
+            border-radius: 30px;
+
+            .tab {
+                background-color: var(--card-bg-color);
+                padding: 3px 15px;
+                flex-grow: 1;
+                text-align: center;
+                border-radius: 30px;
+                cursor: pointer;
+                font-size: 14px;
+                color: var(--muted-text-color);
+
+                &.active {
+                    background-color: var(--theme);
+                    color: var(--color-white);
+                }
+            }
+        }
+
+    }
+
+    .leave-requests-container {
+
+        .status-tabs {
+            display: flex;
+            padding: 0px;
+            gap: 10px;
+            font-size: 12px;
+
+            .status-item {
+                background-color: var(--background-color);
+                padding: 2px 15px;
+                border-radius: 20px;
+                
+                &.active {
+                    background-color: var(--theme);
+                    color: var(--color-white);
+                }
+            }
+        }
+    }
+
+    .team-insights {
+        background-color: var(--card-bg-color);
+        border-radius: 16px;
+        padding: 16px;
+
+        .icon {
+            color: var(--theme);
+            font-size: 20px;
+        }
+    }
+
+    .performance-feedback {
+        padding: 16px;
+        background-color: var(--card-bg-color);
+        border-radius: 16px;
+
+        .icon {
+            color: var(--theme);
+            font-size: 20px;
+        }
+
+        .performance-summary {
+            display: flex;
+            flex-direction: column;
+
+            h3 {
+                color: var(--theme);
+            }
+        }
+    }
+
+    .action-card {
+        background-color: var(--card-bg-color);
+        padding: 16px;
+        border-radius: 14px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+        .icon-container {
+            background-color: var(--theme-light);
+            height: 60px;
+            width: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+
+            .icon {
+                color: var(--theme);
+                font-size: 40px;
+            }
+        }
+    }
+
+}
+
+.manager-ems-modal {
+    .att-basic-info {
+        padding: 0px;
+        list-style: none;
+
+        li {
+            color: var(--muted-text-color);
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+    }
+}
+
+.att-progress-bar {
+    width: 100% !important;
+    height: 10px !important;
+    background-color: var(--background-color);
+    border-radius: 10px;
+    overflow: hidden;
+
+    .att-progress {
+        background-color: var(--theme);
+        height: 100%;
+        display: block;
+        border-radius: 10px;
+        transition: width 0.4s ease;
+    }
+}

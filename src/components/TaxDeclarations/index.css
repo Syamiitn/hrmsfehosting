@@ -1,0 +1,58 @@
+/* ==========================
+   Tax Declarations Card
+   ========================== */
+.tax-declarations-card {
+    background: var(--card-bg-color);
+    border-radius: 16px;
+    box-shadow: 0 6px 18px rgba(16, 24, 40, 0.06);
+    padding: 16px;
+    transition: 0.2s;
+
+    /* Header */
+    .tax-declarations__header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 14px;
+        font-size: 17px;
+        font-weight: 500;
+        color: var(--accent, #6d4cff);
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 6px;
+    }
+
+    .tax-declarations__icon {
+        display: flex;
+        align-items: center;
+    }
+
+    /* Rows */
+    .tax-declarations__rows {
+        display: grid;
+        gap: 10px;
+        margin-bottom: 14px;
+    }
+
+    .tax-declarations__row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 14px;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        background: var(--card-bg-color);
+    }
+
+    .row-label {
+        font-size: 15px;
+        font-weight: 500;
+        color: var(--sub-heading-color);
+    }
+
+    /* Footer */
+    .tax-declarations__footer {
+        margin-top: auto;
+        display: flex;
+        justify-content: center;
+    }
+}

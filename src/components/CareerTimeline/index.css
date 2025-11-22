@@ -1,0 +1,205 @@
+/* ==========================
+   Career Timeline Styles
+   ========================== */
+.career-timeline-card {
+  background: var(--card-bg-color);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 6px 18px rgba(16, 24, 40, 0.06);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.career-timeline__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding-bottom: 6px;
+}
+
+.career-timeline__title {
+  font-size: 17px;
+  font-weight: 500;
+}
+
+/* Timeline wrapper */
+.career-timeline {
+  --tl-accent: var(--theme);
+  --tl-accent-ghost: var(--theme-light);
+  --tl-rail: var(--theme-light);
+  --tl-line: #e8eaf3;
+  --tl-radius: 12px;
+  --tl-shadow-1: 0 4px 12px rgba(16, 24, 40, 0.06),
+    0 1px 1px rgba(16, 24, 40, 0.04);
+  --tl-shadow-2: 0 10px 24px rgba(16, 24, 40, 0.1),
+    0 4px 8px rgba(16, 24, 40, 0.07);
+  padding-top: 4px;
+}
+
+.career-timeline.density-comfortable {
+  --tl-row-gap: 20px;
+  --tl-card-pad: 12px 14px;
+}
+
+.career-timeline.density-compact {
+  --tl-row-gap: 14px;
+  --tl-card-pad: 8px 10px;
+}
+
+/* Timeline rail */
+.career-timeline__list {
+  list-style: none;
+  margin: 0;
+  padding: 14px 12px 18px;
+  position: relative;
+  display: grid;
+  gap: var(--tl-row-gap, 20px);
+}
+
+.career-timeline__list::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 20px;
+  bottom: 20px;
+  transform: translateX(-50%);
+  width: 2px;
+  background: linear-gradient(180deg, var(--tl-rail), var(--tl-accent-ghost));
+}
+
+/* Rows */
+.career-timeline__row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 60px 1fr;
+  align-items: start;
+  column-gap: 16px;
+}
+
+/* Axis & dot */
+.career-timeline__axis {
+  grid-column: 2 / 3;
+  position: relative;
+  min-height: 56px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.career-timeline__dot {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--tl-accent);
+  border: 2px solid var(--theme);
+  box-shadow: 0 0 0 6px var(--tl-accent-ghost);
+}
+
+.career-timeline__dot svg {
+  width: 16px;
+  height: 16px;
+}
+
+.career-timeline__connector {
+  position: absolute;
+  top: 38px;
+  width: 18px;
+  height: 2px;
+  background: transparent;
+}
+
+.career-timeline__connector.is-left {
+  right: 28px;
+}
+
+.career-timeline__connector.is-right {
+  left: 28px;
+}
+
+/* Card wrap */
+.career-timeline__cardwrap {
+  position: relative;
+}
+
+.career-timeline__cardwrap.is-left {
+  grid-column: 1 / 2;
+  justify-self: end;
+  max-width: 400px;
+}
+
+.career-timeline__cardwrap.is-right {
+  grid-column: 3 / 4;
+  justify-self: start;
+  max-width: 400px;
+}
+
+.career-timeline__badge {
+  position: absolute;
+  top: -20px;
+  padding: 6px 10px;
+  color: var(--theme);
+  background: var(--background-color);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+}
+
+.career-timeline__card {
+  background: var(--background-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--tl-radius);
+  padding: var(--tl-card-pad, 12px 14px);
+  box-shadow: var(--tl-shadow-1);
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.career-timeline__card:hover {
+  box-shadow: var(--tl-shadow-2);
+  transform: translateY(-1px);
+}
+
+.career-timeline__event {
+  color: var(--sub-heading-color);
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.career-timeline__desc {
+  margin: 0;
+  color: var(--muted-text-color);
+  font-size: 14px;
+}
+
+/* Responsive */
+@media (max-width: 920px) {
+  .career-timeline__list::before {
+    left: 28px;
+    transform: none;
+  }
+
+  .career-timeline__row {
+    grid-template-columns: 60px 1fr;
+    column-gap: 12px;
+  }
+
+  .career-timeline__axis {
+    grid-column: 1 / 2;
+  }
+
+  .career-timeline__cardwrap {
+    grid-column: 2 / 3;
+    max-width: none;
+    justify-self: stretch;
+  }
+
+  .career-timeline__badge {
+    left: 0;
+    transform: translateX(-4px);
+  }
+
+  .career-timeline__connector {
+    display: none;
+  }
+}

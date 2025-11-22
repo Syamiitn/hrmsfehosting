@@ -1,0 +1,8 @@
+.recent-activity-label {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    max-height: 300px;
+    overflow-y: auto;
+}

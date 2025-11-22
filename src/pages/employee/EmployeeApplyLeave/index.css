@@ -1,0 +1,61 @@
+.employee-apply-leave-page {
+    background-color: var(--background-color);
+
+    .apply-for-leave {
+        background-color: var(--card-bg-color);
+        padding: 16px;
+        border-radius: 20px;
+
+        .icon {
+            color: var(--theme);
+        }
+    }
+
+    .leave-summary {
+        background-color: var(--card-bg-color);
+        padding: 16px;
+        border-radius: 20px;
+
+        .icon {
+            color: var(--theme);
+            font-size: 20px;
+        }
+    }
+
+    .smart-checks {
+        background-color: var(--card-bg-color);
+        padding: 16px;
+        border-radius: 20px;
+
+        .icon {
+            color: var(--theme);
+            font-size: 20px;
+        }
+
+        .checks {
+            padding: 0px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+
+            .icon {
+                font-size: 16px;
+            }
+        }
+    }
+}
+
+.form-input,
+.form-select {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+}
+
+.form-input:focus,
+.form-select:focus {
+    border-color: var(--theme-light);
+    box-shadow: none !important;
+    outline: none;
+}

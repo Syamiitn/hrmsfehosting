@@ -1,0 +1,230 @@
+.employee-dashboard {
+    background-color: var(--background-color);
+    min-height: 100vh;
+}
+
+.employee-profile-card {
+    background-color: var(--card-bg-color);
+    padding: 20px;
+    border-radius: 20px;
+    display: flex;
+    gap: 10px;
+    color: #000;
+    width: 100%;
+
+    .profile-info {
+        width: 100%;
+
+        p {
+            margin-bottom: 0px !important;
+        }
+    }
+
+    .profile-info .icon {
+        color: var(--gray-500);
+    }
+
+    .profile-info .employee-status {
+        display: flex;
+        margin: 0px !important;
+    }
+
+    .profile-info .employee-status .status-text {
+        color: var(--gray-600);
+    }
+}
+
+.quote-container {
+    background-color: var(--card-bg-color);
+    border-radius: 20px;
+
+    .icon {
+        font-size: 20px;
+        color: var(--gray-500);
+        padding: 0px 2px;
+    }
+
+    .quote-by {
+        display: flex;
+        align-items: center;
+        color: var(--theme);
+    }
+}
+
+.clock-in-out-container {
+    background-color: var(--card-bg-color);
+    padding: 20px;
+    border-radius: 20px;
+
+    .clock-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        .icon {
+            color: var(--theme);
+        }
+    }
+}
+
+/* Quick Actions stylings */
+.quick-links {
+    padding: 20px;
+    border-radius: 20px;
+    background-color: var(--card-bg-color);
+
+    h5 {
+        margin-bottom: 0px !important;
+    }
+
+    .icon {
+        color: var(--theme);
+    }
+
+    .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        /* 3 equal columns */
+        grid-auto-rows: 1fr;
+        /* equal height rows */
+        gap: 15px;
+        width: 100%;
+
+        .action-card {
+            display: flex;
+            width: 100%;
+            height: 100%;
+
+            .action-btn {
+                border: 0px;
+                background-color: var(--background-color);
+                flex-grow: 1;
+                border-radius: 10px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                /* center content vertically */
+                width: 100%;
+                height: 100%;
+                /* ensures all are same height */
+                padding: 12px;
+            }
+
+            .icon {
+                font-size: 30px;
+                color: var(--gray-500);
+            }
+
+            h6 {
+                margin: 5px 0 0 0;
+            }
+
+            span {
+                font-size: 12px;
+                color: var(--text-color);
+            }
+        }
+    }
+}
+
+/* Nudgers */
+
+.nudgers-container {
+    background-color: var(--card-bg-color);
+    padding: 20px;
+    border-radius: 20px;
+
+    .icon {
+        color: var(--theme);
+    }
+}
+
+/* Apply Leave OffCanvas */
+
+.apply-leave {
+    background-color: var(--card-bg-color);
+
+    .icon {
+        color: var(--theme);
+    }
+
+    .apply-leave-form {
+
+        /* Upload Box */
+        .upload-box {
+            border: 2px dashed var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            transition: border-color 0.2s;
+            cursor: pointer;
+        }
+
+        .upload-box:hover {
+            border-color: var(--theme);
+        }
+
+        .upload-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .upload-icon {
+            color: var(--theme);
+            margin-bottom: 8px;
+        }
+
+        .upload-text {
+            font-size: 14px;
+            color: #666;
+        }
+
+    }
+}
+
+/* Expense Claim Stylings */
+
+.expense-claim {
+    background-color: var(--card-bg-color);
+
+    .icon {
+        color: var(--theme);
+    }
+
+    .expense-claim-form {
+
+        /* Upload Box */
+        .upload-box {
+            border: 2px dashed var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            transition: border-color 0.2s;
+            cursor: pointer;
+        }
+
+        .upload-box:hover {
+            border-color: var(--theme);
+            /* Indigo border */
+        }
+
+        .upload-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .upload-icon {
+            color: var(--theme);
+            margin-bottom: 8px;
+        }
+
+        .upload-text {
+            font-size: 14px;
+            color: #666;
+        }
+
+    }
+}

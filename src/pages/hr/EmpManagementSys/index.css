@@ -1,0 +1,23 @@
+.emp-management-sys {
+    background-color: var(--background-color);
+
+    .cards-list {
+        background-color: var(--background-color);
+        padding: 0px;
+
+        .ems-route-card {
+            background-color: var(--card-bg-color);
+            padding: 16px;
+            border-radius: 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            text-decoration: none;
+
+            .icon {
+                font-size: 36px;
+                color: var(--theme);
+            }
+        }
+    }
+}

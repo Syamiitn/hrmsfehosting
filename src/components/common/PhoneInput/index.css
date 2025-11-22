@@ -1,0 +1,62 @@
+.phone-input {
+    width: 100% !important;
+    border: 1px solid var(--border-color) !important;
+    background-color: var(--card-bg-color) !important;
+    color: var(--muted-text-color) !important;
+    /* border-radius: 20px !important; */
+}
+
+.flag-dropdown {
+    background-color: var(--card-bg-color) !important;
+    border: 1px solid var(--border-color) !important;
+    /* border-top-left-radius: 20px !important;  */
+    /* border-bottom-left-radius: 20px !important;   */
+}
+
+.flag-dropdown.open {
+    background-color: var(--card-bg-color) !important;
+    border: 1px solid var(--border-color) !important;
+    border-top-left-radius: 20px !important;
+    border-bottom-left-radius: 20px !important;
+}
+
+.flag-dropdown.open:focus {
+    background-color: var(--card-bg-color) !important;
+    border-top-left-radius: 20px !important;
+    border-bottom-left-radius: 20px !important;
+}
+
+.selected-flag.open {
+    background-color: var(--card-bg-color) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+.country-list {
+    background-color: var(--background-color) !important;
+
+    .search {
+        background-color: var(--theme) !important;
+
+        .search-box {
+            border: 1px solid var(--color-white);
+            color: var(--color-white);
+        }
+    }
+
+    .country:hover {
+        background-color: var(--card-bg-color) !important;
+    }
+
+    .country[aria-selected="true"] {
+        background-color: var(--theme) !important;
+        color: var(--color-white) !important;
+
+        .country-name {
+            color: var(--color-white);
+        }
+
+        .dial-code {
+            color: var(--color-white);
+        }
+    }
+}

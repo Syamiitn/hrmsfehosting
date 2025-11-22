@@ -1,0 +1,23 @@
+.bank-card {
+    background: var(--card-bg-color);
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+
+    .icon {
+        color: var(--theme);
+
+    }
+
+    .bank-cell {
+        border: 1px solid var(--border-color);
+        padding: 10px;
+        border-radius: 10px;
+
+        .small {
+            color: var(--muted-text-color) !important;
+        }
+    }
+
+}

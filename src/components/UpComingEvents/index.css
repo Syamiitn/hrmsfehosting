@@ -1,0 +1,59 @@
+.upcoming-events {
+    padding: 0px;
+    margin: 0px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
+
+    .event-item {
+        background-color: var(--background-color);
+        padding: 8px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        .date-container {
+            background-color: var(--card-bg-color);
+            padding: 5px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .icon-container {
+            margin-left: auto;
+
+            .icon {
+                color: var(--theme);
+                font-size: 24px;
+            }
+
+            /* Icon color codes */
+            /* .icon.birthday {
+                color: #ff6b6b;
+            }
+
+            .icon.anniversary {
+                color: #f0b429;
+            }
+
+            .icon.new-joiner {
+                color: #4e9bde;
+            }
+
+            .icon.company-event {
+                color: #3bb44a;
+            }
+
+            .icon.default {
+                color: #888;
+            } */
+        }
+    }
+}

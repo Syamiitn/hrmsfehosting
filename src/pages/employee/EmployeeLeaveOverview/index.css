@@ -1,0 +1,58 @@
+.employee-leave-overview {
+    background-color: var(--background-color);
+
+    .stat-card {
+        background-color: var(--card-bg-color);
+        padding: 16px;
+        border-radius: 20px;
+
+        .icon {
+            font-size: 30px;
+            color: var(--theme);
+        }
+
+        h3 {
+            color: var(--theme);
+        }
+    }
+
+    .recent-leave-request-card {
+        background-color: var(--card-bg-color);
+        padding: 20px;
+        border-radius: 16px;
+
+        .icon {
+            font-size: 20px;
+            color: var(--theme);
+        }
+
+        .recent-request-list {
+            padding: 0px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    }
+
+    .important-reminders {
+        background-color: var(--card-bg-color);
+        padding: 16px;
+        border-radius: 20px;
+
+        .icon {
+            color: var(--theme);
+            font-size: 20px;
+        }
+
+        .imp-reminders-list {
+            padding: 0px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    }
+}

@@ -1,0 +1,16 @@
+.jobinfo-card {
+  background: var(--card-bg-color);
+  border-radius: 16px;
+  box-shadow: var(--sh-1);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+
+  .icon {
+    color: var(--theme);
+  }
+
+  .jobinfo-cell {
+    border: 1px solid var(--border-color);
+  }
+}

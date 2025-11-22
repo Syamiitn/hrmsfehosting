@@ -1,0 +1,17 @@
+.reminders-list {
+    margin: 0px;
+    padding: 0px;
+    list-style: none;
+    max-height: 220px;
+    overflow-y: auto;
+
+    li {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        margin-bottom: 10px;
+        border: 1px solid var(--border-color);
+        padding: 10px;
+        border-radius: 5px;
+    }
+}

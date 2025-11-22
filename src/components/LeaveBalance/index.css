@@ -1,0 +1,9 @@
+.leave-balance-card {
+    background-color: var(--card-bg-color);
+    padding: 16px;
+    border-radius: 20px;
+
+    .icon {
+        color: var(--theme);
+    }
+}

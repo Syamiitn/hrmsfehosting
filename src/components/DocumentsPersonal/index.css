@@ -1,0 +1,25 @@
+.documents-preferences-card {
+    background-color: var(--card-bg-color);
+    padding: 20px;
+    border-radius: 20px;
+
+    .docs-section {
+        padding: 0px;
+    }
+
+    .icon {
+        margin: 0px;
+        padding: 0px;
+        font-size: 20px;
+        color: var(--theme);
+    }
+
+    h5 {
+        margin: 0px;
+        padding: 0px;
+    }
+
+    .preview-icon {
+        color: var(--theme);
+    }
+}

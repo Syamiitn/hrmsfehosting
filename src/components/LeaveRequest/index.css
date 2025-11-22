@@ -1,0 +1,15 @@
+.leave-request {
+    border: 1px solid var(--border-color);
+    padding: 16px;
+    border-radius: 16px;
+
+    .edit-btn {
+        background-color: transparent;
+        border: 0px;
+
+        .icon {
+            color: var(--theme);
+            font-size: 18px;
+        }
+    }
+}

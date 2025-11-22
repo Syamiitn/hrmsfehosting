@@ -1,0 +1,141 @@
+.my-team-overview {
+    background-color: var(--card-bg-color);
+    padding: 20px;
+    border-radius: 16px;
+
+    .icon {
+        color: var(--theme);
+    }
+
+    /* Search & Filters */
+    form {
+        margin-top: 10px;
+
+        .search-icon {
+            position: absolute;
+            top: 10px;
+            left: 12px;
+            color: var(--muted-text-color);
+            font-size: 16px;
+        }
+    }
+
+    /* Attendance Table */
+    .attendance-table {
+        padding: 8px 5px;
+
+        .table-header {
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 0;
+            font-weight: 600;
+            color: var(--text-secondary);
+            background-color: var(--background-alt);
+        }
+
+        .table-body {
+            border-bottom: 1px solid var(--border-color);
+            padding: 8px 0;
+            align-items: center;
+
+            &:hover {
+                background-color: var(--hover-bg-color, rgba(0, 0, 0, 0.02));
+            }
+
+            /* Progress bar */
+            .progress-bar {
+                width: 100px;
+                height: 8px;
+                background-color: var(--background-color);
+                border-radius: 10px;
+                overflow: hidden;
+                position: relative;
+
+                .active-progress {
+                    background-color: var(--theme);
+                    height: 100%;
+                    display: block;
+                    border-radius: 10px;
+                    transition: width 0.4s ease;
+                }
+            }
+
+            /* Action buttons */
+            .icon-btn {
+                background-color: var(--background-color);
+                padding: 8px;
+                border-radius: 10px;
+                border: none;
+                cursor: pointer;
+
+                .icon {
+                    font-size: 16px;
+                    color: var(--theme);
+                }
+
+                &:hover {
+                    background-color: var(--theme);
+                    transform: translateY(-2px);
+                }
+
+                &:hover .icon {
+                    color: var(--color-white);
+                }
+            }
+        }
+    }
+
+    /* 📱 Mobile Cards */
+    .att-card {
+        border: 1px solid var(--border-color);
+        padding: 16px;
+        border-radius: 16px;
+        background-color: var(--card-bg-color);
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: var(--background-color);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 4px;
+
+            .active-progress {
+                background-color: var(--theme);
+                height: 100%;
+                display: block;
+                border-radius: 10px;
+            }
+        }
+
+        .icon-btn {
+            background-color: var(--background-color);
+            padding: 8px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+
+            .icon {
+                font-size: 16px;
+                color: var(--theme);
+            }
+
+            &:hover {
+                background-color: var(--theme);
+                transform: translateY(-2px);
+            }
+
+            &:hover .icon {
+                color: var(--color-white);
+            }
+        }
+    }
+
+    /* Empty State */
+    .no-data {
+        text-align: center;
+        color: var(--muted-text-color);
+        font-size: 14px;
+        padding: 20px 0;
+    }
+}

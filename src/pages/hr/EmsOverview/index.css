@@ -1,0 +1,59 @@
+.ems-overview {
+    background-color: var(--background-color);
+    
+    .stat-card {
+        padding: 16px;
+        background-color: var(--card-bg-color);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        .icon {
+            font-size: 30px;
+            color: var(--theme);
+        }
+    }
+
+    .recent-activities-container {
+        background-color: var(--card-bg-color);
+        padding: 16px;
+        border-radius: 16px;
+
+        .icon {
+            font-size: 20px;
+            color: var(--theme);
+        }
+
+        .recent-activities {
+            padding: 0px;
+        }
+    }
+
+    .quick-actions {
+        background-color: var(--card-bg-color);
+        padding: 16px;
+        border-radius: 16px;
+
+        .icon {
+            fill: var(--theme);
+            color: var(--theme);
+        }
+
+        .quick-action {
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 12px;
+            border-radius: 10px;
+
+            .icon {
+                color: var(--theme);
+                fill: none;
+                margin-bottom: 5px;
+            }
+        }
+    }
+}

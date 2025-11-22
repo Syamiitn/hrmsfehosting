@@ -1,0 +1,95 @@
+/* ==========================
+   Payslip History Card
+   ========================== */
+.payslip-history-card {
+    background: var(--card-bg-color);
+    border-radius: 16px;
+    box-shadow: 0 6px 18px rgba(16, 24, 40, 0.06);
+    padding: 16px;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+
+    /* Header */
+    .payslip-history__header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 14px;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 6px;
+    }
+
+    .payslip-history__icon {
+        display: flex;
+        align-items: center;
+    }
+
+    /* List */
+    .payslip-history__list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .payslip-history__row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--border-color);
+
+        &:last-child {
+            border-bottom: none;
+        }
+    }
+
+    .payslip-history__left {
+        .month {
+            font-size: 17px;
+            font-weight: 600;
+        }
+
+        .sub {
+            font-size: 15px;
+            color: #64748b;
+        }
+    }
+
+    .payslip-history__right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* Chip */
+    .chip {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    /* Icon Button */
+    .iconbtn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        background: none;
+        cursor: pointer;
+        padding: 4px;
+        color: var(--muted-text-color);
+        font-size: 18px;
+
+        &:hover {
+            color: var(--theme-color);
+        }
+    }
+
+    /* Footer */
+    .payslip-history__footer {
+        display: flex;
+        justify-content: center;
+        margin-top: 10px;
+    }
+}

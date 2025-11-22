@@ -1,0 +1,18 @@
+.employee-leave-history {
+    background-color: var(--background-color);
+
+    .leave-history-card {
+        background-color: var(--card-bg-color);
+        padding: 16px;
+        border-radius: 20px;
+
+        .icon {
+            margin-top: 3px;
+            color: var(--theme);
+        }
+
+        .leave-history-info {
+            padding: 0px;
+        }
+    }
+}

@@ -1,0 +1,32 @@
+.personal-information-card {
+    background-color: var(--card-bg-color);
+    padding: 20px;
+    border-radius: 20px;
+
+    h5 {
+        margin-bottom: 0px;
+    }
+
+    p {
+        color: var(--muted-text-color);
+    }
+
+    .icon {
+        color: var(--theme);
+    }
+
+    .avatar-info {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .profile-main-info {
+        span {
+            font-size: 14px;
+            color: var(--muted-text-color);
+        }
+    }
+}

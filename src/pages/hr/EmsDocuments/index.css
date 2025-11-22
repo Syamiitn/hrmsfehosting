@@ -1,0 +1,9 @@
+.ems-documents {
+    background-color: var(--background-color);
+
+    .doc-card {
+        background-color: var(--card-bg-color);
+        border-radius: 14px;
+        padding: 14px;
+    }
+}
