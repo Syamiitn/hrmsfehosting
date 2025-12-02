@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import axios from "axios";
 
-const BASE_URL = "http://192.168.191.162:3000/"; // base API endpoint (http://192.168.29.245:3000/ - old ip)
+const BASE_URL = "https://hrmsbehosting.onrender.com/"; // base API endpoint (http://192.168.29.245:3000/ - old ip)
 
 // Abhishek Server
 // 1. http://192.168.191.162:3000
