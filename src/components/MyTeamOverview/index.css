@@ -1,7 +1,9 @@
 .my-team-overview {
-    background-color: var(--card-bg-color);
-    padding: 20px;
-    border-radius: 16px;
+    background-color: var(--card-bg);
+    padding: var(--padding-lg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-glassy);
+    border: 1px solid var(--border-color);
 
     .icon {
         color: var(--theme);

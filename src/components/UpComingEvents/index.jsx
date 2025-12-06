@@ -1,4 +1,5 @@
 import React from "react";
+import { format, parseISO } from "date-fns";
 import {
     FaBirthdayCake,
     FaMedal,
@@ -34,16 +35,16 @@ export default function UpComingEvents({ upcomingEvents = [] }) {
                     {upcomingEvents.map((event, i) => (
                         <li key={i} className="event-item">
                             <div className="date-container">
-                                <span>{event.month}</span>
-                                <h5>{event.day}</h5>
+                                <span>{format(parseISO(event?.date), "MMM")}</span>
+                                <h5>{format(parseISO(event?.date), 'dd')}</h5>
                             </div>
 
                             <div className="event-info">
-                                <h5>{event.name}</h5>
-                                <p className="p4">{event.event}</p>
+                                <h5>{event?.name}</h5>
+                                <p className="p4">{event?.type}</p>
                             </div>
 
-                            <div className="icon-container">{getEventIcon(event.event)}</div>
+                            <div className="icon-container">{getEventIcon(event?.type)}</div>
                         </li>
                     ))}
                 </ul>

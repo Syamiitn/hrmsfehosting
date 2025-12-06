@@ -1,0 +1,14 @@
+.fin-tax-declarations {
+    background-color: var(--card-bg-color);
+    padding: 14px;
+    border-radius: 14px;
+
+    .tax-declarations {
+        background-color: var(--card-bg-color);
+
+        .icon {
+            color: var(--theme);
+            margin-top: 3px;
+        }
+    }
+}

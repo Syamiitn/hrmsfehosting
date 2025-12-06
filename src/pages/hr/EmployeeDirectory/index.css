@@ -1,16 +1,18 @@
 .employee-directory {
-    background-color: var(--background-color);
+    background-color: var(--body-bg);
 
     .filter-bar {
-        background-color: var(--card-bg-color);
-        padding: 15px 0px;
-        border-radius: 20px;
+        padding: var(--padding-lg);
+        background-color: var(--card-bg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-glassy);
+        border: 1px solid var(--border-color);
     }
 
     .employees-cards-container {
         padding: 0px;
-        background-color: var(--background-color);
-        border-radius: 20px;
+        background-color: var(--body-bg);
+        border-radius: var(--radius-lg);
         margin-top: 20px;
     }
 }

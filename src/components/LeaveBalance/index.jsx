@@ -8,7 +8,7 @@ import './index.css';
 
 export default function LeaveBalance({ leavesList, isLoading }) {
     return (
-        <div className="leave-balance-card shadow-sm flex-fill">
+        <div className="leave-balance-card  flex-fill">
             <div className="d-flex align-items-center gap-2 mb-2">
                 <FaCalendarAlt className="icon" />
                 <h5 className="mb-0">Leave Balance</h5>

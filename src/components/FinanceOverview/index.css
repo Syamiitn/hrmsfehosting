@@ -1,0 +1,92 @@
+.finance-overview {
+    background-color: var(--body-bg);
+
+    .stat-card {
+        background-color: var(--card-bg);
+        padding: var(--padding-md);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-glassy);
+        border: 1px solid var(--border-color);
+
+        .icon {
+            color: var(--theme);
+            font-size: 26px;
+        }
+    }
+
+    .latest-payslip {
+        background-color: var(--card-bg);
+        padding: var(--padding-lg);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-glassy);
+        border: 1px solid var(--border-color);
+
+        .icon {
+            color: var(--theme);
+        }
+    }
+
+    .payslip-details {
+        padding: 0px;
+
+        li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+    }
+
+    .year-to-date-summary {
+        background-color: var(--card-bg);
+        padding: var(--padding-lg);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-glassy);
+        border: 1px solid var(--border-color);
+
+        .icon {
+            color: var(--theme);
+        }
+
+        .details-container {
+            padding: 0px;
+
+            li {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 5px;
+            }
+        }
+    }
+
+    .quick-actions {
+        background-color: var(--card-bg);
+        padding: var(--padding-lg);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-glassy);
+        border: 1px solid var(--border-color);
+        margin-bottom: 10px;
+
+        .icon {
+            color: var(--theme);
+        }
+
+        .action-card {
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-soft);
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 14px;
+
+            .icon {
+                color: var(--theme);
+                font-size: 28px;
+                margin-bottom: 5px;
+            }
+        }
+    }
+}

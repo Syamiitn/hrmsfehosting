@@ -1,0 +1,88 @@
+.ems-attendance-tracking {
+    background-color: var(--body-bg);
+
+    .header-bar {
+        background-color: var(--card-bg);
+        padding: var(--padding-md);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-soft);
+        border: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap-reverse;
+        gap: 8px;
+
+        .icon-container {
+            height: 50px;
+            width: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--theme);
+            border-radius: 14px;
+
+            .icon {
+                color: var(--color-white);
+                font-size: 30px;
+            }
+        }
+    }
+
+    .stat-card {
+        background-color: var(--card-bg);
+        padding: var(--padding-md);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-glassy);
+        border: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        .icon {
+            font-size: 26px;
+            color: var(--theme);
+        }
+    }
+
+    .tabs-bar {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+        background-color: var(--card-bg);
+        padding: 5px;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-glassy);
+        border: 1px solid var(--border-color);
+
+        .tab-item {
+            padding: 3px 5px;
+            font-size: 12px;
+            flex-grow: 1;
+            text-align: center;
+
+            &.active {
+                background-color: var(--theme);
+                border-radius: 20px;
+                color: var(--color-white);
+            }
+        }
+    }
+
+    @media (max-width: 480px) {
+        .tabs-bar {
+            background-color: transparent;
+            box-shadow: none;
+            border: none;
+            justify-content: flex-start;
+            flex-wrap: wrap;
+            gap: 5px;
+
+            .tab-item {
+                flex-grow: 0;
+                border: 1px solid var(--border-color);
+                border-radius: var(--radius-lg);
+            }
+        }
+    }
+}

@@ -130,14 +130,14 @@ export default function EmployeeDirectory() {
                 </div>
 
                 {/* Filters */}
-                <form className="row filter-bar shadow-sm">
+                <form className="row filter-bar ">
                     <div className="col-12 col-md-4">
                         <label htmlFor="name">Search by name</label>
                         <input
                             type="search"
                             id="name"
                             name="name"
-                            className="form-input"
+                            className="form-control"
                             placeholder="Enter employee name"
                             value={filters.name}
                             onChange={handleChange}
@@ -149,7 +149,7 @@ export default function EmployeeDirectory() {
                         <select
                             id="department"
                             name="department"
-                            className="form-input"
+                            className="form-control"
                             value={filters.department}
                             onChange={handleChange}
                         >
@@ -167,7 +167,7 @@ export default function EmployeeDirectory() {
                         <select
                             id="location"
                             name="location"
-                            className="form-input"
+                            className="form-control"
                             value={filters.location}
                             onChange={handleChange}
                         >

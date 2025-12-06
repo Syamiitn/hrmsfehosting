@@ -1,7 +1,9 @@
 .employee-card {
-    background-color: var(--card-bg-color);
-    padding: 16px;
-    border-radius: 20px;
+    padding: var(--padding-lg);
+    background-color: var(--card-bg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--border-color);
     margin-bottom: 14px;
     width: 100%;
     text-decoration: none;
@@ -13,6 +15,7 @@
     ul {
         li {
             margin-bottom: 10px;
+
             .icon {
                 font-size: 20px;
             }

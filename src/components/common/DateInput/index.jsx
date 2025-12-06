@@ -12,13 +12,35 @@ export default function DateInput({
     maxDate,
     required = false,
     disabled = false,
+    mode = "date", // "date" | "month" | "year" | "month-year"
 }) {
-    // Safely parse any string or Date
-    const parsedDate = value
-        ? typeof value === "string"
-            ? new Date(`${value}T00:00:00`)
-            : value
-        : null;
+
+    // Convert value to Date object for DatePicker
+    const getParsedDate = () => {
+        if (!value) return null;
+
+        if (mode === "month") {
+            const monthNum = Number(value);
+            if (!monthNum) return null;
+            return new Date(2025, monthNum - 1, 1);
+        }
+
+        if (mode === "year") {
+            const yearNum = Number(value);
+            if (!yearNum) return null;
+            return new Date(yearNum, 0, 1);
+        }
+
+        if (mode === "month-year") {
+            const [year, month] = value.split("-").map(Number);
+            if (!year || !month) return null;
+            return new Date(year, month - 1, 1);
+        }
+
+        return new Date(`${value}T00:00:00`);
+    };
+
+    const parsedDate = getParsedDate();
 
     return (
         <div className="date-input-container">
@@ -29,28 +51,56 @@ export default function DateInput({
             )}
 
             <DatePicker
-                key={value} // Force re-render on value change
                 selected={parsedDate}
                 onChange={(date) => {
                     if (!date) return onChange("");
 
-                    // Fix the one-day offset bug
-                    const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+                    if (mode === "month") {
+                        return onChange(String(date.getMonth() + 1));
+                    }
+
+                    if (mode === "year") {
+                        return onChange(String(date.getFullYear()));
+                    }
+
+                    if (mode === "month-year") {
+                        const month = String(date.getMonth() + 1).padStart(2, "0");
+                        const year = date.getFullYear();
+                        return onChange(`${year}-${month}`); // returns "2025-03"
+                    }
+
+                    // Normal date
+                    const formatted = new Date(
+                        date.getTime() - date.getTimezoneOffset() * 60000
+                    )
                         .toISOString()
                         .split("T")[0];
 
-                    onChange(localDate); // Send yyyy-MM-dd string to Formik
+                    onChange(formatted);
                 }}
                 className="form-control date-picker-input"
                 placeholderText={placeholder}
-                dateFormat="yyyy-MM-dd"
                 disabled={disabled}
                 minDate={minDate}
                 maxDate={maxDate}
-                showMonthDropdown
+
+                /** ⭐ DISPLAY FORMATS */
+                dateFormat={
+                    mode === "month"
+                        ? "MMMM"
+                        : mode === "year"
+                            ? "yyyy"
+                            : mode === "month-year"
+                                ? "MMMM yyyy"
+                                : "yyyy-MM-dd"
+                }
+
+                /** ⭐ MODE HANDLERS */
+                showMonthYearPicker={mode === "month-year"}
+                showYearPicker={mode === "year"}
+                showMonthDropdown={mode === "date"}
                 showYearDropdown
                 dropdownMode="select"
-                popperPlacement="bottom-start"
             />
         </div>
     );

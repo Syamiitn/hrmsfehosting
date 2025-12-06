@@ -15,12 +15,18 @@ import { showErrorToast, showSuccessToast } from '@utils/utils';
 import { useNavigate } from 'react-router-dom';
 import ChartRenderer from '@components/common/ChartRenderer';
 import ProgressBar from '@components/common/ProgressBar';
+import AttendanceCorrectionReq from '@components/AttendanceCorrectionReq';
 import { FaArrowLeft, FaUsers, FaClock, FaCheckCircle } from 'react-icons/fa'
 import { IoStatsChart } from "react-icons/io5";
 import { FaRegMessage } from "react-icons/fa6";
 import { MdInsights, MdSpeed, MdPersonOff, MdBarChart } from "react-icons/md";
 import { LuTarget } from "react-icons/lu";
 import noDataFound from '@assets/no-data-found.png'
+
+// icons
+import { BsGraphUp } from "react-icons/bs";
+import { CiCircleCheck, CiWarning } from "react-icons/ci";
+import { FaArrowRight } from "react-icons/fa6";
 
 import './index.css'
 
@@ -29,11 +35,14 @@ export default function ManagerEmsOverview() {
     const [isTabActive, setIsTabActive] = useState('LR');
     const [statusTab, setStatusTab] = useState('PENDING');
     const [userDetails, setUserDetails] = useState([]);
+    const [teamSize, setTeamSize] = useState(0);
     const [isFetchingEmployees, setIsFetchingEmployees] = useState(false);
     const [leaveRequests, setLeaveRequests] = useState([]);
     const [pendingReqCount, setPendingReqCount] = useState(0);
     const [leaveUtilization, setLeaveUtilization] = useState([])
     const [monthlyLeaveUtiliz, setMonthlyLeaveUtiliz] = useState([])
+    const [dashboardDetails, setDashboardDetails] = useState();
+    const [attendanceTrend, setAttendanceTrend] = useState();
     const { showLoading, hideLoading } = useLoading();
 
     // Pagination
@@ -43,60 +52,6 @@ export default function ManagerEmsOverview() {
     const { user } = useAuth()
     const { get, patch, loading } = useApi()
     const navigate = useNavigate();
-
-    // attendance dummy data
-    const attendanceList = [
-        {
-            id: 1,
-            firstName: 'Pavan',
-            lastName: 'Kurme',
-            email: 'pavan@company.com',
-            designation: 'Software Developer',
-            status: 'Active',
-            attendance: '100',
-            currentLeave: '',
-        },
-        {
-            id: 2,
-            firstName: 'Nitesh',
-            lastName: 'Bellamkonda',
-            email: 'nitesh@company.com',
-            designation: 'Senior UI Developer',
-            status: 'InActive',
-            attendance: '80',
-            currentLeave: 'Annual Leave (2 days remaining)',
-        },
-        {
-            id: 3,
-            firstName: 'Bhanu',
-            lastName: 'Chowdary',
-            email: 'bhanu@company.com',
-            designation: 'HR Manager',
-            status: 'Active',
-            attendance: '90',
-            currentLeave: '',
-        },
-        {
-            id: 4,
-            firstName: 'Naga',
-            lastName: 'Reddy',
-            email: 'naga@company.com',
-            designation: 'Backend Developer',
-            status: 'Active',
-            attendance: '70',
-            currentLeave: '',
-        },
-        {
-            id: 5,
-            firstName: 'Isabella',
-            lastName: 'Brown',
-            email: 'isabella@company.com',
-            designation: 'Project Manager',
-            status: 'Active',
-            attendance: '99',
-            currentLeave: '',
-        },
-    ];
 
     // Fetching Employees and leave request details Details
     const fetchUserDetails = async () => {
@@ -141,8 +96,8 @@ export default function ManagerEmsOverview() {
         try {
             showLoading({ type: 'spinner', size: 'md' })
             const res = await get(`leave-requests/manager/${user.emp}`);
-            const pendingCount = res.filter(item => item.status === "pending").length;
-            setPendingReqCount(pendingCount);
+            // const pendingCount = res.filter(item => item.status === "pending").length;
+            // setPendingReqCount(pendingCount);
             setLeaveRequests(res);
         } catch (err) {
             console.error(err.message);
@@ -165,11 +120,34 @@ export default function ManagerEmsOverview() {
         }
     }
 
+    // Fetching Attendance Details
+    const fetchAttendanceDetails = async () => {
+        try {
+            const month = format(new Date(), 'MM');
+            const year = format(new Date(), 'yyyy');
+            const res = await get(`attendance/dashboard/manager?managerId=${user?.emp}&month=${month}&year=${year}`);
+
+            // updating trend chart data
+            const updatedTrend = res?.trend?.map(day => ({
+                date: day?.date ? format(new Date(day.date), 'dd MMM') : '-',
+                value: day?.present ?? 0
+            })) || [];
+
+            setDashboardDetails(res)
+            setAttendanceTrend(updatedTrend);
+            setTeamSize(res?.teamSize)
+            setPendingReqCount(res?.pendingApprovals)
+        } catch (err) {
+            console.error(err.message)
+        }
+    }
+
     // Fetch users on mount
     useEffect(() => {
         fetchUserDetails()
         fetchLeaveRequests()
         fetchLeaveUtilization()
+        fetchAttendanceDetails()
     }, [])
 
     // Updating the leave 
@@ -463,7 +441,7 @@ export default function ManagerEmsOverview() {
             case 'LR':
                 return renderLeaveRequests();
             case 'ATT':
-                return <p className="mt-3 p3">Showing Attendance Requests</p>;
+                return <AttendanceCorrectionReq />;
             case 'EXP':
                 return <p className="mt-3 p3">Showing Expense Requests</p>;
             case 'GOL':
@@ -472,6 +450,15 @@ export default function ManagerEmsOverview() {
                 return <p className="mt-3 p3">Select a tab to view details</p>;
         }
     };
+
+    // Modal Showing Attendance Details
+    const handleAttendanceModal = () => {
+        console.log('Attendance: ', dashboardDetails);
+        openModal(
+            <TeamAttendanceAnalytics metrics={dashboardDetails} />,
+            { title: 'Team Attendance Analytics', size: 'lg' }
+        )
+    }
 
     // Tabs List
     const tabsList = [
@@ -499,7 +486,7 @@ export default function ManagerEmsOverview() {
                 <div className="row">
                     {/* Header Bar */}
                     <div className="col-12">
-                        <div className="header-container shadow-sm">
+                        <div className="header-container ">
                             <div>
                                 <button className='back-btn' onClick={() => navigate('/manager/dashboard')}>
                                     <FaArrowLeft /> Back to Dashboard
@@ -519,8 +506,8 @@ export default function ManagerEmsOverview() {
                         </div>
                     </div>
                     {/* Stat Cards */}
-                    <div className="col-12 col-md-6 col-lg-3 mt-3">
-                        <div className="stat-card shadow-sm">
+                    <div className="col-12 col-md-6 col-lg-3 mt-3 d-flex">
+                        <div className="stat-card  flex-fill">
                             <div className='d-flex align-items-center justify-content-between w-100'>
                                 <div>
                                     <p className="p3">
@@ -538,15 +525,15 @@ export default function ManagerEmsOverview() {
                     </div>
                     {/* card end */}
 
-                    <div className="col-12 col-md-6 col-lg-3 mt-3">
-                        <div className="stat-card shadow-sm">
+                    <div className="col-12 col-md-6 col-lg-3 mt-3 d-flex">
+                        <div className="stat-card  flex-fill">
                             <div className='d-flex align-items-center justify-content-between w-100'>
                                 <div>
                                     <p className="p3">
                                         Team Members
                                     </p>
                                     <h3>
-                                        {userDetails.length || 0}
+                                        {teamSize}
                                     </h3>
                                 </div>
                                 <div>
@@ -557,27 +544,41 @@ export default function ManagerEmsOverview() {
                     </div>
                     {/* card end */}
 
-                    <div className="col-12 col-md-6 col-lg-3 mt-3">
-                        <div className="stat-card shadow-sm">
+                    <div className="col-12 col-md-6 col-lg-3 mt-3 d-flex">
+                        <div
+                            className="stat-card  flex-fill"
+                            role='button'
+                            onClick={handleAttendanceModal}
+                        >
                             <div className='d-flex align-items-center justify-content-between w-100'>
                                 <div>
                                     <p className="p3">
                                         Avg Attendance
                                     </p>
                                     <h3>
-                                        87%
+                                        {dashboardDetails?.metrics?.attendancePercent} %
                                     </h3>
                                 </div>
                                 <div>
                                     <IoStatsChart className='icon' />
                                 </div>
                             </div>
+                            <div>
+                                {/* <Button
+                                    variant='outline'
+                                    size='sm'
+                                    radius={5}
+                                    label={'View Details'}
+                                    iconRight={<FaArrowRight />}
+                                /> */}
+                                <span className='d-flex align-items-center gap-1' style={{color: 'var(--theme)'}}>View Details <FaArrowRight /></span>
+                            </div>
                         </div>
                     </div>
                     {/* card end */}
 
-                    <div className="col-12 col-md-6 col-lg-3 mt-3">
-                        <div className="stat-card shadow-sm">
+                    <div className="col-12 col-md-6 col-lg-3 mt-3 d-flex">
+                        <div className="stat-card  flex-fill">
                             <div className='d-flex align-items-center justify-content-between w-100'>
                                 <div>
                                     <p className="p3">
@@ -599,7 +600,7 @@ export default function ManagerEmsOverview() {
                     <div className="col-12 mt-3">
                         <MyTeamOverview
                             userDetails={userDetails}
-                            attendanceList={attendanceList}
+                            attendanceList={dashboardDetails?.teamMembers}
                             leaveRequests={leaveRequests}
                             onClickEye={handleOnClickIcon}
                             isLoading={isFetchingEmployees}
@@ -608,7 +609,7 @@ export default function ManagerEmsOverview() {
 
                     {/* Approvals & Requests */}
                     <div className="col-12 my-3">
-                        <div className="approvals-requests-card shadow-sm">
+                        <div className="approvals-requests-card ">
                             <div className="d-flex align-items-center gap-2">
                                 <FaCheckCircle className='icon' />
                                 <h5>
@@ -630,19 +631,22 @@ export default function ManagerEmsOverview() {
 
                     {/* Team Insights */}
                     <div className="col-12 col-md-6 mb-3">
-                        <div className="team-insights shadow-sm">
+                        <div className="team-insights ">
                             <div className="d-flex align-items-center gap-2">
                                 <MdInsights className='icon' />
                                 <h5>Team Insights</h5>
                             </div>
                             <hr />
+                            <h6 className="mb-2">
+                                Attendance Trend
+                            </h6>
                             <ChartRenderer
                                 type="bar"
-                                data={monthlyLeaveUtiliz}
-                                dataKeyX="month"
+                                data={attendanceTrend}
+                                dataKeyX="date"
                                 dataKeyY="value"
                                 colors={["var(--theme)"]}
-                                seriesName='Leaves Utilizations'
+                                seriesName='Attendance Trend'
                             />
                             <h6 className='mb-2'>
                                 Leave Utilization
@@ -668,7 +672,7 @@ export default function ManagerEmsOverview() {
 
                     {/* Performance & Feedback */}
                     <div className="col-12 col-md-6 mb-3 d-flex">
-                        <div className="performance-feedback shadow-sm flex-fill">
+                        <div className="performance-feedback  flex-fill">
                             <div className="d-flex align-items-center gap-2">
                                 <MdSpeed className='icon' />
                                 <h5>
@@ -734,7 +738,7 @@ export default function ManagerEmsOverview() {
 
                     {/* Exit Management Card */}
                     <div className="col-12 col-md-4 mb-3 d-flex">
-                        <div className="action-card shadow-sm flex-fill">
+                        <div className="action-card  flex-fill">
                             <div className="icon-container mb-1">
                                 <MdPersonOff className='icon' />
                             </div>
@@ -756,7 +760,7 @@ export default function ManagerEmsOverview() {
                     {/* Card End */}
 
                     <div className="col-12 col-md-4 mb-3 d-flex">
-                        <div className="action-card shadow-sm flex-fill">
+                        <div className="action-card  flex-fill">
                             <div className="icon-container mb-1">
                                 <MdBarChart className='icon' />
                             </div>
@@ -778,7 +782,7 @@ export default function ManagerEmsOverview() {
                     {/* Card End */}
 
                     <div className="col-12 col-md-4 mb-3 d-flex">
-                        <div className="action-card shadow-sm flex-fill">
+                        <div className="action-card  flex-fill">
                             <div className="icon-container mb-1">
                                 <LuTarget className='icon' />
                             </div>
@@ -803,3 +807,254 @@ export default function ManagerEmsOverview() {
         </div>
     )
 }
+
+
+// Team Attendance Analytics Modal
+const TeamAttendanceAnalytics = ({ metrics }) => {
+    const [activeTab, setActiveTab] = useState('Overview');
+    const [excellent, setExcellent] = useState();
+    const [needAttention, setNeedAttention] = useState();
+
+    // analytics stats
+    const [presentDay, setPresentDays] = useState(0)
+    const [absentDay, setAbsentDays] = useState(0)
+    const [lateArrivals, setLateArrivals] = useState(0)
+    const [halfDays, setHalfDays] = useState(0);
+
+    // Run once when `metrics` changes
+    useEffect(() => {
+        if (!metrics) return;
+
+        /* -------------------------------
+           1. Attendance Distribution
+        --------------------------------*/
+        if (metrics.attendanceDistribution) {
+            metrics.attendanceDistribution.forEach(item => {
+                if (item.category === "Excellent") setExcellent(item.employees);
+                if (item.category === "Needs Attention") setNeedAttention(item.employees);
+            });
+        }
+
+        /* -------------------------------
+           2. Team Member Summary Totals
+        --------------------------------*/
+        let totalPresent = 0;
+        let totalAbsent = 0;
+        let totalLate = 0;
+        let totalHalf = 0;
+
+        metrics?.teamMembers?.forEach(member => {
+            const s = member.summary || {};
+
+            totalPresent += s.presentDays || 0;
+            totalAbsent += s.absentDays || 0;
+            totalLate += s.lateCount || 0;
+            totalHalf += s.halfDayCount || 0;
+        });
+
+        setPresentDays(metrics?.analytics?.presentDays);
+        setAbsentDays(metrics?.analytics?.absentDays);
+        setLateArrivals(metrics?.analytics?.lateArrivals);
+        setHalfDays(metrics?.analytics?.halfDays);
+
+    }, [metrics]);
+
+    // Overview
+    const renderOverview = () => {
+        return (
+            <div className="overview-container">
+                <div className="container-fulid">
+                    <div className="row">
+                        {/* Team Average card */}
+                        <div className="col-12 col-md-6 mb-3 d-flex">
+                            <div className="stat-card  flex-fill">
+                                <div>
+                                    <p className="p3">Team Average</p>
+                                    <h5>{metrics?.metrics?.attendancePercent}%</h5>
+                                </div>
+                                <div>
+                                    <BsGraphUp className="icon" />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Excellent card */}
+                        <div className="col-12 col-md-6 mb-3 d-flex">
+                            <div className="stat-card  flex-fill">
+                                <div>
+                                    <p className="p3">Excellent (95%+)</p>
+                                    <h5>{excellent}</h5>
+                                    {/* <small>17% of team</small> */}
+                                </div>
+                                <div>
+                                    <CiCircleCheck className="icon" />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Needs Attention */}
+                        <div className="col-12 col-md-6 mb-3 d-flex">
+                            <div className="stat-card  flex-fill">
+                                <div>
+                                    <p className="p3">Needs Attention</p>
+                                    <h5>{needAttention}</h5>
+                                    {/* <small>Below 85% attendance</small> */}
+                                </div>
+                                <div>
+                                    <CiWarning className="icon" />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Total Employees */}
+                        <div className="col-12 col-md-6 mb-3 d-flex">
+                            <div className="stat-card  flex-fill">
+                                <div>
+                                    <p className="p3">Total Employees</p>
+                                    <h5>{metrics?.teamMembers.length}</h5>
+                                    <small>Reporting to you</small>
+                                </div>
+                                <div>
+                                    <FaUsers className="icon" />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Attendance Distribution */}
+                        <div className="col-12 mb-3">
+                            <h5 className='mb-2'>Attendance Distribution</h5>
+                            {metrics?.attendanceDistribution?.map((item, i) => (
+                                <div className="mb-2" key={i}>
+                                    <ProgressBar
+                                        label={`${item?.category} (${item?.range})`}
+                                        value={item?.percentage}
+                                        percentage={true}
+                                        color="var(--theme)"
+                                    />
+                                    <div className="d-flex justify-content-end mt-1">
+                                        <p className="p4">
+                                            {item?.employees} Employee's
+                                        </p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Monthly Attendance Trend */}
+                        <div className="col-12 mb-3">
+                            <h5>
+                                Monthly Attendance Trend
+                            </h5>
+                            <div className="mt-3">
+                                <ChartRenderer
+                                    type='bar'
+                                    data={metrics?.monthlyTrend}
+                                    colors={['var(--theme)']}
+                                    dataKeyX='month'
+                                    dataKeyY='percentage'
+                                />
+                            </div>
+                        </div>
+
+                        {/* Department-wise Attendance */}
+                        {metrics?.departmentWiseAttendance?.map((item, i) => (
+                            <div className="col-12 mb-3" key={i}>
+                                <h5 className='mb-2'>
+                                    Department-wise Attendance
+                                </h5>
+                                <div className="department-label mb-2">
+                                    <div className="d-flex align-items-center justify-content-start gap-2">
+                                        <div className="icon-container">
+                                            <FaUsers className='icon' />
+                                        </div>
+                                        <div>
+                                            <h5>{item?.department}</h5>
+                                            <p className="p3">{item?.headCount} Employee's</p>
+                                        </div>
+                                    </div>
+                                    <div style={{ minWidth: '40%' }}>
+                                        <ProgressBar value={item?.attendancePercent} color='var(--theme)' label='Percentage' />
+                                    </div>
+                                    <div>
+                                        <h4 style={{ color: 'var(--theme)' }}>{item?.attendancePercent}%</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
+    // Analytics
+    const renderAnalytics = () => {
+        return (
+            <div className="analytics-container">
+                <div className="container-fulid">
+                    <div className="row">
+                        <div className="col-12 mb-2">
+                            <h5>Detailed Metrics</h5>
+                        </div>
+                        <div className="col-12 col-md-6 mb-2">
+                            <div className="stat-card">
+                                <p className="p3">Total Present Days</p>
+                                <h4>{presentDay}</h4>
+                            </div>
+                        </div>
+                        <div className="col-12 col-md-6 mb-2">
+                            <div className="stat-card">
+                                <p className="p3">Total Absences</p>
+                                <h4>{absentDay}</h4>
+                            </div>
+                        </div>
+                        <div className="col-12 col-md-6 mb-2">
+                            <div className="stat-card">
+                                <p className="p3">Total Late Arrivals</p>
+                                <h4>{lateArrivals}</h4>
+                            </div>
+                        </div>
+                        <div className="col-12 col-md-6 mb-2">
+                            <div className="stat-card">
+                                <p className="p3">Total Half Days</p>
+                                <h4>{halfDays}</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
+    // Tab rendering logic
+    const getRenderTabsContent = () => {
+        switch (activeTab) {
+            case 'Overview':
+                return renderOverview();
+            case 'Analytics':
+                return renderAnalytics();
+            default:
+                return <p>No data found</p>;
+        }
+    };
+
+    return (
+        <div className="team-attendance-analytics">
+            {/* Tab bar */}
+            <ul className="tab-bar">
+                {['Overview', 'Analytics'].map((tab, i) => (
+                    <li
+                        role="button"
+                        className={`tab-item ${activeTab === tab ? 'active' : ''}`}
+                        key={i}
+                        onClick={() => setActiveTab(tab)}
+                    >
+                        {tab}
+                    </li>
+                ))}
+            </ul>
+
+            {getRenderTabsContent()}
+        </div>
+    );
+};

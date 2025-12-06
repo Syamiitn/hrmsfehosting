@@ -1,10 +1,11 @@
 .manager-ems-overview {
-    background-color: var(--background-color);
+    background-color: var(--body-bg);
 
     .header-container {
-        background-color: var(--card-bg-color);
+        background-color: var(--card-bg);
         padding: 10px 20px;
-        border-radius: 16px;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-soft);
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -48,10 +49,15 @@
     }
 
     .stat-card {
-        background-color: var(--card-bg-color);
-        padding: 16px;
-        border-radius: 16px;
+        background-color: var(--card-bg);
+        padding: var(--padding-lg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-glassy);
+        border: 1px solid var(--border-color);
+
         display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
 
         .icon {
             color: var(--theme);
@@ -60,37 +66,57 @@
     }
 
     .approvals-requests-card {
-        background-color: var(--card-bg-color);
-        padding: 16px;
-        border-radius: 16px;
+        background-color: var(--card-bg);
+        padding: var(--padding-lg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-glassy);
+        border: 1px solid var(--border-color);
 
         .icon {
             color: var(--theme);
         }
 
         .tabs-bar {
-            padding: 0px;
             display: flex;
             justify-content: flex-start;
             align-items: center;
             gap: 20px;
-            background-color: var(--background-color);
+            background-color: var(--body-bg);
             padding: 5px 5px;
-            border-radius: 30px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-glassy);
 
             .tab {
-                background-color: var(--card-bg-color);
+                background-color: var(--card-bg);
                 padding: 3px 15px;
                 flex-grow: 1;
                 text-align: center;
-                border-radius: 30px;
+                border-radius: var(--radius-lg);
                 cursor: pointer;
                 font-size: 14px;
-                color: var(--muted-text-color);
+                color: var(--text-muted);
 
                 &.active {
                     background-color: var(--theme);
                     color: var(--color-white);
+                }
+            }
+        }
+
+        @media (max-width: 580px) {
+            .tabs-bar {
+                background-color: transparent;
+                box-shadow: none;
+                border: none;
+                justify-content: flex-start;
+                flex-wrap: wrap;
+                gap: 10px;
+                border-radius: 0px;
+                border-bottom: 1px solid var(--border-color);
+
+                .tab {
+                    flex-grow: 0;
+                    border: 1px solid var(--border-color);
                 }
             }
         }
@@ -119,9 +145,11 @@
     }
 
     .team-insights {
-        background-color: var(--card-bg-color);
-        border-radius: 16px;
-        padding: 16px;
+        background-color: var(--card-bg);
+        padding: var(--padding-lg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-glassy);
+        border: 1px solid var(--border-color);
 
         .icon {
             color: var(--theme);
@@ -130,9 +158,11 @@
     }
 
     .performance-feedback {
-        padding: 16px;
-        background-color: var(--card-bg-color);
-        border-radius: 16px;
+        background-color: var(--card-bg);
+        padding: var(--padding-lg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-glassy);
+        border: 1px solid var(--border-color);
 
         .icon {
             color: var(--theme);
@@ -150,9 +180,11 @@
     }
 
     .action-card {
-        background-color: var(--card-bg-color);
-        padding: 16px;
-        border-radius: 14px;
+        background-color: var(--card-bg);
+        padding: var(--padding-lg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-glassy);
+        border: 1px solid var(--border-color);
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -202,5 +234,81 @@
         display: block;
         border-radius: 10px;
         transition: width 0.4s ease;
+    }
+}
+
+.team-attendance-analytics {
+    background-color: var(--card-bg-color);
+
+    .tab-bar {
+        background-color: var(--background-color);
+        padding: 0px;
+        display: flex;
+        justify-content: space-between;
+        border-radius: 20px;
+
+        .tab-item {
+            text-align: center;
+            flex-grow: 1;
+            background-color: var(--card-bg-color);
+            margin: 4px;
+            border-radius: 20px;
+            font-size: 14px;
+
+            &.active {
+                background-color: var(--theme);
+                color: var(--color-white);
+            }
+        }
+    }
+
+    .overview-container {
+        .stat-card {
+            background-color: var(--background-color);
+            padding: 14px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            .icon {
+                color: var(--theme);
+                font-size: 26px;
+            }
+        }
+
+        .department-label {
+            border: 1px solid var(--border-color);
+            padding: 6px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            .icon-container {
+                height: 50px;
+                width: 50px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background-color: var(--card-bg-color);
+                border-radius: 10px;
+
+                .icon {
+                    font-size: 24px;
+                    color: var(--theme);
+                }
+            }
+        }
+    }
+
+    .analytics-container {
+        background-color: var(--card-bg-color);
+
+        .stat-card {
+            background-color: var(--background-color);
+            padding: 8px;
+            border-radius: 14px;
+        }
     }
 }

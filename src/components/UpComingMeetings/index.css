@@ -13,18 +13,17 @@
     .meeting-item {
         display: flex;
         align-items: center;
-        background-color: var(--background-color);
+        background-color: var(--body-bg);
         padding: 5px;
         border-radius: 12px;
-        border: 1px solid var(--border-color);
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: var(--shadow-glassy);
         cursor: pointer;
         gap: 10px;
 
         .meeting-date-container {
             border: 1px solid var(--border-color);
-            background-color: var(--card-bg-color);
+            background-color: var(--card-bg);
+            box-shadow: var(--shadow-glassy);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -55,9 +54,6 @@
             justify-content: space-between;
             align-items: center;
 
-            .meeting-badge {
-                background-color: var(--background-color);
-            }
 
             .badge-participants {
                 min-width: 90px;

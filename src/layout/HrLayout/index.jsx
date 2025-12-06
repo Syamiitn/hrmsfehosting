@@ -8,6 +8,8 @@ import Header from "@components/Header";
 import Sidebar from "@components/Sidebar";
 import { SIDEBAR_MENU } from "@config/component.config";
 
+import './index.css'
+
 export default function HrLayout() {
     const { themeColor, changeTheme, themeMode, toggleThemeMode } = useTheme();
     const [showSidebar, setShowSidebar] = useState(true);
@@ -77,7 +79,7 @@ export default function HrLayout() {
                 />
 
                 {/*  Only content scrolls */}
-                <main className="flex-1 min-h-[80vh] max-h-[90vh] overflow-y-auto px-4">
+                <main className="flex-1 min-h-[80vh] max-h-[90vh] overflow-y-auto px-4" style={{ background: 'var(--body-bg)'}}>
                     <Outlet />
                 </main>
             </div>

@@ -1,155 +1,283 @@
-.attendance-calendar-container {
-    width: 100%;
-    margin: auto;
+.super-calendar-wrapper {
 
-    /* Calendar core styles */
+    /* ===========================
+       CALENDAR ROOT
+    ============================ */
     .react-calendar {
         width: 100%;
         border: none;
-        border-radius: 16px;
-        background: transparent;
+        border-radius: 14px;
+        background: var(--card-bg);
+        padding: 12px;
+        transition: all 0.3s ease;
         font-family: "Inter", sans-serif;
+    }
 
-        .react-calendar__navigation__prev-button {
+    /* ===========================
+       NAVIGATION BUTTONS
+    ============================ */
+    .react-calendar__navigation {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        gap: 5px;
+
+        button {
+            min-width: 40px;
+            background: var(--background-color);
+            border: none;
             color: var(--muted-text-color);
-        }
+            font-weight: 600;
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
 
-        .react-calendar__navigation__prev2-button {
-            color: var(--muted-text-color);
-        }
+            &:hover {
+                background: var(--hover-bg);
+            }
 
-        .react-calendar__navigation__next-button {
-            color: var(--muted-text-color);
-        }
-
-        .react-calendar__navigation__next2-button {
-            color: var(--muted-text-color);
-        }
-
-        .react-calendar__navigation__next-button:disabled {
-            background-color: var(--background-color);
-        }
-
-        .react-calendar__navigation__next2-button:disabled {
-            background-color: var(--background-color);
-        }
-
-        .react-calendar__navigation {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-
-            button {
-                min-width: 40px;
-                background: var(--background-color);
-                border: none;
-                font-weight: 600;
-                cursor: pointer;
-                padding: 6px;
+            &:disabled {
+                opacity: 0.4;
+                cursor: not-allowed;
             }
         }
+    }
 
-        .react-calendar__month-view__weekdays {
-            text-align: center;
-            font-size: 12px;
+    .react-calendar__navigation__prev-button,
+    .react-calendar__navigation__prev2-button,
+    .react-calendar__navigation__next-button,
+    .react-calendar__navigation__next2-button {
+        color: var(--muted-text-color);
+    }
+
+    /* ===========================
+       WEEKDAY HEADERS
+    ============================ */
+    .react-calendar__month-view__weekdays {
+        text-align: center;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--muted-text-color);
+    }
+
+    /* ===========================
+       DAY TILE
+    ============================ */
+    .react-calendar__tile {
+        height: 65px;
+        padding: 5px;
+        background: var(--card-bg-color);
+        border-radius: 10px;
+        transition: background 0.2s ease;
+        text-align: center;
+        position: relative;
+        color: var(--text-color);
+        cursor: pointer;
+
+        &:hover {
+            border: 2px solid var(--theme);
+            background-color: var(--background-color);
+        }
+    }
+
+    .react-calendar__month-view__days {
+        gap: 6px !important;
+        padding: 4px !important;
+        border-radius: 5px;
+        display: grid !important;
+        grid-template-columns: repeat(7, 1fr);
+        background-color: var(--background-color);
+    }
+
+    /* Disabled tiles (future dates) */
+    .react-calendar__tile:disabled {
+        background: var(--card-bg-color);
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    /* TODAY */
+    .react-calendar__tile--now {
+        border: 2px solid var(--theme);
+    }
+
+    /* SELECTED DATE */
+    .react-calendar__tile--active {
+        background-color: var(--theme);
+        color: var(--color-black);
+    }
+
+    /* ===========================
+       LABEL MODE - BADGES
+    ============================ */
+    .calendar-status-label {
+        margin-top: 4px;
+
+        .badge {
+            font-size: 11px;
             font-weight: 600;
-            color: #666;
-        }
-
-        .react-calendar__tile {
-            height: 70px;
-            max-width: 100%;
-            text-align: center;
-            padding: 4px;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .react-calendar__tile:disabled {
-            height: 70px;
-            max-width: 100%;
-            text-align: center;
-            padding: 4px;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .react-calendar__tile--now {
-            border: 1px solid var(--theme);
-        }
-
-        .react-calendar__tile--active {
-            color: var(--theme);
+            padding: 2px 8px;
+            border-radius: 10px;
+            text-transform: capitalize !important;
         }
     }
 
-    /* Label inside tile */
-    .status-label {
-        font-size: 10px;
-        margin-top: 2px;
-
-        &.on-time {
-            color: #2e7d32;
-        }
-
-        &.late {
-            color: #fbc02d;
-        }
-
-        &.leave {
-            color: #1976d2;
-        }
-
-        &.absent {
-            color: #d32f2f;
-        }
-
-        &.comp-off {
-            color: #0097a7;
-        }
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-        .react-calendar__tile {
-            height: 55px;
-            font-size: 12px;
-        }
-
-        .status-label {
-            font-size: 9px;
-        }
-    }
-
+    /* ===========================
+       CELL BG MODE
+    ============================ */
+    .status-present,
     .status-on-time {
-        background-color: var(--on-time-bg);
+        background: var(--on-time-bg) !important;
     }
 
     .status-late {
-        background-color: var(--late-bg);
+        background: var(--late-bg) !important;
     }
 
     .status-leave {
-        background-color: var(--leave-bg);
+        background: var(--leave-bg) !important;
     }
 
     .status-wfh {
-        background-color: var(--wfh-bg);
+        background: var(--wfh-bg) !important;
     }
 
     .status-holiday {
-        background-color: var(--holiday-bg);
+        background: var(--holiday-bg) !important;
     }
 
     .status-absent {
-        background-color: var(--absent-bg);
+        background: var(--absent-bg) !important;
     }
 
     .status-comp-off {
-        background-color: var(--comp-off-bg);
+        background: var(--comp-off-bg) !important;
     }
 
     .status-weekend {
-        background-color: var(--weekend-bg);
+        background: var(--weekend-bg) !important;
     }
+
+    /* ===========================
+       LABEL MODE COLORS
+    ============================ */
+    .text-present {
+        color: var(--on-time-text) !important;
+    }
+
+    .text-late {
+        color: var(--late-text) !important;
+    }
+
+    .text-leave {
+        color: var(--leave-text) !important;
+    }
+
+    .text-absent {
+        color: var(--absent-text) !important;
+    }
+
+    .text-wfh {
+        color: var(--wfh-text) !important;
+    }
+
+    .text-holiday {
+        color: var(--holiday-text) !important;
+    }
+
+    .text-weekend {
+        color: var(--weekend-text) !important;
+    }
+
+    /* ===========================
+       EXTRA CONTENT BELOW DATE
+    ============================ */
+    .day-extra {
+        margin-top: 4px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    /* Exception icons list */
+    .exception-list {
+        position: absolute;
+        width: 100%;
+        display: flex;
+        justify-content: flex-start;
+        gap: 10px;
+        padding: 0px 10px;
+        margin-top: 3px;
+        top: 3px;
+    }
+
+    .exception-icon {
+        font-size: 14px;
+        color: var(--theme);
+    }
+
+    /* ===========================
+       POPUP STYLES
+    ============================ */
+    .calendar-popup-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+    }
+
+    .calendar-popup-card {
+        background: var(--card-bg-color);
+        padding: 20px;
+        min-width: 250px;
+        max-width: 390px;
+        border-radius: 14px;
+        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
+
+        h5 {
+            color: var(--text-color);
+        }
+
+        p {
+            color: var(--muted-text-color);
+        }
+
+        ul li {
+            color: var(--text-color);
+        }
+    }
+
+    /* ===========================
+       MOBILE RESPONSIVE
+    ============================ */
+    @media (max-width: 768px) {
+        .react-calendar__tile {
+            height: 50px !important;
+        }
+
+        .calendar-status-label .badge {
+            font-size: 10px;
+        }
+    }
+
+    @media (max-width: 350px) {
+        .react-calendar__tile {
+            height: 20px !important;
+            width: 20px;
+            padding: 0px;
+        }
+
+        abbr {
+            font-size: 10px;
+        }
+    }
+
+    .react-calendar__navigation__label {
+        pointer-events: none !important;
+        cursor: not-allowed !important;
+    }
+
 }

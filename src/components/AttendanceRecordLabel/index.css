@@ -1,5 +1,286 @@
 .attendance-record-label {
+    background-color: var(--card-bg);
+    padding: var(--padding-lg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-glassy);
     border: 1px solid var(--border-color);
-    padding: 16px;
-    border-radius: 16px;
+    margin-bottom: 14px;
+
+    /* --- Top Content Styles --- */
+
+    .dot {
+        font-size: 8px;
+    }
+
+    .location {
+        font-size: 13px;
+        color: var(--muted-text-color);
+        display: flex;
+        align-items: center;
+        gap: 5px;
+
+        .icon {
+            color: var(--theme);
+        }
+    }
+
+    .time-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 4px 0;
+    }
+
+    .small-label {
+        font-size: 13px;
+        color: var(--muted-text-color);
+    }
+
+    .time-value {
+        font-size: 14px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .total-hours {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 700;
+    }
+
+    .total-text {
+        font-size: 12px;
+        color: var(--muted-text-color);
+    }
+
+    /* --- CORRECTION (Absent State) --- */
+    .correction-label {
+        border: 1px solid var(--absent-text);
+        padding: 12px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    /* --- Original Shift Timeline (Deprecated/Old) --- */
+    .timeline-container {
+        position: relative;
+        margin-top: 14px;
+    }
+
+    .timeline-track {
+        height: 6px;
+        background: var(--background-color);
+        border-radius: 4px;
+    }
+
+    .timeline-progress {
+        position: absolute;
+        top: 0;
+        height: 6px;
+        border-radius: 4px;
+        background-color: var(--theme);
+        /* Keep original logic */
+    }
+
+    .timeline-time-labels {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 6px;
+        font-size: 12px;
+        color: var(--muted-text-color);
+    }
+
+    .bottom-tag {
+        margin-top: 10px;
+    }
+
+    /* --- 24-Hour Timeline Styles (New Implementation) --- */
+
+    .full-day-timeline-container {
+        position: relative;
+        width: 100%;
+    }
+
+    .timeline-title {
+        display: block;
+        margin-bottom: 5px;
+        font-size: 0.75rem;
+        color: var(--muted-text-color);
+    }
+
+    /* Base track for 24 hours */
+    .timeline-track-24h {
+        height: 10px;
+        /* Adjusted height for better visibility/tooltip hover */
+        background-color: var(--background-color);
+        border-radius: 5px;
+        /* Adjusted radius */
+        position: relative;
+        /* overflow: hidden; */
+    }
+
+    /* 1. Highlight the scheduled shift time (Lighter theme color) */
+    .shift-highlight {
+        position: absolute;
+        top: 50%;
+        /* Move to vertical middle */
+        transform: translateY(-50%);
+        /* Pull up by half of its own height */
+        height: 15px;
+        /* Your custom height */
+        background-color: var(--theme);
+        opacity: 0.3;
+        border-radius: 5px;
+    }
+
+    /* 2. Highlight the actual worked time (Solid theme color, not dark grey) */
+    /* Updated to use var(--theme) for consistency with the sample image look */
+    .worked-time-24h {
+        position: absolute;
+        top: 0;
+        height: 100%;
+        background-color: var(--theme);
+        border-radius: 5px;
+
+    }
+
+    /* Time Markers (00:00, 06:00, 12:00, 18:00, 24:00) */
+    .timeline-time-labels-24h {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.75rem;
+        /* Adjusted size */
+        color: var(--muted-text-color);
+        margin-top: 5px;
+        position: relative;
+    }
+
+    /* Center positioning for intermediate labels (06:00, 12:00, 18:00) */
+    /* Note: These require index-based targeting for absolute positioning */
+    & .timeline-time-labels-24h span:nth-child(2) {
+        /* 06:00 */
+        position: absolute;
+        left: calc((6 / 24 * 100%) - 18px);
+    }
+
+    & .timeline-time-labels-24h span:nth-child(3) {
+        /* 12:00 */
+        position: absolute;
+        left: calc(50% - 18px);
+    }
+
+    & .timeline-time-labels-24h span:nth-child(4) {
+        /* 18:00 */
+        position: absolute;
+        right: calc((6 / 24 * 100%) - 18px);
+        left: auto;
+        /* Reset left positioning */
+    }
+}
+
+@media (max-width: 768px) {
+    .attendance-record-label {
+        padding: var(--padding-md);
+    }
+
+    /* Top Section: Stack content instead of left-right */
+    .attendance-record-label>.d-flex {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 10px;
+    }
+
+    .attendance-record-label h5 {
+        font-size: 15px;
+    }
+
+    .total-hours {
+        font-size: 18px !important;
+        margin-top: 5px;
+    }
+
+    .time-row {
+        gap: 6px;
+        font-size: 13px;
+    }
+
+    .time-value {
+        font-size: 13px;
+    }
+
+    .badge {
+        font-size: 11px !important;
+        padding: 2px 6px !important;
+    }
+}
+
+
+@media (max-width: 480px) {
+    .attendance-record-label {
+        padding: var(--padding-sm);
+    }
+
+    h5 {
+        font-size: 14px !important;
+    }
+
+    .location {
+        font-size: 12px;
+    }
+
+    .time-row {
+        flex-wrap: wrap;
+        font-size: 12px;
+        margin-bottom: 6px;
+    }
+
+    .time-value {
+        font-size: 12px;
+    }
+
+    .total-hours {
+        font-size: 16px !important;
+    }
+
+    /* Timeline—compact mode */
+    .timeline-time-labels-24h {
+        justify-content: space-between !important;
+        width: 100%;
+        padding-right: 4px;
+        padding-left: 4px;
+    }
+
+    /* Badge cleanup */
+    .bottom-tag {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+
+    .badge {
+        font-size: 10px !important;
+        padding: 2px 5px !important;
+    }
+}
+
+@media (max-width: 360px) {
+    .timeline-time-labels-24h span {
+        font-size: 9px !important;
+    }
+
+    .attendance-record-label {
+        border-radius: 10px;
+    }
+
+    .time-row {
+        gap: 4px;
+    }
+
+    .total-hours {
+        font-size: 15px;
+    }
 }

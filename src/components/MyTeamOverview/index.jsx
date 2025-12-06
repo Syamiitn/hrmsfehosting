@@ -37,7 +37,7 @@ export default function MyTeamOverview({
         const updatedList = userDetails.map((emp) => {
             const activeJob = emp.jobDetails?.find((job) => job.isActive) || {};
             const attendanceRecord =
-                attendanceList.find((a) => a.empId === emp.id) || {};
+                attendanceList.find((a) => a.employeeId === emp.id) || {};
 
             // approved leaves only
             const empLeaves = leaveRequests
@@ -70,7 +70,7 @@ export default function MyTeamOverview({
                 email: activeJob.workEmail || "",
                 status: emp.status || "Inactive",
                 designation: activeJob.jobTitle || "N/A",
-                attendance: attendanceRecord.attendance ?? 80,
+                attendance: attendanceRecord.metrics?.attendancePercent ?? 0,
                 currentLeave: currentLeave
                     ? `${currentLeave.leaveType.name} [${format(
                         new Date(currentLeave.startDate),
@@ -204,7 +204,7 @@ export default function MyTeamOverview({
     // Employee Card (Mobile)
     const renderMobileCard = (emp) => (
         <div key={emp.id} className="col-12 col-md-6 mt-3 d-flex">
-            <div className="att-card flex-fill p-3 shadow-sm rounded-3">
+            <div className="att-card flex-fill p-3  rounded-3">
                 <div className="d-flex align-items-center justify-content-between">
                     <div className="d-flex gap-2 align-items-center">
                         <Avatar
@@ -264,14 +264,14 @@ export default function MyTeamOverview({
     // Loading State
     if (isLoading) {
         return (
-            <div className="my-team-overview shadow-sm d-flex justify-content-center align-items-center" style={{ minHeight: "250px" }}>
+            <div className="my-team-overview  d-flex justify-content-center align-items-center" style={{ minHeight: "250px" }}>
                 <Loading type="dots" message="Loading Employees" size="lg" />
             </div>
         );
     }
 
     return (
-        <div className="my-team-overview shadow-sm">
+        <div className="my-team-overview ">
             {/* Header */}
             <div className="d-flex align-items-center gap-2 mb-2">
                 <FaUser className="icon" />
@@ -282,7 +282,6 @@ export default function MyTeamOverview({
             {/* Filters */}
             <form className="row g-2 align-items-center">
                 <div className="col-12 col-md-5 position-relative">
-                    <FaSearch className="icon search-icon" />
                     <input
                         type="search"
                         name="search"

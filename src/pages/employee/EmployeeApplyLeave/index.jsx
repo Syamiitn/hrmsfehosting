@@ -117,7 +117,7 @@ export default function EmployeeApplyLeave() {
                 <div className="row">
                     {/* Apply for leave form */}
                     <div className="col-12 col-md-6 my-3">
-                        <div className="apply-for-leave shadow-sm">
+                        <div className="apply-for-leave ">
                             <div className="row">
                                 <DynamicForm
                                     config={leaveApplyFormConfig}
@@ -137,7 +137,7 @@ export default function EmployeeApplyLeave() {
                     {/* Right Side: Leave Summary + Smart Checks */}
                     <div className="col-12 col-md-6 mt-3">
                         {/* Leave Summary */}
-                        <div className="leave-summary shadow-sm">
+                        <div className="leave-summary ">
                             <div className="d-flex align-items-center gap-2">
                                 <IoDocumentTextOutline className="icon" />
                                 <h5>Leave Summary</h5>
@@ -162,7 +162,7 @@ export default function EmployeeApplyLeave() {
                         </div>
 
                         {/* Smart Checks */}
-                        <div className="smart-checks shadow-sm mt-3">
+                        <div className="smart-checks  mt-3">
                             <div className="d-flex align-items-center gap-2">
                                 <PiListChecksLight className="icon" />
                                 <h5>Smart Checks</h5>

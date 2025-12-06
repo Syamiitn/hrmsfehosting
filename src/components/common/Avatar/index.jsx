@@ -20,6 +20,7 @@ export default function Avatar({
     uploadPath = "employee-personal-details",
     cloudName = "dvte0khlz",
     uploadPreset = "employee_profiles",
+    className,
 }) {
     const fileInputRef = useRef(null);
     const { get, patch } = useApi();
@@ -115,10 +116,10 @@ export default function Avatar({
                     <Loading type="spinner" size="sm" message="Uploading..." />
                 </div>
             ) : imgUrl ? (
-                <img src={imgUrl} alt={displayName} className="avatar-img" />
+                <img src={imgUrl} alt={displayName} className={`avatar-img ${className}`} />
             ) : (
                 <div
-                    className="avatar-fallback"
+                    className={`avatar-fallback ${className}`}
                     style={{ backgroundColor: bgColor, fontSize: size / 2.5 }}
                 >
                     {initials}

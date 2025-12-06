@@ -2,12 +2,14 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import tailwindcss from '@tailwindcss/vite';
+import svgr from "vite-plugin-svgr";
 
 export default defineConfig({
   base: '/',
   plugins: [
     react(),
     tailwindcss(),
+    svgr(),
   ],
   resolve: {
     alias: {
@@ -22,6 +24,7 @@ export default defineConfig({
       '@utils': path.resolve(__dirname, './src/utils'),
       '@hooks': path.resolve(__dirname, './src/hooks'),
       '@services': path.resolve(__dirname, './src/services'),
+      '@stylings': path.resolve(__dirname, './src/stylings'),
     }
   },
   server: {

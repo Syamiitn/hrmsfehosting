@@ -6,11 +6,13 @@ import { useApi } from "@hooks/useApi";
 import { createCommonApi } from "@services/commonApi";
 import { showErrorToast, showSuccessToast } from "@utils/utils";
 
+// Statically defined groups keep the modal benefits checkboxes tidy
 const BENEFIT_GROUPS = [
   ["Paid Leave", "Bonus Eligibility"],
   ["Medical Coverage", "Insurance"],
 ];
 
+// Safely unwraps job type lists regardless of how the backend envelops responses
 const parseList = (payload) => {
   if (typeof payload === "string") {
     try {
@@ -35,6 +37,7 @@ const parseList = (payload) => {
   return [];
 };
 
+// Normalizes company payloads (array/string/object) into the format used in the modal
 const parseCompanyEntries = (value) => {
   if (!value) return [];
 
@@ -92,9 +95,11 @@ const parseCompanyEntries = (value) => {
   return [];
 };
 
+// UI-ready string array for the table view
 const buildCompanyNames = (entries = []) =>
   (entries || []).map((entry) => entry?.name).filter(Boolean);
 
+// Converts checkbox selections back into the backend contract
 const formatCompaniesForPayload = (selectedKeys = [], options = []) => {
   if (!Array.isArray(selectedKeys)) return [];
   return selectedKeys
@@ -119,6 +124,7 @@ const formatCompaniesForPayload = (selectedKeys = [], options = []) => {
     .filter(Boolean);
 };
 
+// Helper used by both job types + departments to read organization lists
 const parseOrganizationList = (payload) => {
   const raw = Array.isArray(payload)
     ? payload
@@ -138,6 +144,7 @@ const parseOrganizationList = (payload) => {
     .filter((org) => (org.id && org.name) || org.name);
 };
 
+// Ensures job type rows stay consistent even when API fields are optional
 const normalizeJobType = (item) => {
   if (!item || typeof item !== "object") return null;
 
@@ -169,6 +176,7 @@ const normalizeJobType = (item) => {
   };
 };
 
+// Modal used for both create and edit operations; handles all validation locally
 function JobTypeModal({
   existingJob = null,
   onSave,
@@ -468,6 +476,7 @@ function JobTypeModal({
   );
 }
 
+// Main step component powering "Job Types & Compliance Mapping"
 export default function JobTypesForm({ selectedOrg }) {
   const { openModal, closeModal } = useModal();
   const { get, post, put, patch, del } = useApi();
@@ -488,6 +497,7 @@ export default function JobTypesForm({ selectedOrg }) {
 
   const isMountedRef = useRef(false);
 
+  // Tracks mounted state so async callbacks don't update stale components
   useEffect(() => {
     isMountedRef.current = true;
     return () => {
@@ -495,6 +505,7 @@ export default function JobTypesForm({ selectedOrg }) {
     };
   }, []);
 
+  // Pulls the list of job types from the API and normalizes them for the grid
   const loadJobTypes = useCallback(async () => {
       setLoading(true);
       try {
@@ -518,10 +529,12 @@ export default function JobTypesForm({ selectedOrg }) {
       }
   }, [get]);
 
+  // Reload job types whenever org scope changes
   useEffect(() => {
     loadJobTypes();
   }, [loadJobTypes, selectedOrg?.id, selectedOrg?.organizationId]);
 
+  // Hydrates the organizations dropdown used when assigning job types to companies
   useEffect(() => {
     let ignore = false;
     const ensureSelectedOrg = () => {
@@ -597,6 +610,7 @@ export default function JobTypesForm({ selectedOrg }) {
     return [];
   }, [companiesList, selectedOrgId, selectedOrgName]);
 
+  // Auto-selects the scoped org when opening the modal
   const defaultCompanySelection = useMemo(() => {
     if (!selectedOrgId && !selectedOrgName) return [];
     const preferred =
@@ -609,6 +623,7 @@ export default function JobTypesForm({ selectedOrg }) {
     return key ? [key] : [];
   }, [companyOptions, selectedOrgId, selectedOrgName]);
 
+  // Handles the create/update logic and keeps the local table in sync
   const handleSave = async (payload) => {
     if (!companyOptions.length) {
       showErrorToast("No organizations available. Please add one first.");
@@ -676,6 +691,7 @@ export default function JobTypesForm({ selectedOrg }) {
     }
   };
 
+  // Removes a job type after the confirmation dialog
   const handleDelete = async (id) => {
     setDeleting(true);
     try {
@@ -697,6 +713,7 @@ export default function JobTypesForm({ selectedOrg }) {
     }
   };
 
+  // Column definition for the job type DataTable
   const columns = [
     {
       name: "Job Type",
@@ -756,6 +773,7 @@ export default function JobTypesForm({ selectedOrg }) {
     },
   ];
 
+  // Match DataTable styling with rest of settings UI
   const customStyles = {
     table: {
       style: {
@@ -768,10 +786,12 @@ export default function JobTypesForm({ selectedOrg }) {
     headRow: { style: { backgroundColor: "#f9fafb", fontWeight: 600 } },
   };
 
+  // Client-side search (job types list is small)
   const filteredJobTypes = jobTypes.filter((item) =>
     (item?.jobType || "").toLowerCase().includes(search.toLowerCase())
   );
 
+  // Launches the modal with either a blank form or the selected row
   const launchModal = (existingJob = null) => {
     if (!companyOptions.length) {
       showErrorToast("No organizations available. Please add one first.");

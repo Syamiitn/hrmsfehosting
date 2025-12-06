@@ -1,0 +1,24 @@
+.emp-sub-dashboard {
+    background-color: var(--body-bg);
+
+    .cards-list {
+        padding: 0px;
+
+        .ems-route-card {
+            background-color: var(--card-bg);
+            padding: var(--padding-lg);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-glassy);
+            text-decoration: none;
+
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+            gap: 10px;
+
+            .icon {
+                font-size: 26px;
+            }
+        }
+    }
+}

@@ -388,6 +388,21 @@
         }
     }
 
+    /* Pill buttons to match design */
+    .pill-btn {
+        border-radius: 999px !important;
+        min-width: 90px;
+    }
+
+    /* Center action column content */
+    .exit-table th:last-child,
+    .exit-table td:last-child {
+        text-align: center;
+    }
+    .action-cell {
+        justify-content: center;
+    }
+
     .termination-modal-overlay {
         position: fixed;
         inset: 0;
@@ -468,11 +483,39 @@
         }
     }
 
-    .modal-actions {
-        display: flex;
-        gap: 12px;
-        justify-content: flex-end;
-    }
+.modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+/* Pill buttons and action centering */
+.pill-btn {
+    border-radius: 999px !important;
+    min-width: 90px;
+}
+
+.exit-table th:last-child,
+.exit-table td:last-child {
+    text-align: center;
+}
+
+.action-cell {
+    justify-content: center;
+}
+
+.checklist-modal {
+    background: var(--card-bg-color);
+}
+
+.checklist-list .muted-text {
+    font-size: 12px;
+}
+
+.checklist-row input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+}
 
     @media (max-width: 768px) {
         .handover-row,

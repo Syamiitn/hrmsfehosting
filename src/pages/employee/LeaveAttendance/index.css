@@ -1,10 +1,12 @@
 .leave-attendance-page {
-    background-color: var(--background-color);
+    background-color: var(--body-bg);
 
     .stat-card {
-        background-color: var(--card-bg-color);
-        padding: 16px;
-        border-radius: 20px;
+        background-color: var(--card-bg);
+        padding: var(--padding-lg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-glassy);
+        border: 1px solid var(--border-color);
 
         .icon {
             color: var(--theme);
@@ -17,9 +19,11 @@
     }
 
     .recent-leave-requests-card {
-        background-color: var(--card-bg-color);
-        padding: 16px;
-        border-radius: 20px;
+        background-color: var(--card-bg);
+        padding: var(--padding-lg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-glassy);
+        border: 1px solid var(--border-color);
         overflow-y: auto;
 
         .icon {
@@ -39,15 +43,19 @@
     }
 
     .attendance-calendar-card {
-        background-color: var(--card-bg-color);
-        padding: 16px;
-        border-radius: 20px;
+        background-color: var(--card-bg);
+        padding: var(--padding-lg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-glassy);
+        border: 1px solid var(--border-color);
     }
 
     .upcoming-event-card {
-        background-color: var(--card-bg-color);
-        padding: 16px;
-        border-radius: 20px;
+        background-color: var(--card-bg);
+        padding: var(--padding-lg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-glassy);
+        border: 1px solid var(--border-color);
 
         .icon {
             color: var(--theme);
@@ -64,9 +72,11 @@
     }
 
     .team-availability-card {
-        background-color: var(--card-bg-color);
-        padding: 16px;
-        border-radius: 20px;
+        background-color: var(--card-bg);
+        padding: var(--padding-lg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-glassy);
+        border: 1px solid var(--border-color);
 
         .icon {
             color: var(--theme);
@@ -107,9 +117,11 @@
     }
 
     .quick-actions-card {
-        background-color: var(--card-bg-color);
-        padding: 16px;
-        border-radius: 20px;
+        background-color: var(--card-bg);
+        padding: var(--padding-lg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-glassy);
+        border: 1px solid var(--border-color);
 
         .icon {
             color: var(--theme);

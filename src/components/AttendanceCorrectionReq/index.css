@@ -1,0 +1,12 @@
+.attendance-correction-req {
+    background-color: var(--card-bg);
+    border-radius: var(--radius-lg);
+    padding: var(--padding-lg);
+    box-shadow: var(--shadow-glassy);
+    margin-bottom: 10px;
+
+    .icon {
+        font-size: 20px;
+        color: var(--theme);
+    }
+}

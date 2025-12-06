@@ -1,0 +1,15 @@
+.payslip-label {
+    border: 1px solid var(--border-color);
+    padding: var(--padding-lg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+
+    .salary-details {
+        padding: 0px;
+        display: flex;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        gap: 26px;
+        margin-top: 10px;
+    }
+}

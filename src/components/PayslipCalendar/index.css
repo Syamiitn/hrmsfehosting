@@ -1,0 +1,87 @@
+/* ---------------- HEADER ---------------- */
+.payslip-calendar .pc-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+    background-color: var(--body-bg);
+    box-shadow: var(--shadow-glassy);
+    padding: 5px 10px;
+    border-radius: 5px;
+
+    button {
+        background: var(--card-bg);
+        border: 2px solid transparent;
+        padding: 3px 6px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 16px;
+        color: var(--text-color);
+        box-shadow: var(--shadow-soft);
+
+        &:hover {
+            background: var(--hover-bg);
+            border: 2px solid var(--border-color);
+        }
+    }
+
+    .pc-year-label {
+        margin: 0 10px;
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--text-color);
+        pointer-events: none;
+        /* match react-calendar */
+    }
+}
+
+/* ---------------- GRID ---------------- */
+.payslip-calendar .pc-grid {
+    display: grid;
+    gap: 15px;
+}
+
+/* ---------------- MONTH TILE ---------------- */
+.payslip-calendar .pc-month-tile {
+    background: var(--card-bg);
+    padding: 18px 12px;
+    border-radius: var(--radius-md);
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--border-color);
+
+    h6 {
+        margin: 0;
+    }
+
+    &.active:hover h6 {
+        color: var(--color-white);
+    }
+
+    &.active:hover {
+        background: var(--theme);
+        color: var(--color-white);
+    }
+
+    &.disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
+
+    .pc-indicator {
+        width: 10px;
+        height: 10px;
+        background-color: var(--theme);
+        border-radius: 50%;
+        position: absolute;
+        bottom: 8px;
+        right: 10px;
+    }
+
+    &.active:hover .pc-indicator {
+        background-color: var(--background-color);
+    }
+}

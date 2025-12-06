@@ -7,6 +7,8 @@ import {
     XAxis, YAxis, Tooltip, CartesianGrid, Legend, ResponsiveContainer
 } from "recharts";
 
+import NoDataFound from "../NoDataFound";
+
 const DEFAULT_COLORS = ["#6C63FF", "#FF6B6B", "#4ECDC4", "#FFD93D", "#1A535C"];
 
 const ChartRenderer = ({
@@ -15,11 +17,11 @@ const ChartRenderer = ({
     dataKeyX = "name",
     dataKeyY = "value",
     colors = DEFAULT_COLORS,
-    seriesName = "Value",  
+    seriesName = "Value",
 }) => {
 
     if (!data || data.length === 0) {
-        return <p style={{ textAlign: "center", margin: "20px 0" }}>No data available</p>;
+        return <NoDataFound message="No Data Found" />;
     }
 
     const mainColor = colors[0] || DEFAULT_COLORS[0];
@@ -48,7 +50,7 @@ const ChartRenderer = ({
                         <Line
                             type="monotone"
                             dataKey={dataKeyY}
-                            name={seriesName}  
+                            name={seriesName}
                             stroke={mainColor}
                             strokeWidth={2}
                             activeDot={{ r: 6 }}
@@ -66,7 +68,7 @@ const ChartRenderer = ({
                         <Legend />
                         <Bar
                             dataKey={dataKeyY}
-                            name={seriesName} 
+                            name={seriesName}
                             fill={mainColor}
                             radius={[8, 8, 0, 0]}
                         />
@@ -92,7 +94,7 @@ const ChartRenderer = ({
                         <Area
                             type="monotone"
                             dataKey={dataKeyY}
-                            name={seriesName} 
+                            name={seriesName}
                             stroke={mainColor}
                             fillOpacity={1}
                             fill="url(#colorGradient)"
@@ -109,7 +111,7 @@ const ChartRenderer = ({
                             data={data}
                             dataKey={dataKeyY}
                             nameKey={dataKeyX}
-                            name={seriesName}    
+                            name={seriesName}
                             cx="50%"
                             cy="50%"
                             outerRadius={100}
@@ -120,6 +122,53 @@ const ChartRenderer = ({
                             ))}
                         </Pie>
                     </PieChart>
+                )}
+
+                {/* ATTENDANCE GROUPED BAR CHART */}
+                {type === "attendance-bar" && (
+                    <BarChart data={data}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey={dataKeyX} />
+                        <YAxis />
+
+                        {/* Custom Tooltip */}
+                        <Tooltip
+                            content={({ active, payload, label }) => {
+                                if (!active || !payload || payload.length === 0) return null;
+                                const present = payload.find(p => p.dataKey === "present")?.value;
+                                const absent = payload.find(p => p.dataKey === "absent")?.value;
+
+                                return (
+                                    <div
+                                        style={{
+                                            background: "white",
+                                            padding: "10px 14px",
+                                            border: "1px solid #ddd",
+                                            borderRadius: "6px",
+                                        }}
+                                    >
+                                        <b>{label}</b>
+                                        <div style={{ color: "red" }}>Absent : {absent}</div>
+                                        <div style={{ color: "green" }}>Present : {present}</div>
+                                    </div>
+                                );
+                            }}
+                        />
+
+                        {/* Grey Hover Highlight */}
+                        <Bar
+                            dataKey="present"
+                            fill="#2EAF7D"
+                            radius={[6, 6, 0, 0]}
+                            barSize={30}
+                        />
+                        <Bar
+                            dataKey="absent"
+                            fill="#E74C3C"
+                            radius={[6, 6, 0, 0]}
+                            barSize={20}
+                        />
+                    </BarChart>
                 )}
 
             </ResponsiveContainer>

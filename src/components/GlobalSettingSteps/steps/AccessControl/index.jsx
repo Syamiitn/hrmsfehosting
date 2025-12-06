@@ -9,6 +9,7 @@ import { useApi } from "@hooks/useApi";
 import { createCommonApi } from "@services/commonApi";
 import { showErrorToast, showSuccessToast } from "@utils/utils";
 
+// Safely unwraps the array from most backend response shapes so the table always receives a list
 const unwrapList = (payload) => {
     if (Array.isArray(payload)) return payload;
     const candidates = ["data", "records", "items", "rows", "result", "content", "value"];
@@ -25,9 +26,11 @@ const unwrapList = (payload) => {
     return [];
 };
 
+// Makes sure every permission is always a string that the UI knows how to render
 const normalisePermission = (value, fallback = "No Access") =>
     String(value ?? fallback ?? "No Access");
 
+// Default permission template used for brand new rows
 const defaultPermissions = {
     globalSettings: "No Access",
     payroll: "No Access",
@@ -36,11 +39,13 @@ const defaultPermissions = {
     exitProcess: "No Access",
 };
 
+// Generates a unique identifier for rows even when backend payloads are incomplete
 const generateFallbackId = () =>
     typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
         ? crypto.randomUUID()
         : Date.now();
 
+// Converts raw API role payloads into the normalized shape expected by the table/form UI
 const mapRoleFromApi = (role) => {
     if (!role || typeof role !== "object") {
         return {
@@ -72,6 +77,7 @@ const mapRoleFromApi = (role) => {
     };
 };
 
+// Normalizes form submissions before they are sent back to the API
 const mapRoleToApi = (formValues) => {
     const name = String(formValues?.role ?? "").trim();
     const permissions = {
@@ -106,6 +112,7 @@ export default function AccessControlForm({ selectedOrg }) {
         [get, post, put, patch, del]
     );
 
+    // Initial load + whenever the organization changes we refetch the roles list
     useEffect(() => {
         const load = async () => {
             setLoading(true);
@@ -122,6 +129,7 @@ export default function AccessControlForm({ selectedOrg }) {
         load();
     }, [commonApi, selectedOrg?.id]);
 
+    // Assigns color-coded badges based on the permission label
     const badgeClass = (text) => {
         const t = (text || "").toLowerCase();
         if (t.includes("full")) return "bg-green-600 text-white";
@@ -133,6 +141,7 @@ export default function AccessControlForm({ selectedOrg }) {
         if (t.includes("no")) return "bg-gray-400 text-white";
         return "bg-gray-200 text-gray-700";
     };
+    // Table definition keeps DataTable configuration in one place
     const columns = [
         {
             name: <div className="text-[14px] font-semibold text-black">Role</div>,
@@ -192,6 +201,7 @@ export default function AccessControlForm({ selectedOrg }) {
     ];
 
     /* ✅ Replace your customStyles object with this */
+    // Custom table theme that mimics the rest of the global settings cards
     const customStyles = {
         table: {
             style: {
@@ -237,6 +247,7 @@ export default function AccessControlForm({ selectedOrg }) {
         },
     };
 
+    // Helper used after mutations to reload the list
     const refetchRoles = async () => {
         try {
             setLoading(true);
@@ -250,6 +261,7 @@ export default function AccessControlForm({ selectedOrg }) {
         }
     };
 
+    // Centralized create/update handler shared by both add + edit modals
     const handleSaveRole = async (payload) => {
         const apiPayload = mapRoleToApi(payload);
         try {
@@ -270,6 +282,7 @@ export default function AccessControlForm({ selectedOrg }) {
         }
     };
 
+    // Soft confirmation before deleting a role definition
     const handleConfirmDelete = async (id) => {
         try {
             await commonApi.roles.remove(id);
@@ -366,6 +379,7 @@ export default function AccessControlForm({ selectedOrg }) {
 }
 
 /* ---------------- RoleModal ---------------- */
+// Lightweight modal form that powers both add + edit role flows
 function RoleModal({ role, onCancel, onSave }) {
     const [visibleErrors, setVisibleErrors] = useState({});
     const permissionOptions = [
@@ -457,6 +471,7 @@ function RoleModal({ role, onCancel, onSave }) {
     );
 }
 
+// Shared select wrapper used by all permission dropdowns inside the modal
 const Select = ({ label, name, value, options, setFieldValue }) => (
     <div>
         <label className="text-sm font-medium text-gray-700">{label}</label>

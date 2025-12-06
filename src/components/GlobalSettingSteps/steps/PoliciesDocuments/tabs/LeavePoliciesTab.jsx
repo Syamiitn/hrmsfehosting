@@ -15,6 +15,7 @@ import { createCommonApi } from "@services/commonApi";
 import { showErrorToast, showSuccessToast } from "@utils/utils";
 
 
+// Converts whatever representation of companies the API returns into a normalized list
 const parseCompanyEntries = (value) => {
   if (!value) return [];
 
@@ -72,9 +73,11 @@ const parseCompanyEntries = (value) => {
   return [];
 };
 
+// Helper used to render a comma-separated string inside the table
 const buildCompanyNames = (entries = []) =>
   (entries || []).map((entry) => entry?.name).filter(Boolean);
 
+// Maps selected checkboxes into payload objects for the backend
 const formatCompaniesForPayload = (selectedKeys = [], options = []) => {
   if (!Array.isArray(selectedKeys)) return [];
   return selectedKeys
@@ -99,6 +102,7 @@ const formatCompaniesForPayload = (selectedKeys = [], options = []) => {
     .filter(Boolean);
 };
 
+// Normalizes both arrays + checkbox selections when editing an existing policy
 const normalizeCompanyPayload = (value, options = []) => {
   if (!Array.isArray(value)) {
     return formatCompaniesForPayload(value, options);
@@ -141,6 +145,7 @@ const normalizeCompanyPayload = (value, options = []) => {
     .filter(Boolean);
 };
 
+// A tiny helper so truthy settings survive inconsistent API responses
 const coerceBoolean = (value, fallback = false) => {
   if (typeof value === "boolean") return value;
   if (typeof value === "string") {
@@ -152,6 +157,7 @@ const coerceBoolean = (value, fallback = false) => {
   return fallback;
 };
 
+// Flattens API payloads into the structure expected by the UI + modal
 const mapLeavePolicy = (item = {}) => {
   const companyEntries =
     parseCompanyEntries(item.companies ?? item.company ?? item.companyName) || [];
@@ -235,6 +241,7 @@ const unwrapLeaveTypeItem = (payload) => {
   return payload;
 };
 
+// Handles any backend response shape and extracts the leave type array
 const parseLeaveTypeList = (payload) => {
   if (Array.isArray(payload)) return payload;
   if (!payload || typeof payload !== "object") return [];
@@ -278,6 +285,7 @@ const clampNonNegative = (value, fallback = 0) => {
   return value;
 };
 
+// Maps modal form values back into the API contract
 const buildLeaveTypePayload = (payload = {}, opts = {}) => {
   const normalizedCompanies = normalizeCompanyPayload(
     payload.companies,
@@ -429,6 +437,7 @@ export default function LeavePoliciesTab({ selectedOrg }) {
   );
 
   // Load leave policies from API
+  // Hydrates the organization/company options used inside the modal multi-select
   useEffect(() => {
     let ignore = false;
 
@@ -538,6 +547,7 @@ export default function LeavePoliciesTab({ selectedOrg }) {
     };
   }, [api, selectedOrgId, selectedOrgName]);
 
+  // Falls back to the focused organization when the API doesn't return any companies
   const companyOptions = useMemo(() => {
     if (companiesList.length > 0) return companiesList;
     if (selectedOrgId || selectedOrgName) {
@@ -551,6 +561,7 @@ export default function LeavePoliciesTab({ selectedOrg }) {
     return [];
   }, [companiesList, selectedOrgId, selectedOrgName]);
 
+  // Pre-selects the scoped org when launching the modal
   const defaultCompanySelection = useMemo(() => {
     if (!selectedOrgId && !selectedOrgName) return [];
     const preferred =
@@ -572,6 +583,7 @@ export default function LeavePoliciesTab({ selectedOrg }) {
     return ["All Companies", ...Array.from(names)];
   }, [companyOptions, policies]);
 
+  // Centralized create/update handler that keeps the table in sync with the server
   const handlePolicySave = useCallback(
     async (payload) => {
       if (!payload) return false;
@@ -944,6 +956,7 @@ export default function LeavePoliciesTab({ selectedOrg }) {
 /* ============================================================
    🧩 LeavePolicyModal — Final Version
    ============================================================ */
+// Modal responsible for adding/editing leave policies with advanced settings
 function LeavePolicyModal({
   title,
   onClose,

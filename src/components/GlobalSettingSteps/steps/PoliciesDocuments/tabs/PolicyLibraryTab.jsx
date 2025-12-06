@@ -7,6 +7,7 @@ import { createCommonApi } from "@services/commonApi";
 import { showErrorToast, showSuccessToast } from "@utils/utils";
 import AddPolicyModal from "../AddPolicyModal";
 
+// Safely unwraps the array regardless of how the backend structures the response
 const unwrapList = (payload) => {
   if (Array.isArray(payload)) return payload;
   if (!payload || typeof payload !== "object") return [];
@@ -18,6 +19,7 @@ const unwrapList = (payload) => {
   return [];
 };
 
+// Normalizes all the different ways companies/organizations can be attached to a policy
 const parseCompanyEntries = (value) => {
   if (!value) return [];
 
@@ -97,6 +99,7 @@ const parseOrganizationList = (payload) => {
     .filter((org) => (org.id && org.name) || org.name);
 };
 
+// Ensures each policy row has a predictable shape before rendering
 const normalizePolicy = (item) => {
   if (!item || typeof item !== "object") return null;
 
@@ -148,6 +151,7 @@ const normalizePolicy = (item) => {
   };
 };
 
+// Converts a normalized policy record into the form values expected by AddPolicyModal
 const mapPolicyToFormValues = (policy) => {
   if (!policy) return undefined;
   return {
@@ -205,6 +209,7 @@ export default function PolicyLibraryTab({ selectedOrg, refreshKey = 0 }) {
   const [companiesList, setCompaniesList] = useState([]);
   const isMountedRef = useRef(true);
 
+  // Fetches and normalizes policies scoped to the selected organization
   const loadPolicies = useCallback(
     async ({ withLoader = true } = {}) => {
       if (!policyService) {
@@ -240,6 +245,7 @@ export default function PolicyLibraryTab({ selectedOrg, refreshKey = 0 }) {
     [policyService]
   );
 
+  // Populates the category filter for the modal
   const loadCategories = useCallback(async () => {
     if (!categoriesService || !organizationId) {
       if (isMountedRef.current) setCategories([]);
@@ -351,6 +357,7 @@ export default function PolicyLibraryTab({ selectedOrg, refreshKey = 0 }) {
     return key ? [key] : [];
   }, [companiesList, organizationId, selectedOrgName]);
 
+  // Triggered by AddPolicyModal once a policy has been persisted
   const handlePolicySaved = useCallback(async () => {
     await loadPolicies({ withLoader: false });
   }, [loadPolicies]);
@@ -375,8 +382,10 @@ export default function PolicyLibraryTab({ selectedOrg, refreshKey = 0 }) {
     );
   };
 
+  // Small wrappers keep the table actions declarative
   const handleEdit = (row) => openPolicyModal(row);
 
+  // Opens a confirmation dialog before deleting a policy
   const handleDelete = (policy) => {
     if (!policy) return;
     openModal(

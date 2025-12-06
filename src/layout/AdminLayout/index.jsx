@@ -16,7 +16,6 @@ export default function HrLayout() {
     const { user, enrichUser } = useAuth();
     const role = user?.role || 'admin'
     const location=useLocation();
-    console.log(location.pathname,"location")
 
     // Fetching user details
     const fetchedRef = useRef(false);

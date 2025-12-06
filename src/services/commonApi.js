@@ -1,5 +1,11 @@
 import { API_ENDPOINTS } from "@config/api.config";
 
+// Binds a provided HTTP client (from useApi()) to REST endpoints.
+// Usage pattern:
+//   const api = createCommonApi(client);
+//   api.departments.list({ params: { search: "HR" } });
+// The client is expected to expose get/post/put/patch/del with axios-like signatures.
+
 // Factory for Departments API using a client from useApi()
 export const departmentsApi = (client) => {
   const base = API_ENDPOINTS.departments;
@@ -19,7 +25,7 @@ export const departmentsApi = (client) => {
     // Create new department
     create: (data) => client.post(base, data),
     // Update department by id
-    update: (id, data) => client.put(`${base}/${id}`, data),
+    update: (id, data) => client.patch(`${base}/${id}`, data),
     // Delete department by id
     remove: (id) => client.del(`${base}/${id}`),
   };
@@ -49,10 +55,15 @@ export const designationsApi = (client) => {
 export const shiftsApi = (client) => {
   const base = API_ENDPOINTS.shifts;
   return {
+    // Retrieve all shifts (optionally filtered by query params)
     list: (params) => client.get(base, { params }),
+    // Fetch a single shift definition
     get: (id) => client.get(`${base}/${id}`),
+    // Create a new shift
     create: (data) => client.post(base, data),
+    // Replace an existing shift
     update: (id, data) => client.put(`${base}/${id}`, data),
+    // Delete a shift configuration
     remove: (id) => client.del(`${base}/${id}`),
   };
 };
@@ -117,9 +128,13 @@ export const policiesApi = (client) => {
       }
       return client.get(base, { params: opts });
     },
+    // Fetch a specific policy (optionally with query params)
     get: (id, opts) => client.get(`${base}/${id}`, { params: opts?.params }),
+    // Create a new policy
     create: (data) => client.post(base, data),
+    // Partial update of an existing policy
     update: (id, data) => client.patch(`${base}/${id}`, data),
+    // Remove policy
     remove: (id) => client.del(`${base}/${id}`),
   };
 };
@@ -219,8 +234,26 @@ export const organizationsApi = (client) => {
   };
 };
 
+// Expense Types fetching
+export const expenseTypesApi = (client) => {
+  const base = API_ENDPOINTS.expenseTypes;
+
+  return {
+    list: (params) => client.get(base, { params }),
+    get: (id, params) => client.get(id ? `${base}/${id}` : base, { params }),
+    create: (data) => client.post(base, data),
+    update: (id, data) => client.put(`${base}/${id}`, data),
+    patch: (id, data) => client.patch(`${base}/${id}`, data),
+    delete: (id) => client.delete(`${base}/${id}`),
+  };
+};
+
+// Common API aggregator
 export const createCommonApi = (client) => ({
+  // Org-wide helpers
   organizations: organizationsApi(client),
+
+  // Master data building blocks
   departments: departmentsApi(client),
   designations: designationsApi(client),
   shifts: shiftsApi(client),
@@ -229,8 +262,11 @@ export const createCommonApi = (client) => ({
   policyCategories: policyCategoriesApi(client),
   policies: policiesApi(client),
   separations: separationsApi(client),
-  leaveBalances: leaveBalancesApi(client),   // <-- FIX
+  leaveBalances: leaveBalancesApi(client),
   jobTypes: jobTypesApi(client),
   holidays: holidaysApi(client),
   localization: localizationApi(client),
+
+  // FIXED ✔
+  expenseTypes: expenseTypesApi(client),
 });

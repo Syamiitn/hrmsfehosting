@@ -20,6 +20,7 @@ import "./index.css";
 export default function UpComingSchedules() {
     const [activeTab, setActiveTab] = useState("HOLI");
     const [holidays, setHolidays] = useState([]);
+    const [events, setEvents] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
 
     const { get } = useApi();
@@ -44,7 +45,6 @@ export default function UpComingSchedules() {
 
     /**
      * Fetch holidays from backend
-     * Production-level error handling & safe checks
      */
     const fetchHolidays = useCallback(async () => {
         try {
@@ -70,10 +70,36 @@ export default function UpComingSchedules() {
     }, [get]);
 
     /**
+     * Fetch holidays from backend
+     */
+    const fetchEvents = useCallback(async () => {
+        try {
+            setIsLoading(true);
+
+            const res = await get("employee-events/upcoming?days=100");
+
+            // If API does not return an array → avoid crashing
+            if (!res.events || !Array.isArray(res.events)) {
+                console.warn("Unexpected Events API response:", res);
+                setEvents([]);
+                return;
+            }
+
+            setEvents(res?.events);
+
+        } catch (err) {
+            console.error("Failed to fetch Events:", err?.message);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [get]);
+
+    /**
      * Run once on mount
      */
     useEffect(() => {
         fetchHolidays();
+        fetchEvents();
     }, [fetchHolidays]);
 
     /**
@@ -83,7 +109,7 @@ export default function UpComingSchedules() {
         // Generic "No Data" Component
         const NoData = ({ label }) => (
             <div className="d-flex flex-column align-items-center justify-content-center py-4 w-100">
-                <NoDataFound message={`No upcoming ${label.toLowerCase()} found!`} />
+                <NoDataFound message={`No upcoming ${label.toLowerCase()} found!`} maxWidth="150px" />
             </div>
         );
 
@@ -108,10 +134,10 @@ export default function UpComingSchedules() {
             case "EVENT":
                 return (
                     <div>
-                        {upcomingEvents.length === 0 ? (
+                        {events.length === 0 ? (
                             <NoData label="events" />
                         ) : (
-                            <UpComingEvents upcomingEvents={upcomingEvents} />
+                            <UpComingEvents upcomingEvents={events} />
                         )}
                     </div>
                 );
@@ -138,7 +164,7 @@ export default function UpComingSchedules() {
     };
 
     return (
-        <div className="upcoming-container flex-fill shadow-sm">
+        <div className="upcoming-container flex-fill">
 
             {/* Header */}
             <div className="d-flex flex-row align-items-center gap-2 mb-2">

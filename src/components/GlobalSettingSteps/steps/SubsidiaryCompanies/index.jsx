@@ -6,6 +6,7 @@ import OrganizationInfoForm from "../OrganizationInfo";//@components/GlobalSetti
 import "./index.css";
 
 /* ============== Small UI Helper: CardOption ============== */
+// Pill-like selection card used inside the modal when choosing subsidiaries
 function CardOption({ company, selected, onSelect, disabled }) {
   return (
     <button

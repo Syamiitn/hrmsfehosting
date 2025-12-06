@@ -10,6 +10,7 @@ import { showSuccessToast } from "@utils/utils";
    ============================================================ */
 
 // 🔹 GET Acknowledgment Settings
+// Simulates retrieving aggregated acknowledgement stats + toggles
 async function apiGetAcknowledgmentSettings(orgId) {
   console.log("📡 GET -> /api/acknowledgments/settings?org=" + orgId);
   return new Promise((res) =>
@@ -34,6 +35,7 @@ async function apiGetAcknowledgmentSettings(orgId) {
 }
 
 // 🔹 PATCH (Save Settings)
+// Simulates persisting the toggle settings
 async function apiSaveAcknowledgmentSettings(orgId, payload) {
   console.log("📡 PATCH -> /api/acknowledgments/settings/" + orgId, payload);
   return { success: true };

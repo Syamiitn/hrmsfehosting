@@ -17,7 +17,7 @@
     color: var(--text-1);
 
     /* Dark mode variables */
-    background-color: var(--background-color);
+    background-color: var(--body-bg);
     color: var(--muted-text-color);
 }
 

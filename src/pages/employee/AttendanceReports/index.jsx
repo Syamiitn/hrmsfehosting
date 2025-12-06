@@ -33,7 +33,7 @@ export default function AttendanceReports() {
       <div className="container-fluid">
         <div className="row">
           <div className="col-12">
-            <div className="attendance-reports shadow-sm">
+            <div className="attendance-reports ">
               <div className="d-flex align-items-start gap-2">
                 <IoDocumentTextOutline className='icon' />
                 <div>

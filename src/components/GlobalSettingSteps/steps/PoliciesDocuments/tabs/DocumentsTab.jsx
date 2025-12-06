@@ -3,6 +3,7 @@ import { FiFileText } from "react-icons/fi"; // icon for header
 import HrTemplatesTab from "./HrTemplatesTab.jsx";
 import CompanyDocumentsTab from "./CompanyDocumentsTab.jsx";
 
+// Hosts the "Documents" step with nested Standard vs Company tabs
 export default function DocumentsTab({ selectedOrg }) {
   const [activeSubTab, setActiveSubTab] = useState("hrTemplates");
 

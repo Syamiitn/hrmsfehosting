@@ -2,11 +2,11 @@
    Tax Declarations Card
    ========================== */
 .tax-declarations-card {
-    background: var(--card-bg-color);
-    border-radius: 16px;
-    box-shadow: 0 6px 18px rgba(16, 24, 40, 0.06);
-    padding: 16px;
-    transition: 0.2s;
+    background-color: var(--card-bg);
+    padding: var(--padding-lg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-glassy);
+    border: 1px solid var(--border-color);
 
     /* Header */
     .tax-declarations__header {
@@ -24,6 +24,7 @@
     .tax-declarations__icon {
         display: flex;
         align-items: center;
+        color: var(--theme);
     }
 
     /* Rows */
@@ -40,7 +41,8 @@
         padding: 12px 14px;
         border: 1px solid var(--border-color);
         border-radius: 12px;
-        background: var(--card-bg-color);
+        background: var(--card-bg);
+        box-shadow: var(--shadow-soft);
     }
 
     .row-label {

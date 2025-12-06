@@ -62,6 +62,76 @@ export const SIDEBAR_MENU = {
             icon: MdOutlineAttachMoney,
             activeIcon: MdAttachMoney,
         },
+        {
+            path: "/admin/ems/overview",
+            label: "EMS",
+            icon: MdOutlineWork,
+            activeIcon: MdWork,
+            subMenu: [
+                {
+                    path: "/admin/ems/overview",
+                    label: "Overview",
+                    icon: MdOutlinePeople,
+                    activeIcon: MdPeople
+                },
+                {
+                    path: "/admin/ems/directory",
+                    label: "Employee Directory",
+                    icon: MdOutlinePeople,
+                    activeIcon: MdPeople
+                },
+                {
+                    path: "/admin/ems/pending-actions",
+                    label: "Pending Actions",
+                    icon: MdOutlineEventBusy,
+                    activeIcon: MdEventBusy
+                },
+                {
+                    path: "/admin/ems/ems/overview",
+                    label: "EMS",
+                    icon: MdOutlineDashboard,
+                    activeIcon: MdDashboard,
+                    subMenu: [
+                        {
+                            icon: MdPeopleAlt,
+                            label: "Employee Directory",
+                            desc: "View and manage all employee information.",
+                            path: "/admin/ems/ems/directory",
+                        },
+                        {
+                            icon: MdCalendarMonth,
+                            label: "Leave Management",
+                            desc: "Approve leave requests and manage policies.",
+                            path: "/admin/ems/ems/leave-management",
+                        },
+                        {
+                            icon: MdAccessTime,
+                            label: "Attendance Tracking",
+                            desc: "Monitor attendance and resolve issues.",
+                            path: "/admin/ems/ems/attendance-tracking",
+                        },
+                        {
+                            icon: MdTrendingUp,
+                            label: "Performance Reviews",
+                            desc: "Conduct and track performance evaluations.",
+                            path: "/admin/ems/ems/performace-reviews",
+                        },
+                        {
+                            icon: MdPersonAddAlt1,
+                            label: "Onboarding",
+                            desc: "Manage new employee onboarding process.",
+                            path: "/admin/ems/ems/onboarding",
+                        },
+                        {
+                            icon: MdDescription,
+                            label: "Documents",
+                            desc: "Employee documents and compliance.",
+                            path: "/admin/ems/ems/documents",
+                        },
+                    ]
+                },
+            ],
+        },
     ],
 
     employee: [
@@ -199,6 +269,12 @@ export const SIDEBAR_MENU = {
             label: "Inbox",
             icon: MdOutlineInbox,
             activeIcon: MdInbox,
+        },
+        {
+            path: "/employee/finance",
+            label: "Finance",
+            icon: MdOutlineAttachMoney,
+            activeIcon: MdAttachMoney,
         },
     ],
 
@@ -385,6 +461,12 @@ export const SIDEBAR_MENU = {
                             label: "Attendance Tracking",
                             desc: "Monitor attendance and resolve issues.",
                             path: "/hr/ems/ems/attendance-tracking",
+                        },
+                        {
+                            icon: MdExitToApp,
+                            label: "Exit Management",
+                            desc: "Handle employee exit requests and handovers.",
+                            path: "/hr/ems/exit-process",
                         },
                         {
                             icon: MdTrendingUp,

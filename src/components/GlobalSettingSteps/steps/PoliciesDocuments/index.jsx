@@ -11,8 +11,9 @@ import { FiPlus } from "react-icons/fi";
 import { useModal } from "@context/GlobalModalContext";
 import AddPolicyModal from "./AddPolicyModal";
 
-
+// Wrapper for the Policies & Documents step that wires up tab navigation + modals
 export default function PoliciesDocumentsForm({ selectedOrg }) {
+  // Tab definitions drive both the buttons + switch statement below
   const tabs = [
     { key: "policyLibrary", label: "Policy Library" },
     { key: "categories", label: "Categories" },
@@ -43,6 +44,7 @@ export default function PoliciesDocumentsForm({ selectedOrg }) {
     return key ? [key] : [];
   }, [fallbackCompanyOptions]);
 
+  // Opens the add policy/document modal and triggers a refresh on success
   const handleOpenAddModal = () => {
     openModal(
       <AddPolicyModal
@@ -60,6 +62,7 @@ export default function PoliciesDocumentsForm({ selectedOrg }) {
     );
   };
 
+  // Keeps the JSX for each tab isolated from the switch logic
   const renderActiveTab = () => {
     switch (activeTab) {
       case "policyLibrary":

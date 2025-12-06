@@ -34,31 +34,181 @@ const formatDate = (date) => {
 // Normalize phone number for comparisons (keep only digits)
 const normalizePhone = (p) => (p || "").toString().replace(/[^\d]/g, "");
 
-// Code mappings for employee code generation
-const ENTITY_CODES = {
-  sogo_corporation: "SG",
-  sogo_technologies: "ST",
-  sogo_services: "SS",
-  other: "OT",
+// Default dropdown fallbacks (used if APIs are unreachable)
+const DEFAULT_LEGAL_ENTITIES = [
+  { value: "SoGo Corporation", label: "SoGo Corporation", name: "SoGo Corporation", code: "SG" },
+  { value: "SoGo Technologies", label: "SoGo Technologies", name: "SoGo Technologies", code: "ST" },
+  { value: "SoGo Services", label: "SoGo Services", name: "SoGo Services", code: "SS" },
+  { value: "Other", label: "Other", name: "Other", code: "OT" },
+];
+const DEFAULT_BUSINESS_UNITS = [
+  { value: "Human Resources", label: "Human Resources", name: "Human Resources", code: "HR" },
+  { value: "Finance", label: "Finance", name: "Finance", code: "FN" },
+  { value: "Sales & Marketing", label: "Sales & Marketing", name: "Sales & Marketing", code: "SM" },
+  { value: "Operations", label: "Operations", name: "Operations", code: "OP" },
+  { value: "Other", label: "Other", name: "Other", code: "OT" },
+];
+const DEFAULT_EMPLOYMENT_TYPES = [
+  { value: "Full-Time", label: "Full-Time", name: "Full-Time", code: "FT" },
+  { value: "Part-Time", label: "Part-Time", name: "Part-Time", code: "PT" },
+  { value: "Contract", label: "Contract", name: "Contract", code: "CT" },
+  { value: "Intern", label: "Intern", name: "Intern", code: "IN" },
+];
+
+// Helpers to handle API list responses and code prefixes
+const unwrapList = (payload) => {
+  if (Array.isArray(payload)) return payload;
+  if (typeof payload === "string") {
+    const trimmed = payload.trim();
+    if (trimmed.startsWith("{") || trimmed.startsWith("[")) {
+      try {
+        const parsed = JSON.parse(trimmed);
+        return unwrapList(parsed);
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  }
+  if (!payload || typeof payload !== "object") return [];
+  if (Array.isArray(payload.data)) return payload.data;
+  if (Array.isArray(payload.items)) return payload.items;
+  if (Array.isArray(payload.records)) return payload.records;
+  if (Array.isArray(payload.result)) return payload.result;
+  const firstArray = Object.values(payload).find(Array.isArray);
+  return Array.isArray(firstArray) ? firstArray : [];
 };
-const BUSINESS_UNIT_CODES = {
-  "Human Resources": "HR",
-  Finance: "FN",
-  "Sales & Marketing": "SM",
-  Operations: "OP",
-  Other: "OT",
+
+const normalizeOrganizations = (payload = []) =>
+  unwrapList(payload)
+    .map((org) => {
+      const name = org?.name ?? org?.orgName ?? org?.companyName ?? org?.title ?? "";
+      const id = org?.id ?? org?.organizationId ?? org?._id ?? null;
+      const value = id != null ? id : name;
+      if (value == null && !name) return null;
+      return {
+        id,
+        value: value != null ? String(value) : "",
+        label: name || String(value),
+        name: name || String(value),
+        code: org?.code ?? org?.shortCode ?? org?.abbr ?? null,
+      };
+    })
+    .filter(Boolean);
+
+const normalizeDepartments = (payload = []) =>
+  unwrapList(payload)
+    .map((dept) => {
+      const name = dept?.name ?? dept?.department ?? dept?.departmentName ?? dept?.title ?? "";
+      const id = dept?.id ?? dept?.departmentId ?? dept?._id ?? null;
+      const value = id != null ? id : name;
+      if (value == null && !name) return null;
+      return {
+        id,
+        value: value != null ? String(value) : "",
+        label: name || String(value),
+        name: name || String(value),
+        code: dept?.code ?? dept?.abbr ?? null,
+      };
+    })
+    .filter(Boolean);
+
+const normalizeJobTypes = (payload = []) =>
+  unwrapList(payload)
+    .map((jt) => {
+      const name = jt?.jobType ?? jt?.name ?? jt?.title ?? "";
+      const id = jt?.id ?? jt?.jobTypeId ?? jt?._id ?? null;
+      const value = id != null ? id : name;
+      if (value == null && !name) return null;
+      return {
+        id,
+        value: value != null ? String(value) : "",
+        label: name || String(value),
+        name: name || String(value),
+        code: jt?.code ?? jt?.abbr ?? null,
+      };
+    })
+    .filter(Boolean);
+
+const buildPrefix = (text) => {
+  const source = String(text || "").trim();
+  if (!source) return "__";
+  const caps = source.replace(/[^A-Z]/g, "");
+  if (caps.length >= 2) return caps.slice(0, 2);
+  const words = source.split(/[\s/_-]+/).filter(Boolean);
+  const initials = words.slice(0, 2).map((w) => w[0]);
+  if (initials.length === 2) return (initials[0] + initials[1]).toUpperCase();
+  if (initials.length === 1) {
+    const fallback = source.replace(/[^A-Za-z0-9]/g, "").slice(1, 2) || "_";
+    return (initials[0] + fallback).toUpperCase();
+  }
+  const cleaned = source.replace(/[^A-Za-z0-9]/g, "").slice(0, 2).toUpperCase();
+  return cleaned.padEnd(2, "_") || "__";
 };
-const EMP_TYPE_CODES = {
-  full_time: "FT",
-  part_time: "PT",
-  contract: "CT",
-  intern: "IN",
+
+const resolvePrefix = (value, options = [], fallback = [], { preferCode = true } = {}) => {
+  if (!value) return "__";
+  const match =
+    options.find(
+      (opt) =>
+        String(opt.value) === String(value) ||
+        (opt.id != null && String(opt.id) === String(value))
+    ) ||
+    fallback.find(
+      (opt) =>
+        String(opt.value) === String(value) ||
+        (opt.id != null && String(opt.id) === String(value)) ||
+        (opt.name && String(opt.name) === String(value))
+    );
+
+  const candidates = [];
+  const pushCandidates = (item) => {
+    if (!item) return;
+    const ordered = preferCode
+      ? [item.code, item.name, item.label, item.value]
+      : [item.name, item.label, item.value, item.code];
+    ordered.forEach((c) => {
+      if (typeof c === "string" && c.trim()) candidates.push(c);
+    });
+  };
+
+  pushCandidates(match);
+  pushCandidates(fallback.find((opt) => String(opt.name) === String(value)));
+  if (typeof value === "string" && value.trim()) candidates.push(value);
+
+  const source = candidates.find(Boolean) || value;
+  return buildPrefix(source);
+};
+
+const resolveLabel = (value, options = [], fallback = []) => {
+  if (!value) return "";
+  const match =
+    options.find(
+      (opt) =>
+        String(opt.value) === String(value) ||
+        (opt.id != null && String(opt.id) === String(value)) ||
+        (opt.name && String(opt.name) === String(value))
+    ) ||
+    fallback.find(
+      (opt) =>
+        String(opt.value) === String(value) ||
+        (opt.id != null && String(opt.id) === String(value)) ||
+        (opt.name && String(opt.name) === String(value))
+    );
+  return match?.label || match?.name || match?.value || String(value);
 };
 
 export default function EmpOnboarding() {
   const navigate = useNavigate();
   const { openModal, closeModal } = useModal();
   const { get, post, loading, lastError } = useApi();
+  const [legalEntities, setLegalEntities] = useState([]);
+  const [businessUnits, setBusinessUnits] = useState([]);
+  const [employmentTypes, setEmploymentTypes] = useState([]);
+  const [dropdownLoading, setDropdownLoading] = useState(false);
+  const entityOptions = legalEntities.length ? legalEntities : DEFAULT_LEGAL_ENTITIES;
+  const businessOptions = businessUnits.length ? businessUnits : DEFAULT_BUSINESS_UNITS;
+  const employmentOptions = employmentTypes.length ? employmentTypes : DEFAULT_EMPLOYMENT_TYPES;
 
   // refs
   const empRef = useRef(null);
@@ -206,6 +356,42 @@ export default function EmpOnboarding() {
   });
 
   // =====================================================
+  // Fetch dropdown options (legal entities, business units, job types)
+  // =====================================================
+  useEffect(() => {
+    let active = true;
+
+    const fetchDropdowns = async () => {
+      setDropdownLoading(true);
+      try {
+        const [orgRes, deptResRaw, jobRes] = await Promise.all([
+          get("/organizations"),
+          get("/departments").catch(async (err) => {
+            console.warn("Failed to fetch /departments, trying /department", err?.message || err);
+            return get("/department");
+          }),
+          get("/job-types"),
+        ]);
+
+        if (!active) return;
+        setLegalEntities(normalizeOrganizations(orgRes));
+        setBusinessUnits(normalizeDepartments(deptResRaw));
+        setEmploymentTypes(normalizeJobTypes(jobRes));
+      } catch (err) {
+        console.error("Failed to fetch onboarding dropdowns:", err);
+        showErrorToast("Could not load dropdowns. Using defaults.");
+      } finally {
+        if (active) setDropdownLoading(false);
+      }
+    };
+
+    fetchDropdowns();
+    return () => {
+      active = false;
+    };
+  }, [get]);
+
+  // =====================================================
   // Fetch Sequence Number (no random fallback)
   // =====================================================
   useEffect(() => {
@@ -253,6 +439,29 @@ export default function EmpOnboarding() {
   const handleConfirmSubmit = async (values) => {
     closeModal();
     try {
+      const findOption = (opts = [], val) =>
+        (opts || []).find(
+          (opt) =>
+            String(opt.value) === String(val) ||
+            (opt.id != null && String(opt.id) === String(val)) ||
+            (opt.name && String(opt.name) === String(val))
+        );
+
+      const selectedLegal =
+        findOption(legalEntities, values.legalEntity) ||
+        findOption(DEFAULT_LEGAL_ENTITIES, values.legalEntity);
+      const selectedBusiness =
+        findOption(businessUnits, values.businessUnit) ||
+        findOption(DEFAULT_BUSINESS_UNITS, values.businessUnit);
+      const selectedEmployment =
+        findOption(employmentTypes, values.employmentType) ||
+        findOption(DEFAULT_EMPLOYMENT_TYPES, values.employmentType);
+      const employmentTypeLabel =
+        selectedEmployment?.name ||
+        selectedEmployment?.label ||
+        selectedEmployment?.value ||
+        values.employmentType;
+
       // Determine which sequence number to send
       let seqToSend = sequenceNumber;
       if (manualOverride) {
@@ -271,7 +480,16 @@ export default function EmpOnboarding() {
       const payload = {
         employeeCode: values.employeeCode || employeeCode,
         sequenceNumber: seqToSend,
-        employmentType: values.employmentType,
+        legalEntityId:
+          selectedLegal?.id ||
+          (selectedLegal?.value ? selectedLegal.value : undefined),
+        businessUnitId:
+          selectedBusiness?.id ||
+          (selectedBusiness?.value ? selectedBusiness.value : undefined),
+        employmentTypeId:
+          selectedEmployment?.id ||
+          (selectedEmployment?.value ? selectedEmployment.value : undefined),
+        employmentType: employmentTypeLabel,
         status: "active",
         hireDate: formatDate(values.hireDate),
         exitDate: null,
@@ -340,16 +558,20 @@ export default function EmpOnboarding() {
       showErrorToast(codeStatus.message || "Custom code not verified as available.");
       return;
     }
-    const required = (addr) => addr && addr.line1 && addr.city && addr.state && addr.postalCode;
-    if (!required(values.currentAddress) || !required(values.permanentAddress)) {
-      showErrorToast("Please complete both Current and Permanent Address.");
-      return;
-    }
+        const required = (addr) => addr && addr.line1 && addr.city && addr.state && addr.postalCode;
+        if (!required(values.currentAddress) || !required(values.permanentAddress)) {
+          showErrorToast("Please complete both Current and Permanent Address.");
+          return;
+        }
 
-    openModal(
-      <div className="preview-modal wide">
-        <div className="d-flex flex-column justify-content-center align-items-center">
-          <h4>Review Employee Onboarding Details</h4>
+        const displayLegal = resolveLabel(values.legalEntity, entityOptions, DEFAULT_LEGAL_ENTITIES);
+        const displayBU = resolveLabel(values.businessUnit, businessOptions, DEFAULT_BUSINESS_UNITS);
+        const displayEmployment = resolveLabel(values.employmentType, employmentOptions, DEFAULT_EMPLOYMENT_TYPES);
+
+        openModal(
+          <div className="preview-modal wide">
+            <div className="d-flex flex-column justify-content-center align-items-center">
+              <h4>Review Employee Onboarding Details</h4>
           <p className="p3">Please verify all details before submission.</p>
         </div>
 
@@ -358,9 +580,9 @@ export default function EmpOnboarding() {
             title="Employee Details"
             icon={<MdBadge className="accent-icon" />}
             fields={[
-              { label: "Legal Entity", value: values.legalEntity },
-              { label: "Business Unit", value: values.businessUnit },
-              { label: "Employment Type", value: values.employmentType },
+              { label: "Legal Entity", value: displayLegal },
+              { label: "Business Unit", value: displayBU },
+              { label: "Employment Type", value: displayEmployment },
               { label: "Hire Date", value: values.hireDate },
               { label: "Employee Code", value: values.employeeCode || employeeCode || "Generating..." },
             ]}
@@ -458,6 +680,10 @@ export default function EmpOnboarding() {
                     codeStatus={codeStatus}
                     sequenceNumber={sequenceNumber}
                     onCodeStatusChange={setCodeStatus}
+                    legalEntities={legalEntities}
+                    businessUnits={businessUnits}
+                    employmentTypes={employmentTypes}
+                    dropdownLoading={dropdownLoading}
                   />
 
                   <PersonalSection
@@ -561,12 +787,19 @@ const EmployeeSection = ({
   codeStatus,
   sequenceNumber,
   onCodeStatusChange,
+  legalEntities = [],
+  businessUnits = [],
+  employmentTypes = [],
+  dropdownLoading = false,
 }) => {
   // Access Formik context
   const { values, setFieldValue, errors, touched } = useFormikContext();
   const { get } = useApi(); // for backend call
   const [status, setStatus] = useState({ isTaken: null, message: "" });
   const debounceRef = useRef(null);
+  const entityOptions = legalEntities.length ? legalEntities : DEFAULT_LEGAL_ENTITIES;
+  const businessOptions = businessUnits.length ? businessUnits : DEFAULT_BUSINESS_UNITS;
+  const employmentOptions = employmentTypes.length ? employmentTypes : DEFAULT_EMPLOYMENT_TYPES;
 
   // ==============================================
   // Auto-generate Employee Code dynamically
@@ -574,31 +807,55 @@ const EmployeeSection = ({
   // Live preview with placeholders until all three are selected
   useEffect(() => {
     if (manualOverride) return;
-    const entityCode = values.legalEntity
-      ? (ENTITY_CODES[values.legalEntity] || values.legalEntity.substring(0, 2).toUpperCase())
-      : "__";
-    const buCode = values.businessUnit
-      ? (BUSINESS_UNIT_CODES[values.businessUnit] || values.businessUnit.substring(0, 2).toUpperCase())
-      : "__";
-    const empTypeCode = values.employmentType
-      ? (EMP_TYPE_CODES[values.employmentType] || values.employmentType.substring(0, 2).toUpperCase())
-      : "__";
+    const entityCode = resolvePrefix(values.legalEntity, entityOptions, DEFAULT_LEGAL_ENTITIES);
+    const buCode = resolvePrefix(values.businessUnit, businessOptions, DEFAULT_BUSINESS_UNITS);
+    const empTypeCode = resolvePrefix(
+      values.employmentType,
+      employmentOptions,
+      DEFAULT_EMPLOYMENT_TYPES,
+      { preferCode: false }
+    );
     const paddedSeq = sequenceNumber != null ? String(sequenceNumber).padStart(4, "0") : "0000";
     const newCode = `${entityCode}-${buCode}-${empTypeCode}-${paddedSeq}`;
     setFieldValue("employeeCode", newCode);
-  }, [values.legalEntity, values.businessUnit, values.employmentType, manualOverride, sequenceNumber, setFieldValue]);
+  }, [
+    values.legalEntity,
+    values.businessUnit,
+    values.employmentType,
+    manualOverride,
+    sequenceNumber,
+    setFieldValue,
+    entityOptions,
+    businessOptions,
+    employmentOptions,
+  ]);
 
   // When manual override is ON, keep last 4 digits but update prefix if dropdowns change
   useEffect(() => {
     if (!manualOverride) return;
-    const entityCode = values.legalEntity ? (ENTITY_CODES[values.legalEntity] || values.legalEntity.substring(0, 2).toUpperCase()) : "__";
-    const buCode = values.businessUnit ? (BUSINESS_UNIT_CODES[values.businessUnit] || values.businessUnit.substring(0, 2).toUpperCase()) : "__";
-    const empTypeCode = values.employmentType ? (EMP_TYPE_CODES[values.employmentType] || values.employmentType.substring(0, 2).toUpperCase()) : "__";
+    const entityCode = resolvePrefix(values.legalEntity, entityOptions, DEFAULT_LEGAL_ENTITIES);
+    const buCode = resolvePrefix(values.businessUnit, businessOptions, DEFAULT_BUSINESS_UNITS);
+    const empTypeCode = resolvePrefix(
+      values.employmentType,
+      employmentOptions,
+      DEFAULT_EMPLOYMENT_TYPES,
+      { preferCode: false }
+    );
     const currentDigits = (values.employeeCode || "").match(/(\d{0,4})$/)?.[1] || "";
     const seq = String(currentDigits).padStart(4, "0");
     const locked = `${entityCode}-${buCode}-${empTypeCode}-${seq}`.toUpperCase();
     if (locked !== values.employeeCode) setFieldValue("employeeCode", locked);
-  }, [values.legalEntity, values.businessUnit, values.employmentType, manualOverride, values.employeeCode, setFieldValue]);
+  }, [
+    values.legalEntity,
+    values.businessUnit,
+    values.employmentType,
+    manualOverride,
+    values.employeeCode,
+    setFieldValue,
+    entityOptions,
+    businessOptions,
+    employmentOptions,
+  ]);
 
   // ==============================================
   // 🔍 Check Custom Employee Code Availability (Debounced)
@@ -646,15 +903,14 @@ const EmployeeSection = ({
   // ==============================================
   const handleEmployeeCodeChange = (value) => {
     // Lock prefix; allow editing only the last 4 digits
-    const entityCode = values.legalEntity
-      ? (ENTITY_CODES[values.legalEntity] || values.legalEntity.substring(0, 2).toUpperCase())
-      : "__";
-    const buCode = values.businessUnit
-      ? (BUSINESS_UNIT_CODES[values.businessUnit] || values.businessUnit.substring(0, 2).toUpperCase())
-      : "__";
-    const empTypeCode = values.employmentType
-      ? (EMP_TYPE_CODES[values.employmentType] || values.employmentType.substring(0, 2).toUpperCase())
-      : "__";
+    const entityCode = resolvePrefix(values.legalEntity, entityOptions, DEFAULT_LEGAL_ENTITIES);
+    const buCode = resolvePrefix(values.businessUnit, businessOptions, DEFAULT_BUSINESS_UNITS);
+    const empTypeCode = resolvePrefix(
+      values.employmentType,
+      employmentOptions,
+      DEFAULT_EMPLOYMENT_TYPES,
+      { preferCode: false }
+    );
 
     const digits = String(value || "").replace(/\D/g, "").slice(-4);
     const seq = digits.padStart(4, "0");
@@ -685,11 +941,19 @@ const EmployeeSection = ({
         <div className="col-12 col-md-6 col-lg-4 mb-3">
           <label className="form-label">Legal Entity *</label>
           <Field as="select" name="legalEntity" className="form-control">
-            <option value="" disabled>Select legal entity</option>
-            <option value="sogo_corporation">SoGo Corporation</option>
-            <option value="sogo_technologies">SoGo Technologies</option>
-            <option value="sogo_services">SoGo Services</option>
-            <option value="other">Other</option>
+            <option value="" disabled>
+              {dropdownLoading ? "Loading legal entities..." : "Select legal entity"}
+            </option>
+            {entityOptions.map((entity) => {
+              const optionValue = String(entity.value || entity.name || entity.id || "");
+              const optionLabel = entity.label || entity.name || entity.value;
+              if (!optionValue || !optionLabel) return null;
+              return (
+                <option key={optionValue} value={optionValue}>
+                  {optionLabel}
+                </option>
+              );
+            })}
           </Field>
           <ErrorMessage
             name="legalEntity"
@@ -702,12 +966,19 @@ const EmployeeSection = ({
         <div className="col-12 col-md-6 col-lg-4 mb-3">
           <label className="form-label">Business Unit *</label>
           <Field as="select" name="businessUnit" className="form-control">
-            <option value="" disabled>Select business unit</option>
-            <option value="human_resources">Human Resources</option>
-            <option value="finance">Finance</option>
-            <option value="sales_marketing">Sales & Marketing</option>
-            <option value="operations">Operations</option>
-            <option value="other">Other</option>
+            <option value="" disabled>
+              {dropdownLoading ? "Loading business units..." : "Select business unit"}
+            </option>
+            {businessOptions.map((unit) => {
+              const optionValue = String(unit.value || unit.name || unit.id || "");
+              const optionLabel = unit.label || unit.name || unit.value;
+              if (!optionValue || !optionLabel) return null;
+              return (
+                <option key={optionValue} value={optionValue}>
+                  {optionLabel}
+                </option>
+              );
+            })}
           </Field>
           <ErrorMessage
             name="businessUnit"
@@ -720,11 +991,19 @@ const EmployeeSection = ({
         <div className="col-12 col-md-6 col-lg-4 mb-3">
           <label className="form-label">Employment Type *</label>
           <Field as="select" name="employmentType" className="form-control">
-            <option value="" disabled>Select employment type</option>
-            <option value="full_time">Full-Time</option>
-            <option value="part_time">Part-Time</option>
-            <option value="contract">Contract</option>
-            <option value="intern">Intern</option>
+            <option value="" disabled>
+              {dropdownLoading ? "Loading employment types..." : "Select employment type"}
+            </option>
+            {employmentOptions.map((type) => {
+              const optionValue = String(type.value || type.name || type.id || "");
+              const optionLabel = type.label || type.name || type.value;
+              if (!optionValue || !optionLabel) return null;
+              return (
+                <option key={optionValue} value={optionValue}>
+                  {optionLabel}
+                </option>
+              );
+            })}
           </Field>
           <ErrorMessage
             name="employmentType"

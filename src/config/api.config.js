@@ -14,4 +14,5 @@ export const API_ENDPOINTS = {
   policyCategories: "/categories",
   policies: "/policies",
   separations: "/separations",
+  expenseTypes: '/expense-types'
 };

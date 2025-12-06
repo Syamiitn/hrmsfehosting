@@ -14,7 +14,7 @@ export default function BankDetailsCard({ data, onEdit, onCreate }) {
     ];
 
     return (
-        <div className="bank-card shadow-sm p-3 flex-fill">
+        <div className="bank-card  p-3 flex-fill">
             <div className="d-flex align-items-center justify-content-between">
                 <div className="d-flex align-items-center gap-2">
                     <Building2 size={18} className="icon" />

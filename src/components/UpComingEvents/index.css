@@ -7,15 +7,17 @@
     margin-top: 10px;
 
     .event-item {
-        background-color: var(--background-color);
-        padding: 8px;
+        background-color: var(--body-bg);
+        box-shadow: var(--shadow-glassy);
+        padding: 5px;
         border-radius: 10px;
         display: flex;
         align-items: center;
         gap: 10px;
 
         .date-container {
-            background-color: var(--card-bg-color);
+            background-color: var(--card-bg);
+            box-shadow: var(--shadow-glassy);
             padding: 5px 10px;
             border: 1px solid var(--border-color);
             border-radius: 10px;

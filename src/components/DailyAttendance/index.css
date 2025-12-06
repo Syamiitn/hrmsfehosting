@@ -1,0 +1,72 @@
+.attendance-tracking {
+    background-color: var(--card-bg);
+    padding: var(--padding-lg);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-glassy);
+    margin-bottom: 10px;
+
+    .filters-wrapper {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-top: 10px;
+        background-color: var(--body-bg);
+        border-radius: 14px;
+
+        .filter-box {
+            position: relative;
+            /* background: var(--body-bg); */
+            border-radius: 12px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 180px;
+            height: 46px;
+            /* border: 1px solid var(--border-color); */
+
+            .filter-icon {
+                color: var(--muted-text-color);
+                font-size: 15px;
+            }
+
+            .filter-input {
+                border: none;
+                outline: none;
+                background: transparent !important;
+                width: 100%;
+                font-size: 14px;
+                font-family: 'Inter', sans-serif;
+                color: var(--muted-text-color);
+
+                &::-ms-expand {
+                    display: none;
+                }
+
+                option {
+                    font-family: 'Inter', sans-serif;
+                }
+            }
+        }
+    }
+
+    .attendance-list {
+        list-style: none;
+        padding: 0;
+        margin-top: 10px;
+    }
+
+    .shadow-sm {
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    }
+
+    @media (max-width: 767px) {
+        .filters-wrapper {
+            .filter-box {
+                flex: 1 1 100%;
+            }
+        }
+    }
+
+}

@@ -14,6 +14,7 @@ export default function DynamicForm({
     onSubmit,
     initialValues = {},
     close,
+    clear = false,
     employeeId
 }) {
     const [dynamicOptions, setDynamicOptions] = useState({});
@@ -214,7 +215,7 @@ export default function DynamicForm({
                     if (success) resetForm();
                 }}
             >
-                {({ values, setFieldValue }) => {
+                {({ values, setFieldValue, resetForm }) => {
                     // Auto-update duration
                     const durationField = config.fields.find((f) => f.name === "duration");
 
@@ -406,6 +407,21 @@ export default function DynamicForm({
 
                             {/* ===================== ACTION BUTTONS ===================== */}
                             <div className="col-12 d-flex align-items-center justify-content-end gap-2 mt-3">
+
+                                {/* SHOW ONLY IF clear=true */}
+                                {clear && (
+                                    <Button
+                                        variant="outline"
+                                        label="Clear Form"
+                                        radius={5}
+                                        size="sm"
+                                        onClick={() => {
+                                            resetForm();
+                                            onChange?.({});
+                                        }}
+                                    />
+                                )}
+
                                 {close && (
                                     <Button
                                         variant="outline"

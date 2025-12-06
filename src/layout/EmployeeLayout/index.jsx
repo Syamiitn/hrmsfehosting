@@ -1,23 +1,34 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Outlet } from "react-router-dom";
+import React, { useState, useEffect } from 'react'
+import { Outlet } from 'react-router-dom';
 import { useTheme } from "@context/ThemeContext";
 import { useAuth } from "@context/AuthContext";
 import { useApi } from "@hooks/useApi";
 import { useLoading } from "@context/LoadingContext";
-import Header from "@components/Header";
-import Sidebar from "@components/Sidebar";
-import { SIDEBAR_MENU } from "@config/component.config";
+import Header from '@data/Header';
+import Sidebar from '@data/Sidebar';
 
-export default function HrLayout() {
+import '@stylings/global.css';
+import './index.css';
+
+export default function EmployeeLayout() {
+    const [isSidebarOpen, setSidebarOpen] = useState(false);
+
     const { themeColor, changeTheme, themeMode, toggleThemeMode } = useTheme();
-    const [showSidebar, setShowSidebar] = useState(true);
     const { showLoading, hideLoading } = useLoading();
     const { get } = useApi();
     const { user, enrichUser } = useAuth();
     const role = user?.role || 'employee'
 
-    // Fetching user details
-    const fetchedRef = useRef(false);
+    const toggleSidebar = () => {
+        setSidebarOpen(prev => !prev);
+    };
+
+    const closeSidebar = () => {
+        setSidebarOpen(false);
+    };
+
+    const fetchedRef = React.useRef(false);
+
     useEffect(() => {
         const fetchUserDetails = async () => {
             if (fetchedRef.current || !user?.emp) return;
@@ -25,21 +36,25 @@ export default function HrLayout() {
 
             try {
                 showLoading({ type: "Spinner", size: "md", fullscreen: true });
+
                 const res = await get(`employees/${user.emp}`);
-                const activeJob = res?.jobDetails?.find((job) => job.isActive);
+
+                const personal = res?.personalDetails || {};
+                const activeJob = res?.jobDetails?.find(job => job.isActive) || {};
 
                 enrichUser({
-                    personalDetailsId: res?.personalDetails?.id,
-                    activeJobId: activeJob?.id,
-                    firstName: res?.personalDetails?.firstName,
-                    lastName: res?.personalDetails?.lastName,
-                    jobTitle: activeJob?.jobTitle,
-                    profilePicUrl: res?.personalDetails?.profilePicUrl,
-                    shiftTimings: activeJob?.workTimings,
-                    workLocation: activeJob?.workLocation,
-                    managerId: activeJob?.managerId,
-                    hrId: activeJob?.hrId,
+                    personalDetailsId: personal.id,
+                    activeJobId: activeJob.id,
+                    firstName: personal.firstName,
+                    lastName: personal.lastName,
+                    jobTitle: activeJob.jobTitle,
+                    profilePicUrl: personal.profilePicUrl,
+                    shiftTimings: activeJob.workTimings,
+                    workLocation: activeJob.workLocation,
+                    managerId: activeJob.managerId,
+                    hrId: activeJob.hrId,
                 });
+
             } catch (err) {
                 console.error(err?.data?.message || "Failed to fetch employee details");
             } finally {
@@ -50,34 +65,38 @@ export default function HrLayout() {
         if (user?.emp && !user?.personalDetailsId) {
             fetchUserDetails();
         }
-    }, [user?.emp]);
+    }, [user?.emp, user?.personalDetailsId]);
+
 
     return (
-        <div className="employee-layout flex">
-            {/* Sidebar (left) */}
-            <Sidebar
+        <div className="layout-wrapper">
+
+            {/* Header */}
+            <Header
+                onMenuClick={toggleSidebar}
                 themeColor={themeColor}
                 themeMode={themeMode}
-                role={role}
-                menuConfig={SIDEBAR_MENU}
-                showSidebar={showSidebar}
-                setShowSidebar={setShowSidebar}
+                toggleThemeMode={toggleThemeMode}
+                changeTheme={changeTheme}
             />
 
-            {/* Main area (right) */}
-            <div className="flex flex-col flex-1">
-                {/*  Fixed header */}
-                <Header
+            {/* Floating Sidebar Overlay (click outside to close) */}
+            {isSidebarOpen && (
+                <div className="sidebar-overlay" onClick={closeSidebar}></div>
+            )}
+
+            <div className="layout-main">
+                {/* Sidebar */}
+                <Sidebar
+                    isOpen={isSidebarOpen}
+                    closeSidebar={closeSidebar}
                     themeColor={themeColor}
                     themeMode={themeMode}
-                    toggleThemeMode={toggleThemeMode}
-                    changeTheme={changeTheme}
-                    setShowSidebar={setShowSidebar}
-                    className="sticky top-0 z-50 shadow-md"
+                    role={role}
                 />
 
-                {/*  Only content scrolls */}
-                <main className="flex-1 min-h-[80vh] max-h-[90vh] overflow-y-auto px-4">
+                {/* Main content */}
+                <main className='layout-content'>
                     <Outlet />
                 </main>
             </div>

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import DataTable from "react-data-table-component";
 import { FiPlus, FiEdit, FiTrash2, FiSearch, FiLayers } from "react-icons/fi";
 import { useModal } from "@context/GlobalModalContext";
@@ -6,6 +6,7 @@ import { useApi } from "@hooks/useApi";
 import { createCommonApi } from "@services/commonApi";
 import { showErrorToast, showSuccessToast } from "@utils/utils";
 
+// Normalizes multi-format companies payloads (array, string, object) into a list of entries the UI understands
 const toCompanyArray = (value) => {
     if (!value) return [];
 
@@ -52,9 +53,11 @@ const toCompanyArray = (value) => {
     return [];
 };
 
+// Helper used by the table to display readable company names
 const buildCompanyNames = (entries = []) =>
     (entries || []).map((entry) => entry?.name).filter(Boolean);
 
+// Converts checkbox selections back into the payload structure required by the backend
 const formatCompaniesForPayload = (selectedKeys = [], options = []) => {
     if (!Array.isArray(selectedKeys)) return [];
     return selectedKeys
@@ -79,6 +82,7 @@ const formatCompaniesForPayload = (selectedKeys = [], options = []) => {
         .filter(Boolean);
 };
 
+// Shapes a department API payload into the structure consumed by the UI
 const mapDepartmentFromApi = (item = {}) => {
     const companyEntries = toCompanyArray(item.companies);
     return {
@@ -93,6 +97,7 @@ const mapDepartmentFromApi = (item = {}) => {
     };
 };
 
+// Shapes a designation API payload into the structure consumed by the UI
 const mapDesignationFromApi = (item = {}) => {
     const companyEntries = toCompanyArray(item.companies);
     return {
@@ -110,6 +115,7 @@ const mapDesignationFromApi = (item = {}) => {
     };
 };
 
+// Extracts organizations regardless of how the backend wraps a list response
 const parseOrganizationList = (payload) => {
     const raw = Array.isArray(payload)
         ? payload
@@ -129,6 +135,7 @@ const parseOrganizationList = (payload) => {
         .filter((org) => (org.id && org.name) || org.name);
 };
 
+// Shared modal for both Department & Designation CRUD actions. The `mode` prop switches the extra designation fields.
 function OrgModal({
     mode = "department",
     existingData,
@@ -150,6 +157,7 @@ function OrgModal({
             existingSelections.length > 0 ? existingSelections : defaultCompanies;
 
         const baseForm = {
+            id: existingData?.id ?? null,
             name: existingData?.name ?? "",
             code: existingData?.code ?? "",
             description: existingData?.description ?? "",
@@ -175,6 +183,7 @@ function OrgModal({
     const [form, setForm] = useState(buildInitialForm);
     const [error, setError] = useState(null);
 
+    // Pulls organizations so every CRUD modal can assign departments/designations to multiple companies
     useEffect(() => {
         setForm(buildInitialForm());
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -384,6 +393,7 @@ function OrgModal({
     );
 }
 
+// Container component that powers the Global Settings "Departments & Designations" step
 export default function DepartmentDesignation({ selectedOrg }) {
     const { openModal, closeModal } = useModal();
     const { get, post, put, patch, del } = useApi();
@@ -467,6 +477,7 @@ export default function DepartmentDesignation({ selectedOrg }) {
         };
     }, [api, selectedOrgId, selectedOrgName]);
 
+    // Builds a fallback option list so the UI always has at least the selected organization available
     const companyOptions = useMemo(() => {
         if (companiesList.length > 0) return companiesList;
         if (selectedOrgId || selectedOrgName) {
@@ -480,6 +491,7 @@ export default function DepartmentDesignation({ selectedOrg }) {
         return [];
     }, [companiesList, selectedOrgId, selectedOrgName]);
 
+    // When opening the modal we auto-select the currently focused org if it exists
     const defaultCompanySelection = useMemo(() => {
         if (!selectedOrgId && !selectedOrgName) return [];
         const preferred =
@@ -492,6 +504,7 @@ export default function DepartmentDesignation({ selectedOrg }) {
         return key ? [key] : [];
     }, [companyOptions, selectedOrgId, selectedOrgName]);
 
+    // Initial load of departments + designations tables
     useEffect(() => {
         let ignore = false;
 
@@ -522,6 +535,7 @@ export default function DepartmentDesignation({ selectedOrg }) {
 
     const list = activeTab === "department" ? departments : designations;
 
+    // Lightweight client-side search across name/code/description
     const filtered = useMemo(
         () =>
             list.filter((item) =>
@@ -533,6 +547,7 @@ export default function DepartmentDesignation({ selectedOrg }) {
         [list, query]
     );
 
+    // Handles both create + update flows for either tab
     const handleSave = async (payload) => {
         if (!companyOptions.length) {
             showErrorToast("No organizations available. Please add one first.");
@@ -606,6 +621,7 @@ export default function DepartmentDesignation({ selectedOrg }) {
         }
     };
 
+    // Kicks off the modal while safeguarding against missing dependencies (orgs/departments)
     const launchModal = (existingData = null) => {
         if (!companyOptions.length) {
             showErrorToast("No organizations available. Please add one first.");
@@ -630,6 +646,7 @@ export default function DepartmentDesignation({ selectedOrg }) {
         );
     };
 
+    // Soft confirmation delete shared between the two resource types
     const handleDelete = async (id) => {
         try {
             if (activeTab === "department") {
@@ -649,6 +666,48 @@ export default function DepartmentDesignation({ selectedOrg }) {
         }
     };
 
+    // Map of id/name -> readable label to render company chips in the DataTable
+    const organizationNameMap = useMemo(() => {
+        const map = {};
+        companyOptions.forEach((org) => {
+            if (!org) return;
+            if (org.id) map[String(org.id)] = org.name || String(org.id);
+            if (org.name) map[String(org.name)] = org.name;
+        });
+        return map;
+    }, [companyOptions]);
+
+    // Used to detect generated IDs masquerading as names so we can look up the proper label
+    const uuidRegex = useMemo(
+        () => /\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\b/i,
+        []
+    );
+
+    // Resolves whichever representation of companies is available on the row
+    const resolveCompanyNames = useCallback(
+        (row) => {
+            if (!row) return [];
+            const entries = Array.isArray(row.companyEntries) ? row.companyEntries : [];
+            if (entries.length) {
+                const names = entries
+                    .map((entry) => {
+                        const rawName = entry?.name?.trim();
+                        if (rawName && !uuidRegex.test(rawName)) return rawName;
+                        const key = entry?.organizationId ? String(entry.organizationId) : rawName;
+                        return (key && organizationNameMap[key]) || rawName || key || "";
+                    })
+                    .filter(Boolean);
+                if (names.length) return names;
+            }
+            const fallback = Array.isArray(row.companies) ? row.companies : [];
+            return fallback
+                .map((item) => organizationNameMap[item] || item)
+                .filter(Boolean);
+        },
+        [organizationNameMap, uuidRegex]
+    );
+
+    // DataTable column config shared by both tabs
     const columns = [
         {
             name: <div className="text-[14px] font-semibold text-black">Name</div>,
@@ -672,11 +731,15 @@ export default function DepartmentDesignation({ selectedOrg }) {
         },
         {
             name: <div className="text-[14px] font-semibold text-black">Companies</div>,
-            cell: (r) => (
-                <div className="truncate whitespace-nowrap overflow-hidden text-gray-800 px-3" title={r.companies.join(", ")}>
-                    {r.companies.join(", ")}
-                </div>
-            ),
+            cell: (r) => {
+                const names = resolveCompanyNames(r);
+                const label = names.length ? names.join(", ") : "—";
+                return (
+                    <div className="truncate whitespace-nowrap overflow-hidden text-gray-800 px-3" title={label}>
+                        {label}
+                    </div>
+                );
+            },
             minWidth: "240px",
         },
         {
@@ -723,6 +786,7 @@ export default function DepartmentDesignation({ selectedOrg }) {
         },
     ];
 
+    // Brings DataTable visuals in line with the rest of the Global Settings UI
     const customStyles = {
         table: {
             style: {

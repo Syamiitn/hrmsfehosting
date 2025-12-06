@@ -1,7 +1,9 @@
 .leave-history-label {
+    background-color: var(--card-bg);
+    padding: var(--padding-lg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-glassy);
     border: 1px solid var(--border-color);
-    padding: 14px;
-    border-radius: 16px;
 
     .time-icon {
         font-size: 20px;

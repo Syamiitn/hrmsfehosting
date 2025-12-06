@@ -221,7 +221,7 @@ export default function EmployeeLeaveHistory() {
             <div className="container-fluid">
                 <div className="row">
                     <div className="col-12 mt-3">
-                        <div className="leave-history-card shadow-sm">
+                        <div className="leave-history-card ">
                             <div className="d-flex align-items-start gap-2">
                                 <FaCalendarAlt className="icon" />
                                 <div>

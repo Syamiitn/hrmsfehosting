@@ -1,0 +1,239 @@
+/* ======================================================
+   CARD COMPONENT — Nested CSS
+====================================================== */
+
+.card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    transition: all 0.25s ease;
+    position: relative;
+
+    /* ------------------------------
+       VARIANTS
+    ------------------------------ */
+    &.card--variant-filled {
+        background: var(--card-bg);
+    }
+
+    &.card--variant-outline {
+        background: transparent;
+        border: 1px solid var(--border-color);
+    }
+
+    &.card--variant-ghost {
+        background: transparent;
+        border: none;
+    }
+
+    /* ------------------------------
+       SHADOWS
+    ------------------------------ */
+    &.card--shadow-none {
+        box-shadow: none;
+    }
+
+    &.card--shadow-soft {
+        box-shadow: var(--shadow-soft);
+    }
+
+    &.card--shadow-strong {
+        box-shadow: var(--shadow-medium);
+    }
+
+    &.card--shadow-in {
+        box-shadow: var(--shadow-in);
+    }
+
+    &.card--shadow-theme {
+        box-shadow: 0 6px 14px rgba(var(--theme-rgb), 0.25);
+    }
+
+    &.card--shadow-glass {
+        box-shadow: var(--shadow-glass);
+    }
+
+    /* Hover Elevation */
+    &.card--hover:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 0 18px rgba(var(--theme-rgb), 0.25);
+    }
+
+    /* Glass Blur */
+    &.card--blur {
+        backdrop-filter: blur(14px);
+    }
+
+    /* ------------------------------
+       BORDER TYPES
+    ------------------------------ */
+    &.card--border-none {
+        border: none;
+    }
+
+    &.card--border-default {
+        border: 1px solid var(--border-color);
+    }
+
+    &.card--border-theme {
+        border: 1px solid var(--theme-primary);
+    }
+
+    /* Gradient Border using mask */
+    &.card--border-gradient {
+        border: none;
+
+        &::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            padding: 2px;
+            border-radius: inherit;
+            background: var(--theme-gradient);
+            mask:
+                linear-gradient(#fff 0 0) content-box,
+                linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            -webkit-mask-composite: xor;
+            pointer-events: none;
+        }
+    }
+
+    /* ------------------------------
+       RADIUS OPTIONS
+    ------------------------------ */
+    &.card--radius-sm {
+        border-radius: var(--radius-sm);
+    }
+
+    &.card--radius-md {
+        border-radius: var(--radius-md);
+    }
+
+    &.card--radius-lg {
+        border-radius: var(--radius-lg);
+    }
+
+    &.card--radius-xl {
+        border-radius: var(--radius-xl);
+    }
+
+    /* ------------------------------
+       PADDING OPTIONS
+    ------------------------------ */
+    &.card--padding-none {
+        padding: 0;
+    }
+
+    &.card--padding-sm {
+        padding: 8px;
+    }
+
+    &.card--padding-md {
+        padding: 16px;
+    }
+
+    &.card--padding-lg {
+        padding: 24px;
+    }
+
+    /* ======================================================
+       CARD INTERNAL SECTIONS
+    ======================================================= */
+
+    /* Header Area */
+    &__header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 14px;
+
+        .card__icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: rgba(var(--theme-rgb), 0.12);
+            color: var(--theme-primary);
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card__title {
+            font-size: var(--font-size-h4);
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-main);
+        }
+
+        .card__subtitle {
+            font-size: var(--font-size-small);
+            color: var(--text-muted);
+        }
+    }
+
+    /* Body */
+    &__body {
+        font-size: var(--font-size-body);
+        color: var(--text-main);
+    }
+
+    /* Footer */
+    &__footer {
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: var(--font-size-small);
+        color: var(--text-secondary);
+
+        .footer-link {
+            color: var(--theme-primary);
+            cursor: pointer;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+
+    /* ======================================================
+       PRESET CARD TYPES
+    ======================================================= */
+    &.card--type-stat {
+        text-align: center;
+
+        .card__title {
+            font-size: 22px;
+            font-weight: 700;
+        }
+    }
+
+    &.card--type-tile {
+        text-align: center;
+
+        .card__icon {
+            margin: 0 auto;
+        }
+
+        .card__title {
+            margin-top: 8px;
+        }
+    }
+
+    &.card--type-feed {
+        padding: 20px;
+
+        .card__body {
+            font-size: 15px;
+        }
+
+        .card__footer {
+            border-top: none;
+            padding-top: 0;
+        }
+    }
+}

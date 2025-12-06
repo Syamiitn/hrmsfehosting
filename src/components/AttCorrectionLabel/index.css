@@ -1,0 +1,6 @@
+.att-correction-label {
+    border: 1px solid var(--border-color);
+    padding: 16px;
+    border-radius: 16px;
+    margin-bottom: 10px;
+}

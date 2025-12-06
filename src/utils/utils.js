@@ -136,36 +136,82 @@ export const formatDate = (dateString, currentFormat, targetFormat) => {
 
 export const getConditionClassName = (status) => {
     if (!status) return '';
-
     switch (status.toLowerCase()) {
         case 'pending':
+        case 'draft':
+        case 'pending hr':
+        case 'pending manager':
+        case 'late':
             return 'late';
         case 'reject':
         case 'rejected':
+        case 'absent':
             return 'absent';
         case 'approved':
         case 'completed':
+        case 'present':
+        case 'present':
+        case 'published':
             return 'on-time';
         case 'cancelled':
-        case 'canceled' :
-        case 'overdue' :
+        case 'canceled':
+        case 'overdue':
+        case 'wfh':
+        case 'overtime':
+        case 'half_day':
             return 'wfh';
         case 'in':
             return 'on-time';
         case 'not yet':
+        case 'leave':
+        case 'not in':
             return 'leave';
         case 'out':
             return 'absent';
         case 'weekend':
+        case 'holiday':
             return 'weekend';
         case 'holiday':
             return 'holiday';
         case 'active':
             return 'on-time';
         case 'in active':
-        case 'inactive' :
+        case 'inactive':
             return 'absent';
         default:
             return '';
     }
 };
+
+// ------------------ Currency Symbol -------------------------
+
+export const getCurrencySymbol = (currencyCode = "") => {
+    try {
+        return (0).toLocaleString("en", {
+            style: "currency",
+            currency: currencyCode,
+            minimumFractionDigits: 0,
+        }).replace(/[0-9]/g, "").trim();
+    } catch {
+        return "";
+    }
+};
+
+
+// ------------------- get month name by passing month number ----------------------
+
+// import { format } from "date-fns";
+
+export const getMonthName = (monthNumber) => {
+    try {
+        if (!monthNumber || monthNumber < 1 || monthNumber > 12) {
+            return "";
+        }
+
+        // monthNumber 1 → January, 12 → December
+        const date = new Date(2000, monthNumber - 1);
+        return format(date, "MMMM");
+    } catch {
+        return "";
+    }
+}

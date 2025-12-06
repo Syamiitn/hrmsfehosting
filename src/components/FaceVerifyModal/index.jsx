@@ -10,7 +10,7 @@ import "./index.css";
  *  - onClose: close modal handler
  *  - onSuccess: callback after successful submit
  */
-export default function FaceVerifyModal({ type = "clockIn", onClose, onSuccess }) {
+export default function FaceVerifyModal({ type = "IN", onClose, onSuccess }) {
     const webcamRef = useRef(null);
     const [capturedImage, setCapturedImage] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -29,10 +29,8 @@ export default function FaceVerifyModal({ type = "clockIn", onClose, onSuccess }
             setIsSubmitting(true);
 
             // Simulate API call for Clock In / Clock Out with captured image
-            console.log(`🕒 ${type === "clockIn" ? "Clock-In" : "Clock-Out"} Successful!`);
-            console.log("📸 Captured Image URL:", capturedImage);
-
-            showSuccessToast(`You have ${type === "clockIn" ? "clocked in" : "clocked out"} successfully!`);
+            // console.log(`🕒 ${type === "clockIn" ? "Clock-In" : "Clock-Out"} Successful!`);
+            // console.log("📸 Captured Image URL:", capturedImage);
 
             setTimeout(() => {
                 setIsSubmitting(false);

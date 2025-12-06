@@ -1,0 +1,7 @@
+.recent-expense-claim-label {
+    background-color: var(--card-bg);
+    padding: var(--padding-lg);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--border-color);
+}

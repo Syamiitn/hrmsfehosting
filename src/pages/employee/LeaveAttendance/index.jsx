@@ -34,6 +34,8 @@ export default function LeaveAttendance() {
     const [leaveHistory, setLeaveHistory] = useState([]);
     const [leavesList, setLeavesList] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [calendarLogs, setCalendarLogs] = useState([]);
+    const [attendancePercent, setAttendancePercentage] = useState()
 
     const { openOffCanvas, closeOffCanvas } = useOffCanvas();
     const { openModal, closeModal } = useModal();
@@ -72,6 +74,50 @@ export default function LeaveAttendance() {
             setIsLoading(false);
         }
     };
+
+    // -----------------------------
+    // Fetching calendar month
+    // -----------------------------
+    const fetchCalendarMonth = async (month, year) => {
+        try {
+            const res = await get(
+                `attendance/dashboard/employee?employeeId=${user?.emp}&month=${month}&year=${year}`
+            );
+
+            const calendar = res?.calendar || [];
+
+            /* Merge exceptions inside calendar logs */
+            const ex = res?.summary || {};
+            const merged = calendar.map(item => {
+                const exceptions = [];
+
+                if (ex?.missingClockIn?.includes(item.date))
+                    exceptions.push("Missing Clock In");
+
+                if (ex?.missingClockOut?.includes(item.date))
+                    exceptions.push("Missing Clock Out");
+
+                if (ex?.shortWorkingHours?.includes(item.date))
+                    exceptions.push("Short Working Hours");
+
+                return { ...item, exceptions };
+            });
+
+            setCalendarLogs(merged);
+            setAttendancePercentage(res?.metrics?.attendancePercent)
+
+        } catch (err) {
+            console.error("Calendar Error:", err.message);
+        }
+    };
+
+    // use effect
+    useEffect(() => {
+        // Calendar for current month
+        const month = format(new Date(), "MM");
+        const year = format(new Date(), "yyyy");
+        fetchCalendarMonth(month, year);
+    }, []);
 
     // -----------------------------
     // Generate mock attendance when month/year changes
@@ -164,7 +210,7 @@ export default function LeaveAttendance() {
                 fetchLeaveRequests();
             } catch (err) {
                 console.error("Error submitting leave:", err.message);
-                showErrorToast( err?.data?.message || "Failed to submit leave request.");
+                showErrorToast(err?.data?.message || "Failed to submit leave request.");
             } finally {
                 closeOffCanvas();
             }
@@ -243,7 +289,7 @@ export default function LeaveAttendance() {
                 <div className="row">
                     {/* Stat Cards */}
                     <div className="col-12 col-md-6 col-lg-3 mt-3">
-                        <div className="stat-card shadow-sm">
+                        <div className="stat-card ">
                             <small>Total Leaves</small>
                             <div className="d-flex justify-content-between align-items-center">
                                 <h2>31</h2>
@@ -254,7 +300,7 @@ export default function LeaveAttendance() {
                     </div>
 
                     <div className="col-12 col-md-6 col-lg-3 mt-3">
-                        <div className="stat-card shadow-sm">
+                        <div className="stat-card ">
                             <small>Used Leave</small>
                             <div className="d-flex justify-content-between align-items-center">
                                 <h2>13</h2>
@@ -265,7 +311,7 @@ export default function LeaveAttendance() {
                     </div>
 
                     <div className="col-12 col-md-6 col-lg-3 mt-3">
-                        <div className="stat-card shadow-sm">
+                        <div className="stat-card ">
                             <small>Pending</small>
                             <div className="d-flex justify-content-between align-items-center">
                                 <h2>{pendingRequests}</h2>
@@ -276,10 +322,10 @@ export default function LeaveAttendance() {
                     </div>
 
                     <div className="col-12 col-md-6 col-lg-3 mt-3">
-                        <div className="stat-card shadow-sm">
+                        <div className="stat-card ">
                             <small>Attendance</small>
                             <div className="d-flex justify-content-between align-items-center">
-                                <h2>88%</h2>
+                                <h2>{attendancePercent}%</h2>
                                 <FaUserCheck className="icon" />
                             </div>
                             <small>this month</small>
@@ -293,7 +339,7 @@ export default function LeaveAttendance() {
 
                     {/* Recent Leave Requests */}
                     <div className="col-12 col-md-6 mt-3 d-flex">
-                        <div className="recent-leave-requests-card shadow-sm flex-fill">
+                        <div className="recent-leave-requests-card  flex-fill">
                             <div className="d-flex align-items-center gap-2">
                                 <FaHistory className="icon" />
                                 <h5>Recent Leave Requests</h5>
@@ -325,12 +371,15 @@ export default function LeaveAttendance() {
                     </div>
 
                     {/* Attendance Calendar */}
-                    <div className="col-12 col-md-8 mt-3">
-                        <div className="attendance-calendar-card shadow-sm">
+                    <div className="col-12 col-md-8 col-lg-9 my-3">
+                        <div className="attendance-calendar-card ">
                             <AttendanceCalendar
                                 calendarValue={calendarValue}
-                                setCalendarValue={setCalendarValue}
-                                attendanceLogs={attendanceLogs}
+                                attendanceLogs={calendarLogs}
+                                colorMode="cell"
+                                showPopup={true}
+                                allowMonthChange={false}
+                                allowYearChange={false}
                             />
                             <p className="p4 mt-2">
                                 Showing attendance for{" "}
@@ -342,7 +391,7 @@ export default function LeaveAttendance() {
                     </div>
 
                     {/* Quick Actions */}
-                    <div className="col-12 col-md-4 mt-3 d-flex">
+                    <div className="col-12 col-md-4 col-lg-3 my-3 d-flex">
                         <div className="quick-actions-card flex-fill">
                             <div className="d-flex align-items-center gap-2">
                                 <FaBolt className="icon" />

@@ -1,7 +1,9 @@
 .reminder-label {
+    background-color: var(--card-bg);
+    padding: var(--padding-lg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-glassy);
     border: 1px solid var(--border-color);
-    padding: 10px;
-    border-radius: 12px;
     display: flex;
     align-items: flex-start;
     gap: 5px;

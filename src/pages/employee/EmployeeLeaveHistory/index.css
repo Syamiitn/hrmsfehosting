@@ -1,10 +1,12 @@
 .employee-leave-history {
-    background-color: var(--background-color);
+    background-color: var(--body-bg);
 
     .leave-history-card {
-        background-color: var(--card-bg-color);
-        padding: 16px;
-        border-radius: 20px;
+        background-color: var(--card-bg);
+        padding: var(--padding-lg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-glassy);
+        border: 1px solid var(--border-color);
 
         .icon {
             margin-top: 3px;

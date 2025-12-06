@@ -151,6 +151,7 @@ function CheckboxChip({ label, checked, onChange }) {
   );
 }
 
+// Extracts the organization object regardless of whether the API returned { data: {...} } or the object directly
 const unwrapOrganization = (payload) => {
   if (!payload || typeof payload !== "object") return null;
   if (payload.data && typeof payload.data === "object") return payload.data;
@@ -212,6 +213,7 @@ function AdvancedSettings({ value, onChange }) {
 
 
 
+// Full-featured organization info wizard that supports both create + edit flows
 export default function OrganizationInfoForm({ selectedOrg, parentId }) {
   const { get, post, put, patch, del } = useApi();
   const apiClient = useMemo(

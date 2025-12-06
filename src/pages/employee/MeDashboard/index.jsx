@@ -4,6 +4,8 @@ import SmartMenu from "@components/SmartMenu";
 import Avatar from "@components/common/Avatar";
 import { getConditionClassName } from "@utils/utils";
 import { useApi } from "@hooks/useApi";
+import { useLoading } from "@context/LoadingContext";
+import Loading from "@components/common/Loading";
 import { createCommonApi } from "@services/commonApi";
 import { useAuth } from "@context/AuthContext";
 import {
@@ -20,29 +22,44 @@ export default function MeDashboard() {
     const [deptMap, setDeptMap] = useState({});
     const [managerName, setManagerName] = useState("");
     const { user } = useAuth();
+    const [isFetching, setIsFetching] = useState(true);
     const { get } = useApi();
     const api = createCommonApi(useApi());
+    const { showLoading, hideLoading } = useLoading();
     const role = user?.role || "employee";
 
     // Fetch Employee Details & Departments
     useEffect(() => {
         const fetchEmployee = async () => {
             try {
+                setIsFetching(true);
+                showLoading({
+                    type: 'spinner',
+                    size: 'md',
+                    fullscreen: true,
+                    message: 'Loading Employee Details'
+                });
+
                 const [res, depts] = await Promise.all([
                     get(`employees/${user.emp}`),
                     api.departments.list(),
                 ]);
 
                 setEmployeeDetails(res);
+
                 const map = {};
                 (Array.isArray(depts) ? depts : []).forEach((d) => {
-                    if (d && d.id) map[String(d.id)] = d.name || String(d.id);
+                    if (d && d.id) map[d.id] = d.name;
                 });
                 setDeptMap(map);
             } catch (err) {
                 console.error("Failed to fetch employee details:", err);
+            } finally {
+                setIsFetching(false);
+                hideLoading();
             }
         };
+
         if (user?.emp) fetchEmployee();
     }, [user?.emp]);
 
@@ -107,12 +124,15 @@ export default function MeDashboard() {
 
         const fetchName = async () => {
             try {
+                setIsFetching(true)
                 const emp = await get(`employees/${mgrId}`);
                 if (cancelled) return;
                 const name = fromObj(emp?.personalDetails ? emp : emp?.employee || emp || {});
                 setManagerName(name || String(mgrId));
             } catch {
                 if (!cancelled) setManagerName(String(mgrId));
+            } finally {
+                setIsFetching(false)
             }
         };
 
@@ -127,13 +147,23 @@ export default function MeDashboard() {
         };
     }, [employeeDetails, get]);
 
-    // Loading State
-    if (!employeeDetails)
+    // 1. Loading spinner (local)
+    // if (isFetching) {
+    //     return (
+    //         <div className="d-flex justify-content-center align-items-center py-5 my-5">
+    //             <Loading type="dots" message="Loading data..." />
+    //         </div>
+    //     );
+    // }
+
+    // 2. No employee data after loading
+    if (!employeeDetails) {
         return (
             <div className="d-flex justify-content-center py-5">
                 <img src={noDataFound} style={{ maxWidth: "300px" }} alt="No data found." />
             </div>
         );
+    }
 
     const { personalDetails, jobDetails } = employeeDetails;
     const activeJob = (jobDetails || []).find((job) => job.isActive === true) || {};
@@ -144,7 +174,7 @@ export default function MeDashboard() {
                 {/* Profile Header */}
                 <div className="row mb-3 mt-3">
                     <div className="col-12">
-                        <div className="employee-profile-header shadow-sm d-flex align-items-center gap-3">
+                        <div className="employee-profile-header  d-flex align-items-center gap-3">
                             <div className="profile-info flex-grow-1">
                                 <div className="d-flex align-items-center gap-3 flex-wrap">
                                     <Avatar

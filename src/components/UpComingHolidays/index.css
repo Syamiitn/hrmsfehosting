@@ -11,13 +11,15 @@
         align-items: center;
         gap: 10px;
         padding: 5px;
-        background-color: var(--background-color);
+        background-color: var(--body-bg);
         border-radius: 10px;
-        border: 1px solid var(--border-color);
+        /* border: 1px solid var(--border-color); */
+        box-shadow: var(--shadow-glassy);
 
         .date-container {
             border: 1px solid var(--border-color);
-            background-color: var(--card-bg-color);
+            background-color: var(--card-bg);
+            box-shadow: var(--shadow-glassy);
             display: flex;
             flex-direction: column;
             justify-content: center;

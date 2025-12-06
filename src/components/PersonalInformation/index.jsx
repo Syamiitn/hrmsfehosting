@@ -24,7 +24,7 @@ export default function PersonalInformation({ profileInfo = {}, handleEdit }) {
     const { line1, city, state, postalCode } = currentAddress || {};
 
     return (
-        <div className="personal-information-card shadow-sm flex-fill">
+        <div className="personal-information-card  flex-fill">
             {/* Header */}
             <div className="d-flex align-items-center gap-2">
                 <FaUser className="icon" />

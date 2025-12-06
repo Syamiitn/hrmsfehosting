@@ -2,11 +2,11 @@
    Career Timeline Styles
    ========================== */
 .career-timeline-card {
-  background: var(--card-bg-color);
-  border-radius: 16px;
-  padding: 16px;
-  box-shadow: 0 6px 18px rgba(16, 24, 40, 0.06);
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  background-color: var(--card-bg);
+  padding: var(--padding-lg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-glassy);
+  border: 1px solid var(--border-color);
 }
 
 .career-timeline__header {
@@ -201,5 +201,127 @@
 
   .career-timeline__connector {
     display: none;
+  }
+}
+
+@media (max-width: 920px) {
+  .career-timeline__list::before {
+    left: 24px;
+    transform: none;
+  }
+
+  .career-timeline__row {
+    grid-template-columns: 50px 1fr;
+    column-gap: 10px;
+  }
+
+  .career-timeline__axis {
+    grid-column: 1 / 2;
+    min-height: 40px;
+  }
+
+  .career-timeline__cardwrap {
+    grid-column: 2 / 3;
+    max-width: 100%;
+  }
+
+  .career-timeline__badge {
+    left: 0;
+    transform: translateY(-18px);
+    font-size: 13px;
+    padding: 4px 8px;
+  }
+
+  .career-timeline__dot {
+    width: 28px;
+    height: 28px;
+    box-shadow: 0 0 0 4px var(--tl-accent-ghost);
+  }
+
+  .career-timeline__dot svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .career-timeline__connector {
+    display: none;
+  }
+}
+
+
+@media (max-width: 600px) {
+  .career-timeline-card {
+    padding: var(--padding-md);
+  }
+
+  .career-timeline__list {
+    padding: 10px 6px 16px;
+    gap: 18px;
+  }
+
+  /* Make timeline rail thinner & left aligned */
+  .career-timeline__list::before {
+    left: 16px;
+    width: 2px;
+  }
+
+  /* 1 column stacked layout */
+  .career-timeline__row {
+    grid-template-columns: 40px 1fr;
+    align-items: flex-start;
+  }
+
+  .career-timeline__dot {
+    width: 24px;
+    height: 24px;
+    box-shadow: 0 0 0 3px var(--tl-accent-ghost);
+  }
+
+  .career-timeline__badge {
+    position: relative;
+    top: -4px;
+    transform: none;
+    margin-bottom: 6px;
+    display: inline-block;
+    font-size: 12px;
+  }
+
+  .career-timeline__card {
+    padding: 10px 12px;
+    border-radius: 10px;
+  }
+
+  .career-timeline__event {
+    font-size: 14px;
+  }
+
+  .career-timeline__desc {
+    font-size: 12px;
+    line-height: 1.4;
+  }
+}
+
+
+@media (max-width: 380px) {
+  .career-timeline__dot {
+    width: 20px;
+    height: 20px;
+  }
+
+  .career-timeline__event {
+    font-size: 13px;
+  }
+
+  .career-timeline__desc {
+    font-size: 11px;
+  }
+
+  .career-timeline__badge {
+    font-size: 10px;
+    padding: 3px 6px;
+  }
+
+  .career-timeline__card {
+    padding: 8px 10px;
   }
 }

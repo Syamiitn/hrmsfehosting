@@ -1,10 +1,12 @@
 .attendance-overview-page {
-    background-color: var(--background-color);
+    background-color: var(--body-bg);
 
     .stat-card {
-        background-color: var(--card-bg-color);
-        padding: 16px;
-        border-radius: 20px;
+        background-color: var(--card-bg);
+        padding: var(--padding-lg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-glassy);
+        border: 1px solid var(--border-color);
 
         h2 {
             color: var(--theme);
@@ -17,9 +19,11 @@
     }
 
     .recent-attendance-card {
-        background-color: var(--card-bg-color);
-        padding: 16px;
-        border-radius: 20px;
+        background-color: var(--card-bg);
+        padding: var(--padding-lg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-glassy);
+        border: 1px solid var(--border-color);
 
         .icon {
             color: var(--theme);
@@ -33,9 +37,11 @@
     }
 
     .attendance-exception {
-        background-color: var(--card-bg-color);
-        padding: 16px;
-        border-radius: 20px;
+        background-color: var(--card-bg);
+        padding: var(--padding-lg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-glassy);
+        border: 1px solid var(--border-color);
 
         .icon {
             color: var(--theme);
@@ -51,9 +57,11 @@
                 display: flex;
                 justify-content: space-between;
                 margin-bottom: 10px;
+                background-color: var(--card-bg);
+                padding: var(--padding-lg);
+                border-radius: var(--radius-lg);
+                box-shadow: var(--shadow-glassy);
                 border: 1px solid var(--border-color);
-                padding: 16px;
-                border-radius: 16px;
             }
 
             .icon-btn {
@@ -72,9 +80,11 @@
     }
 
     .attendance-calendar-card {
-        background-color: var(--card-bg-color);
-        padding: 16px;
-        border-radius: 20px;
+        background-color: var(--card-bg);
+        padding: var(--padding-lg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-glassy);
+        border: 1px solid var(--border-color);
 
         .icon {
             color: var(--theme);

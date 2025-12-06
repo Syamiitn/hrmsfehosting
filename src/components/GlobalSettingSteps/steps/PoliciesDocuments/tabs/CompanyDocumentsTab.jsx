@@ -12,6 +12,7 @@ import { showSuccessToast } from '@utils/utils';
 // =====================================================
 // 🧠 Dummy APIs
 // =====================================================
+// Simulates fetching the document list until backend endpoints exist
 async function apiGetCompanyDocuments(orgId) {
   console.log("GET -> /api/company-documents?org=" + orgId);
   return new Promise((res) =>
@@ -42,12 +43,14 @@ async function apiGetCompanyDocuments(orgId) {
   );
 }
 
+// Simulates persisting a document upload
 async function apiUploadCompanyDocument(payload) {
   console.log("POST -> /api/company-documents", payload);
   return { success: true, id: Math.random().toString(36).substring(2, 7) };
 }
 
 // ---------- Small utilities ----------
+// Preview helpers reused by the modal + lightbox
 const isImage = (url = "") => /\.(png|jpg|jpeg|gif|webp|svg)$/i.test(url);
 const getFileName = (url = "") => {
   try {
@@ -68,6 +71,7 @@ export default function CompanyDocumentsTab({ selectedOrg }) {
   const [preview, setPreview] = useState({ open: false, url: "" });
 
   // 🔹 Fetch documents
+  // Fetch documents whenever the org context changes
   useEffect(() => {
     let cancelled = false;
     async function load() {
@@ -82,6 +86,7 @@ export default function CompanyDocumentsTab({ selectedOrg }) {
   }, [selectedOrg?.id]);
 
   // 🔹 Upload document
+  // Opens the upload modal and wires the save callback to update the table
   const handleUpload = () => {
     openModal(
       <UploadDocumentForm

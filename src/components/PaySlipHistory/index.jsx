@@ -1,13 +1,14 @@
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import { CalendarRange, FileDown } from "lucide-react";
 import { PayslipPDF } from "@components/common/PayslipPDF";
 import { pdf } from "@react-pdf/renderer";
 import generatePayslip from "@data/mockData";
-import logo from "../../assets/TetriqSolutionsLogo.png"; // ✅ keep your import
+import logo from "../../assets/TetriqSolutionsLogo.png";
 import "./index.css";
 
-const formatINR = (v) => {
-    const n = Number(v);
+// ---------- Helpers ----------
+const formatINR = (value) => {
+    const n = Number(value);
     return !isNaN(n)
         ? n.toLocaleString("en-IN", {
             style: "currency",
@@ -18,39 +19,63 @@ const formatINR = (v) => {
 };
 
 export default function PayslipHistory({ items = [] }) {
-    if (!items.length) return null;
+    // Empty state
+    if (!items || items.length === 0) return null;
 
-    const downloadPayslip = async (p) => {
-        const [month, year] = p.month.split(" ");
+    // ---------- Optimized Payslip download ----------
+    const downloadPayslip = useCallback(async (slip) => {
+        if (!slip) return;
 
-        const fullPayslip = generatePayslip({
-            name: "Kurme Pavan",
-            employeeId: "TSPL000001",
-            joiningDate: "22 Jul 2025",
-            department: "IT",
-            subDepartment: "N/A",
-            designation: "Software Developer",
-            year: parseInt(year),
-            month,
-            salary: p.net,
+        const { periodMonth, periodYear, netPay } = slip;
+
+        // Convert: 11 → "November"
+        const monthName = useMemo(
+            () =>
+                [
+                    "",
+                    "January",
+                    "February",
+                    "March",
+                    "April",
+                    "May",
+                    "June",
+                    "July",
+                    "August",
+                    "September",
+                    "October",
+                    "November",
+                    "December",
+                ][periodMonth],
+            [periodMonth]
+        );
+
+        // Prepare payslip data for PDF
+        const payslipData = generatePayslip({
+            name: slip?.employee?.personalDetails?.firstName || "Employee",
+            employeeId: slip?.employee?.employeeCode || "N/A",
+            joiningDate: slip?.employee?.joiningDate || "N/A",
+            department: slip?.employee?.department || "IT",
+            subDepartment: slip?.employee?.subDepartment || "N/A",
+            designation: slip?.employee?.designation || "Software Developer",
+            year: periodYear,
+            month: monthName,
+            salary: Number(netPay),
         });
 
-        // Generate PDF blob
-        const blob = await pdf(
-            <PayslipPDF payslip={fullPayslip} logo={logo} />
-        ).toBlob();
+        // Generate PDF Blob
+        const blob = await pdf(<PayslipPDF payslip={payslipData} logo={logo} />).toBlob();
 
         // Trigger browser download
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
-        link.download = `Payslip-${p.month}.pdf`;
-        document.body.appendChild(link);
+        link.download = `Payslip-${monthName}-${periodYear}.pdf`;
         link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-    };
 
+        URL.revokeObjectURL(url);
+    }, []);
+
+    // ---------- Render ----------
     return (
         <section className="payslip-history-card flex-fill">
             {/* Header */}
@@ -63,22 +88,47 @@ export default function PayslipHistory({ items = [] }) {
 
             {/* List */}
             <ul className="payslip-history__list">
-                {items.map((p) => (
-                    <li className="payslip-history__row" key={p.id}>
-                        <div className="payslip-history__left">
-                            <div className="month">{p.month}</div>
-                            <div className="sub">Net: {formatINR(p.net)}</div>
-                        </div>
-                        <div className="payslip-history__right">
-                            <button
-                                className="iconbtn"
-                                onClick={() => downloadPayslip(p)}
-                            >
-                                <FileDown size={20} />
-                            </button>
-                        </div>
-                    </li>
-                ))}
+                {items.map((slip) => {
+                    const monthName =
+                        [
+                            "",
+                            "January",
+                            "February",
+                            "March",
+                            "April",
+                            "May",
+                            "June",
+                            "July",
+                            "August",
+                            "September",
+                            "October",
+                            "November",
+                            "December",
+                        ][slip.periodMonth] || "Unknown";
+
+                    return (
+                        <li className="payslip-history__row" key={slip.id}>
+                            <div className="payslip-history__left">
+                                <div className="month">
+                                    {monthName} {slip.periodYear}
+                                </div>
+
+                                <div className="sub">
+                                    Net: {formatINR(slip.netPay)}
+                                </div>
+                            </div>
+
+                            <div className="payslip-history__right">
+                                <button
+                                    className="iconbtn"
+                                    onClick={() => downloadPayslip(slip)}
+                                >
+                                    <FileDown size={20} />
+                                </button>
+                            </div>
+                        </li>
+                    );
+                })}
             </ul>
         </section>
     );

@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { format, subMonths, startOfMonth, endOfMonth } from "date-fns";
+
 import LatestSalary from "@components/LatestSalary";
 import PaySlipHistory from "@components/PaySlipHistory";
 import TaxDeclarations from "@components/TaxDeclarations";
@@ -14,15 +16,56 @@ import './index.css'
 
 export default function EmployeeFinance() {
     const data = financeData || {};
-    const latestSalary = data.latestSalary ?? null;
-    const payslips = data.payslips ?? [];
+    const [latestSalary, setLatestSalary] = useState({})
+    const [payslips, setPayslips] = useState([])
     const tax = data.tax ?? null;
-    const ytd = data.ytd ?? null;
+    const [ytd, setYtd] = useState({})
     const timeline = data.timeline ?? [];
     const [bankDetails, setBankDetails] = useState();
     const { user } = useAuth();
     const { get } = useApi();
 
+    // fetch finance details
+    const fechingFinanceDetails = async () => {
+        try {
+            const res = await get(`payroll-dashboard?employeeId=${user?.emp}&fiscalYearStart=${format(new Date(), 'yyyy')}`);
+            console.log('Fetching finance Details: ', res)
+            setLatestSalary(res?.latestPayslip);
+            setYtd(res?.yearToDateSummary)
+        } catch (err) {
+            console.error(err.message)
+        }
+    }
+
+    // Fetching Last three months payslips
+    const fetchLastThreeMonthsPayslips = async () => {
+        try {
+            // Today's date
+            const today = new Date();
+
+            // Last 3 months start date
+            const fromDate = startOfMonth(subMonths(today, 2));
+            // (Example: if today = March 10 → fromDate = Jan 1)
+
+            // Current month end date
+            const toDate = endOfMonth(today);
+
+            // Format --> yyyy-MM-dd
+            const payDateFrom = format(fromDate, "yyyy-MM-dd");
+            const payDateTo = format(toDate, "yyyy-MM-dd");
+
+            // API Call
+            const res = await get(
+                `/payslips?payDateFrom=${payDateFrom}&payDateTo=${payDateTo}`
+            );
+
+            setPayslips(res);
+
+        } catch (err) {
+            console.error("Error fetching last 3 months payslips:", err);
+            return [];
+        }
+    };
 
     // Fetching using details
     useEffect(() => {
@@ -37,6 +80,8 @@ export default function EmployeeFinance() {
         };
 
         if (user?.emp) fetchUserDetails();
+        fechingFinanceDetails()
+        fetchLastThreeMonthsPayslips();
     }, [user?.emp]);
 
 

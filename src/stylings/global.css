@@ -1,0 +1,513 @@
+/* ==========================================================
+   FONT IMPORT & GLOBAL RESET
+========================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+* {
+    box-sizing: border-box;
+    font-family: "Inter", "Segoe UI", "Roboto", Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* ==========================================================
+   ROOT — BASE COLOR TOKENS
+   (Brand, Theme, Text, Backgrounds, Borders, Shadows)
+========================================================== */
+:root {
+    /* ---------- Brand Colors ---------- */
+    --primary-100: #A365F9;
+    --primary-200: #9250F0;
+    --primary-300: #892DE6;
+
+    /* ---------- Theme Colors ---------- */
+    --theme-purple: #892DE6;
+    --theme-purple-light: #A365F9;
+    --theme-purple-rgb: 137, 45, 230;
+    --theme-purple-light-rgb: 163, 101, 249;
+
+    --theme-blue: #3A73F5;
+    --theme-blue-light: #6E9BFF;
+    --theme-blue-rgb: 58, 115, 245;
+    --theme-blue-light-rgb: 110, 155, 255;
+
+    --theme-green: #2FBF71;
+    --theme-green-light: #61E2A2;
+    --theme-green-rgb: 47, 191, 113;
+    --theme-green-light-rgb: 97, 226, 162;
+
+    --theme-orange: #a34218;
+    --theme-orange-light: #c25729;
+    --theme-orange-rgb: 163, 66, 24;
+    --theme-orange-light-rgb: 194, 87, 41;
+
+    --theme-red: #E13E3E;
+    --theme-red-light: #FF7171;
+    --theme-red-rgb: 225, 62, 62;
+    --theme-red-light-rgb: 255, 113, 113;
+
+    /* ---------- Secondary Colors ---------- */
+    --secondary-red: #A33333;
+    --secondary-orange: #B55A34;
+    --secondary-gray-light: #EFEFEF;
+    --secondary-gray-mid: #D7D7D7;
+    --secondary-white: #FFFFFF;
+    --secondary-green: #6EE07D;
+
+    /* ---------- Backgrounds ---------- */
+    --bg-body: #F8F7F8;
+    --bg-card: rgba(255, 255, 255, 0.55);
+    --bg-input: #FFFFFF;
+    --bg-transparent: transparent;
+
+    /* ---------- Text Colors ---------- */
+    --text-primary: #1F1F1F;
+    --text-secondary: #555;
+    --text-light: #A5A5A5;
+    --text-light-sm: #c5c5c5;
+    --text-white: #FFFFFF;
+
+    /* ----------- ledges --------------- */
+    --on-time-bg: #e4ffe5;
+    --on-time-text: #2e7d32;
+
+    --late-bg: #fff6db;
+    --late-text: #fbc02d;
+
+    --leave-bg: #e4f3ff;
+    --leave-text: #1976d2;
+
+    --wfh-bg: #fbe4ff;
+    --wfh-text: #6a1b9a;
+
+    --holiday-bg: #fff2de;
+    --holiday-text: #ef6c00;
+
+    --absent-bg: #ffe1de;
+    --absent-text: #d32f2f;
+
+    --comp-off-bg: #e4fcff;
+    --comp-off-text: #0097a7;
+
+    --weekend-bg: #e6e6e6;
+    --weekend-text: #616161;
+
+    /* ---------- Borders ---------- */
+    --border-light: rgba(0, 0, 0, 0.08);
+    --border-soft: rgba(255, 255, 255, 0.4);
+
+    /* ---------- Shadows ---------- */
+    --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --shadow-medium: 0 8px 20px rgba(0, 0, 0, 0.12);
+    --shadow-in:
+        inset 2px 2px 4px rgba(255, 255, 255, 0.45),
+        inset 2px 2px 6px rgba(0, 0, 0, 0.08);
+    --shadow-out: 0 8px 20px rgba(0, 0, 0, 0.10);
+    --shadow-glass:
+        0 4px 14px rgba(0, 0, 0, 0.06),
+        inset 0 2px 4px rgba(255, 255, 255, 0.5),
+        inset 0 -3px 6px rgba(0, 0, 0, 0.05);
+
+    /* ---------- Radii ---------- */
+    --radius-sm: 6px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    --radius-full: 50%;
+
+    /* ------------ Padding --------------- */
+    --padding-xs: 5px;
+    --padding-sm: 8px;
+    --padding-md: 12px;
+    --padding-lg: 16px;
+    --padding-xl: 20px;
+
+
+}
+
+/* ==========================================================
+   THEME MODE (LIGHT / DARK)
+========================================================== */
+[data-mode="light"] {
+    --body-bg: #F8F7F8;
+    --card-bg: rgba(255, 255, 255, 0.65);
+    --input-bg: #FFFFFF;
+
+    --text-main: #1F1F1F;
+    --text-sub: #5A5A5A;
+    --text-muted: #A5A5A5;
+
+    --border-color: #00000014;
+    --shadow-glassy:
+        inset 2px 2px 4px rgba(255, 255, 255, 0.014),
+        /* top-left highlight */
+        inset -2px -2px 4px rgba(255, 255, 255, 0.25),
+        /* bottom-right highlight */
+        inset 2px 2px 6px rgba(0, 0, 0, 0.075),
+        /* top-left depth */
+        inset -2px -2px 6px rgba(0, 0, 0, 0.075);
+    /* bottom-right depth */
+
+}
+
+[data-mode="dark"] {
+    --body-bg: #121212;
+    --card-bg: rgba(255, 255, 255, 0.08);
+    --input-bg: #1E1E1E;
+
+    --text-main: #FFFFFF;
+    --text-sub: #CCCCCC;
+    --text-muted: #999999;
+
+    --border-color: rgba(255, 255, 255, 0.1);
+
+    /* Dark mode glass shadow override */
+    --shadow-glassy:
+        inset 2px 2px 4px rgba(255, 255, 255, 0.014),
+        /* top-left highlight */
+        inset -2px -2px 4px rgba(24, 21, 21, 0.788),
+        /* bottom-right highlight */
+        inset 2px 2px 6px rgba(0, 0, 0, 0.075),
+        /* top-left depth */
+        inset -2px -2px 6px rgba(20, 14, 14, 0.5);
+}
+
+/* ==========================================================
+   THEME COLOR SYSTEM (PURPLE, BLUE, GREEN, ORANGE, RED)
+========================================================== */
+[data-theme="purple"] {
+    --theme-primary: var(--theme-purple);
+    --theme-primary-light: var(--theme-purple-light);
+    --theme-gradient: linear-gradient(90deg, var(--theme-purple-light), var(--theme-purple));
+    --theme-border: var(--theme-purple);
+    --theme-rgb: var(--theme-purple-rgb);
+}
+
+[data-theme="blue"] {
+    --theme-primary: var(--theme-blue);
+    --theme-primary-light: var(--theme-blue-light);
+    --theme-gradient: linear-gradient(90deg, var(--theme-blue-light), var(--theme-blue));
+    --theme-border: var(--theme-blue);
+    --theme-rgb: var(--theme-blue-rgb);
+}
+
+[data-theme="green"] {
+    --theme-primary: var(--theme-green);
+    --theme-primary-light: var(--theme-green-light);
+    --theme-gradient: linear-gradient(90deg, var(--theme-green-light), var(--theme-green));
+    --theme-border: var(--theme-green);
+    --theme-rgb: var(--theme-green-rgb);
+}
+
+[data-theme="orange"] {
+    --theme-primary: var(--theme-orange);
+    --theme-primary-light: var(--theme-orange-light);
+    --theme-gradient: linear-gradient(90deg, var(--theme-orange-light), var(--theme-orange));
+    --theme-border: var(--theme-orange);
+    --theme-rgb: var(--theme-orange-rgb);
+}
+
+[data-theme="red"] {
+    --theme-primary: var(--theme-red);
+    --theme-primary-light: var(--theme-red-light);
+    --theme-gradient: linear-gradient(90deg, var(--theme-red-light), var(--theme-red));
+    --theme-border: var(--theme-red);
+    --theme-rgb: var(--theme-red-rgb);
+}
+
+/* ==========================================================
+   TYPOGRAPHY
+========================================================== */
+:root {
+    --font-family: 'Inter', sans-serif;
+
+    --font-size-h1: 28px;
+    --font-size-h2: 24px;
+    --font-size-h3: 20px;
+    --font-size-h4: 18px;
+    --font-size-h5: 16px;
+    --font-size-h6: 14px;
+
+    --font-size-body: 16px;
+    --font-size-small: 14px;
+    --font-size-extra-small: 12px;
+
+    --font-weight-bold: 700;
+    --font-weight-semibold: 600;
+    --font-weight-regular: 400;
+}
+
+/* Utility Typography Classes */
+.h1 {
+    font-size: var(--font-size-h1);
+    font-weight: var(--font-weight-bold);
+}
+
+.h2 {
+    font-size: var(--font-size-h2);
+    font-weight: var(--font-weight-semibold);
+}
+
+.h3 {
+    font-size: var(--font-size-h3);
+    font-weight: var(--font-weight-semibold);
+}
+
+.h4 {
+    font-size: var(--font-size-h4);
+    font-weight: var(--font-weight-regular);
+}
+
+.h5 {
+    font-size: var(--font-size-h5);
+}
+
+.h6 {
+    font-size: var(--font-size-h6);
+}
+
+.body {
+    font-size: var(--font-size-body);
+}
+
+.p1 {
+    font-size: var(--font-size-small);
+    padding: 0px !important;
+    color: var(--text-sub);
+}
+
+.p2 {
+    font-size: var(--font-size-extra-small);
+    padding: 0px !important;
+    color: var(--text-sub);
+}
+
+/* ==========================================================
+   INPUTS / TEXTAREAS / SELECTS
+========================================================== */
+
+input,
+select,
+textarea {
+    width: 100%;
+    font-family: inherit;
+    font-size: 14px;
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    background: var(--input-bg);
+    outline: none;
+    transition: 0.2s ease;
+}
+
+/* Placeholder styling */
+input::placeholder,
+textarea::placeholder {
+    color: var(--text-secondary);
+}
+
+/* Hover state */
+input:hover,
+select:hover,
+textarea:hover {
+    border-color: var(--theme-primary-light);
+}
+
+/* Focus (theme color outline) */
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--theme-primary);
+    box-shadow: 0 0 0 3px rgba(var(--theme-rgb), 0.2);
+}
+
+/* Remove Firefox focus border */
+input::-moz-focus-inner,
+select::-moz-focus-inner {
+    border: 0;
+}
+
+/* Number input: remove arrows */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+/* Search input with left icon */
+input[type="search"] {
+    padding-left: 35px;
+    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXNlYXJjaC1pY29uIGx1Y2lkZS1zZWFyY2giPjxwYXRoIGQ9Im0yMSAyMS00LjM0LTQuMzQiLz48Y2lyY2xlIGN4PSIxMSIgY3k9IjExIiByPSI4Ii8+PC9zdmc+');
+    background-repeat: no-repeat;
+    background-position: 10px center;
+    background-size: 16px;
+}
+
+/* Phone input left padding */
+input[type="tel"] {
+    padding-left: 45px;
+}
+
+/* ==========================================================
+   SELECT DROPDOWN (Arrow + Options)
+========================================================== */
+
+/* Dropdown arrow */
+:root {
+    --arrow-icon: url("data:image/svg+xml;utf8,<svg width='14' height='14' fill='%23A5A5A5' xmlns='http://www.w3.org/2000/svg'><path d='M7 10L2 5h10L7 10z'/></svg>");
+}
+
+[data-mode="dark"] {
+    --arrow-icon: url("data:image/svg+xml;utf8,<svg width='14' height='14' fill='%23CCCCCC' xmlns='http://www.w3.org/2000/svg'><path d='M7 10L2 5h10L7 10z'/></svg>");
+}
+
+select {
+    appearance: none;
+    background-image: var(--arrow-icon);
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 14px;
+    cursor: pointer;
+}
+
+/* Option list inside dropdown */
+select option {
+    padding: 10px;
+    background: var(--theme-primary);
+    color: white;
+}
+
+select option:hover {
+    background: var(--theme-primary-light) !important;
+}
+
+/* ==========================================================
+   INPUT GROUP UTILITY
+========================================================== */
+
+.input-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.input-group .icon {
+    font-size: 18px;
+    color: var(--text-muted);
+}
+
+/* ==========================================================
+   TOGGLE SWITCH (NESTED CSS VERSION)
+========================================================== */
+
+.toggle {
+    position: relative;
+    width: 48px;
+    height: 26px;
+    display: inline-block;
+
+    /* Hidden checkbox input */
+    input {
+        width: 0;
+        height: 0;
+        opacity: 0;
+    }
+
+    /* Track */
+    .toggle-track {
+        position: absolute;
+        inset: 0;
+        background: var(--border-light);
+        border-radius: 50px;
+        transition: background 0.3s ease;
+        cursor: pointer;
+
+        /* Thumb */
+        .toggle-thumb {
+            position: absolute;
+            height: 22px;
+            width: 22px;
+            top: 2px;
+            left: 2px;
+            border-radius: 50%;
+            background: var(--text-white);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease, background 0.3s ease;
+        }
+    }
+
+    /* Checked State */
+    input:checked+.toggle-track {
+        background: var(--theme-primary);
+
+        .toggle-thumb {
+            transform: translateX(22px);
+        }
+    }
+
+    /* Focus-visible for keyboard users */
+    input:focus-visible+.toggle-track {
+        outline: 2px solid rgba(var(--theme-rgb), 0.4);
+        outline-offset: 3px;
+    }
+
+    /* Disabled State */
+    input:disabled+.toggle-track {
+        opacity: 0.6;
+        cursor: not-allowed;
+
+        .toggle-thumb {
+            background: #ccc;
+        }
+    }
+}
+
+/* ---------- DARK MODE SUPPORT ---------- */
+[data-mode="dark"] {
+    .toggle {
+        .toggle-track {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        input:checked+.toggle-track {
+            background: var(--theme-primary-light);
+        }
+    }
+}
+
+
+
+
+/* --------- Border Colors --------- */
+
+.border-on-time {
+    border-color: var(--on-time-text) !important;
+}
+
+.border-late {
+    border-color: var(--late-text) !important;
+}
+
+.border-absent {
+    border-color: var(--absent-text);
+}
+
+.border-leave {
+    border-color: var(--leave-text) !important;
+}
+
+.border-wfh {
+    border-color: var(--wfh-text) !important;
+}
+
+.border-holiday {
+    border-color: var(--holiday-text) !important;
+}
+
+.border-weekend {
+    border-color: var(--weekend-text) !important;
+}

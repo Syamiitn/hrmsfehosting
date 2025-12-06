@@ -1,10 +1,12 @@
 .ems-overview {
-    background-color: var(--background-color);
-    
+    background-color: var(--body-bg);
+
     .stat-card {
-        padding: 16px;
-        background-color: var(--card-bg-color);
-        border-radius: 16px;
+        padding: var(--padding-lg);
+        background-color: var(--card-bg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-glassy);
+        border: 1px solid var(--border-color);
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -16,9 +18,11 @@
     }
 
     .recent-activities-container {
-        background-color: var(--card-bg-color);
-        padding: 16px;
-        border-radius: 16px;
+        padding: var(--padding-lg);
+        background-color: var(--card-bg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-glassy);
+        border: 1px solid var(--border-color);
 
         .icon {
             font-size: 20px;
@@ -31,9 +35,11 @@
     }
 
     .quick-actions {
-        background-color: var(--card-bg-color);
-        padding: 16px;
-        border-radius: 16px;
+        padding: var(--padding-lg);
+        background-color: var(--card-bg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-glassy);
+        border: 1px solid var(--border-color);
 
         .icon {
             fill: var(--theme);
@@ -41,6 +47,10 @@
         }
 
         .quick-action {
+            padding: var(--padding-lg);
+            background-color: var(--card-bg);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-soft);
             border: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;

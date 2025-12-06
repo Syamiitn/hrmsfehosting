@@ -829,6 +829,7 @@ async function apiGetHrTemplates(orgId) {
 }
 
 // ✅ Mock Add & Edit APIs
+// Mocked persistence until API endpoints exist
 async function apiAddHrTemplate(payload) {
   console.log("📤 Adding template:", payload);
   return new Promise((resolve) =>
@@ -852,6 +853,7 @@ export default function HrTemplatesTab({ selectedOrg }) {
   const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState({});
 
+  // Fetch template list when the organization context changes
   useEffect(() => {
     let cancelled = false;
     async function load() {
@@ -866,6 +868,7 @@ export default function HrTemplatesTab({ selectedOrg }) {
   }, [selectedOrg?.id]);
 
   // ✅ Add Template
+  // Opens the modal for creating a template and wires up the save callback
   const handleAdd = () => {
     openModal(
       <TemplateForm
@@ -894,6 +897,7 @@ export default function HrTemplatesTab({ selectedOrg }) {
   };
 
   // ✅ Edit Template
+  // Launches the modal with the existing template populated
   const handleEdit = (template) => {
     openModal(
       <TemplateForm
@@ -928,7 +932,7 @@ export default function HrTemplatesTab({ selectedOrg }) {
   const toggleInlineExpand = (id) =>
     setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
 
-  // Columns
+  // DataTable column configuration including inline chips for dynamic fields
   const columns = [
     {
       name: "Template Name",

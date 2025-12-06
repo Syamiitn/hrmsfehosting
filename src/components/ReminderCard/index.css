@@ -11,7 +11,8 @@
         gap: 8px;
         margin-bottom: 10px;
         border: 1px solid var(--border-color);
-        padding: 10px;
-        border-radius: 5px;
+        box-shadow: var(--shadow-glassy);
+        padding: var(--padding-md);
+        border-radius: var(--radius-md);
     }
 }

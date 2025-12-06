@@ -341,7 +341,7 @@ export default function LoginPage() {
                 {step === 'login' && (
                     <Formik initialValues={{ emailOrPhone: '', password: '' }} validationSchema={loginValidationSchema} onSubmit={handleLoginSubmit}>
                         {() => (
-                            <Form className="w-full max-w-md px-6 py-4 bg-white rounded-lg shadow-xl">
+                            <Form className="w-full max-w-md px-6 py-4 bg-white rounded-lg shadow-xl p-3">
                                 <h3 className="text-center text-2xl font-bold mb-4">Login to SoGo</h3>
                                 {Logo && <img src={Logo} alt="Logo" loading='lazy' className='w-full mb-3' />}
 
@@ -370,7 +370,7 @@ export default function LoginPage() {
                                     <button type="button" className="text-blue-500 hover:underline cursor-pointer" onClick={() => { setStep('forgot'); setShowErrorMessage(false); }}>Forgot Password?</button>
                                 </div>
 
-                                <Button variant='solid' size='sm' label='Login' className='w-full' type='submit' />
+                                <Button variant='solid' size='sm' label='Login' radius={5} className='w-full' type='submit' />
                             </Form>
                         )}
                     </Formik>
@@ -378,7 +378,7 @@ export default function LoginPage() {
 
                 {/* OTP Step */}
                 {step === 'otp' && (
-                    <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-xl">
+                    <div className="w-full max-w-md p-3 bg-white rounded-lg shadow-xl">
                         <h3 className="text-center text-2xl font-bold mb-4">Enter OTP</h3>
 
                         <div className="flex justify-between gap-2">
@@ -406,7 +406,7 @@ export default function LoginPage() {
                             <span className="text-gray-500">Resend OTP in {formatTime(timer)}</span>
                         </div>
 
-                        <Button variant='solid' size='sm' className='w-full mt-4' label='Submit OTP' onClick={handleOtpSubmit} />
+                        <Button variant='solid' size='sm' radius={5} className='w-full mt-4' label='Submit OTP' onClick={handleOtpSubmit} />
                     </div>
                 )}
 
@@ -414,7 +414,7 @@ export default function LoginPage() {
                 {step === 'forgot' && (
                     <Formik initialValues={{ resetEmail: '' }} validationSchema={forgotValidationSchema} onSubmit={handleForgotSubmit}>
                         {() => (
-                            <Form className="w-full max-w-md p-6 bg-white rounded-lg shadow-xl">
+                            <Form className="w-full max-w-md p-3 bg-white rounded-lg shadow-xl">
                                 <h3 className="text-center text-2xl font-bold mb-4">Forgot Password</h3>
                                 <div className="mb-4">
                                     <label className="block text-gray-700 font-semibold mb-1">Work Email</label>
@@ -427,8 +427,8 @@ export default function LoginPage() {
                                 </div>
 
                                 <div className="flex gap-2 mt-4">
-                                    <Button type='submit' variant='solid' size='sm' className='w-1/2' label='Send Reset Link' />
-                                    <Button type='button' variant='outline' size='sm' className='w-1/2' label='Back to Login' onClick={() => { setStep('login'); setShowErrorMessage(false); }} />
+                                    <Button type='submit' variant='solid' size='sm' radius={5} className='w-1/2' label='Send Reset Link' />
+                                    <Button type='button' variant='outline' size='sm' radius={5} className='w-1/2' label='Back to Login' onClick={() => { setStep('login'); setShowErrorMessage(false); }} />
                                 </div>
                             </Form>
                         )}

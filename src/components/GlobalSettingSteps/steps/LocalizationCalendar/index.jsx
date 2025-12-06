@@ -6,6 +6,7 @@ import { useApi } from "@hooks/useApi";
 import { createCommonApi } from "@services/commonApi";
 import { showErrorToast, showSuccessToast } from "@utils/utils";
 
+// Dropdown definitions for the localization card
 const LOCALIZATION_FIELDS = [
     { id: "country", label: "Default Country", options: ["India", "USA", "UK"] },
     { id: "timezone", label: "Timezone", options: ["IST (GMT +5:30)", "EST (GMT -5)", "PST (GMT -8)"] },
@@ -14,6 +15,7 @@ const LOCALIZATION_FIELDS = [
     { id: "shiftTemplate", label: "Shift Templates", options: ["General Shift", "Night Shift", "Flexible Shift"] },
 ];
 
+// Used both in the modal and the badge renderer
 const HOLIDAY_TYPE_OPTIONS = [
     { label: "National", value: "national" },
     { label: "Regional", value: "regional" },
@@ -21,6 +23,7 @@ const HOLIDAY_TYPE_OPTIONS = [
     { label: "Public", value: "public" },
 ];
 
+// Default shape when there is no localization configured for an org
 const BASE_LOCALIZATION = {
     id: null,
     country: "",
@@ -30,6 +33,7 @@ const BASE_LOCALIZATION = {
     shiftTemplate: "General Shift",
 };
 
+// Baseline used when creating/editing holidays without full payloads
 const DEFAULT_HOLIDAY_CONTEXT = {
     isRecurring: false,
     country: "",
@@ -39,6 +43,7 @@ const DEFAULT_HOLIDAY_CONTEXT = {
     isActive: true,
 };
 
+// Provides consistent badge colors for each holiday category
 const HOLIDAY_TYPE_BADGE_COLORS = {
     national: "bg-red-100 text-red-600 border border-red-200",
     regional: "bg-blue-100 text-blue-600 border border-blue-200",
@@ -47,6 +52,7 @@ const HOLIDAY_TYPE_BADGE_COLORS = {
     default: "bg-gray-100 text-gray-600 border border-gray-200",
 };
 
+// Attempts to find an array inside any backend response envelope
 const parseListResponse = (payload) => {
     if (typeof payload === "string") {
         try {
@@ -68,6 +74,7 @@ const parseListResponse = (payload) => {
     return Array.isArray(firstArray) ? firstArray : [];
 };
 
+// Converts a variety of date formats into YYYY-MM-DD for input[type=date]
 const toDateInputValue = (value) => {
     if (!value) return "";
     if (value instanceof Date) return value.toISOString().slice(0, 10);
@@ -80,6 +87,7 @@ const toDateInputValue = (value) => {
     return "";
 };
 
+// Friendly label utility used when showing tags/badges
 const toSentenceCase = (value = "") => {
     const normalized = value.toString().trim();
     if (!normalized) return "";
@@ -89,12 +97,14 @@ const toSentenceCase = (value = "") => {
         .replace(/\b\w/g, (char) => char.toUpperCase());
 };
 
+// Pre-populates the form with organization-level defaults
 const buildLocalizationDefaults = (selectedOrg) => ({
     ...BASE_LOCALIZATION,
     country: selectedOrg?.country || BASE_LOCALIZATION.country,
     currency: selectedOrg?.currency || BASE_LOCALIZATION.currency,
 });
 
+// Reduces GET responses into a single localization record
 const extractLocalizationPayload = (payload) => {
     if (!payload) return null;
 
@@ -119,6 +129,7 @@ const extractLocalizationPayload = (payload) => {
     return payload;
 };
 
+// Ensures the UI always works against a complete object, even if API omits fields
 const normalizeLocalizationResponse = (payload, selectedOrg) => {
     const defaults = buildLocalizationDefaults(selectedOrg);
     const raw = extractLocalizationPayload(payload);
@@ -133,6 +144,7 @@ const normalizeLocalizationResponse = (payload, selectedOrg) => {
     };
 };
 
+// Shapes holiday payloads into the structure required by the list & modal
 const normalizeHoliday = (item) => {
     if (!item || typeof item !== "object") return null;
     return {
@@ -159,6 +171,7 @@ const normalizeHoliday = (item) => {
     };
 };
 
+// Picks only the fields we care about before persisting localization settings
 const buildLocalizationPayload = (state) => {
     const payload = {
         country: state.country || "",
@@ -170,8 +183,10 @@ const buildLocalizationPayload = (state) => {
     return payload;
 };
 
+// Localization API expects a JSON string so we standardize serialization here
 const serializePayload = (payload) => JSON.stringify(payload);
 
+// Converts the modal form values into the backend contract
 const buildHolidayPayload = (form, defaults = {}) => {
     const base = { ...DEFAULT_HOLIDAY_CONTEXT, ...defaults };
     const payload = {
@@ -190,11 +205,13 @@ const buildHolidayPayload = (form, defaults = {}) => {
     return payload;
 };
 
+// Gracefully renders empty/unknown types in the table
 const formatHolidayType = (value) => {
     const formatted = toSentenceCase(value);
     return formatted || "—";
 };
 
+// Main localization + holiday management step for Global Settings
 export default function LocalizationCalendarForm({ selectedOrg }) {
     const { openModal, closeModal } = useModal();
     const { get, post, put, patch, del } = useApi();
@@ -212,6 +229,7 @@ export default function LocalizationCalendarForm({ selectedOrg }) {
     const [holidays, setHolidays] = useState([]);
     const [confirmDelete, setConfirmDelete] = useState(null);
 
+    // Loads the existing localization settings for the selected organization
     const fetchLocalization = useCallback(async () => {
         if (!organizationId || !localizationService) {
             return buildLocalizationDefaults(selectedOrg);
@@ -228,6 +246,7 @@ export default function LocalizationCalendarForm({ selectedOrg }) {
         }
     }, [organizationId, localizationService, selectedOrg]);
 
+    // Retrieves the holiday list for the org so it can be shown/edited
     const fetchHolidays = useCallback(async () => {
         if (!organizationId || !holidaysService) {
             return [];
@@ -237,12 +256,14 @@ export default function LocalizationCalendarForm({ selectedOrg }) {
         return parsed.map(normalizeHoliday).filter(Boolean);
     }, [organizationId, holidaysService]);
 
+    // Convenience helper for refreshing the list after CRUD actions
     const refreshHolidays = useCallback(async () => {
         const data = await fetchHolidays();
         setHolidays(data);
         return data;
     }, [fetchHolidays]);
 
+    // Initial load + cleanup when organization context changes
     useEffect(() => {
         let isMounted = true;
 
@@ -287,6 +308,7 @@ export default function LocalizationCalendarForm({ selectedOrg }) {
         };
     }, [organizationId, selectedOrg, fetchLocalization, fetchHolidays]);
 
+    // Persists the localization card values (switches between create/update gracefully)
     const handleSaveLocalization = useCallback(async () => {
         if (!organizationId) {
             showErrorToast("Please select an organization first.");
@@ -328,6 +350,7 @@ export default function LocalizationCalendarForm({ selectedOrg }) {
         }
     }, [organizationId, localization, localizationService, fetchLocalization]);
 
+    // Creates or updates a holiday entry via the shared modal
     const saveHoliday = useCallback(
         async (formValues, existingHoliday) => {
             if (!organizationId) {
@@ -387,6 +410,7 @@ export default function LocalizationCalendarForm({ selectedOrg }) {
         ]
     );
 
+    // Removes a holiday after the confirmation dialog
     const handleDeleteHoliday = useCallback(
         async (holiday) => {
             if (!holiday?.id) {
@@ -414,12 +438,14 @@ export default function LocalizationCalendarForm({ selectedOrg }) {
         [holidaysService, refreshHolidays]
     );
 
+    // Opens the holiday modal with optional pre-filled record
     const handleOpenHolidayModal = (existingHoliday = null) => {
         if (!organizationId) {
             showErrorToast("Please select an organization first.");
             return;
         }
 
+        // Inline component keeps the modal logic scoped to this invocation
         const HolidayModal = () => {
             const [formData, setFormData] = useState(
                 existingHoliday

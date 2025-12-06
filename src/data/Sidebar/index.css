@@ -1,0 +1,164 @@
+/* ================================
+   SIDEBAR BASE CONTAINER
+================================ */
+.layout-sidebar {
+    width: 164px;
+    background: var(--theme);
+    padding: 20px 0 20px 10px !important;
+    color: var(--text-white);
+    margin: 8px 0 !important;
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+    overflow-y: auto;
+    flex-shrink: 0;
+
+    /* Hide scrollbar */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* ================================
+       SECTION HEADER (TITLE + DROPDOWN)
+    ================================= */
+    .sidebar-section-title-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        padding-right: 16px;
+
+        .sidebar-section-title {
+            font-size: 14px;
+            font-weight: 600;
+            opacity: 0.8;
+            margin-bottom: 8px;
+        }
+
+        .dropdown-icon {
+            width: 18px;
+            height: 18px;
+            opacity: 0.7;
+        }
+    }
+
+    /* ================================
+       SUBHEADING
+    ================================= */
+    .sidebar-subheading {
+        margin-top: 18px;
+        font-size: 14px;
+        font-weight: 600;
+        opacity: 0.9;
+    }
+
+    /* ================================
+       SIDEBAR ITEM
+    ================================= */
+    .sidebar-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+        border-radius: 12px;
+        margin-bottom: 6px;
+        text-decoration: none;
+
+        .sidebar-icon {
+            width: 15px;
+            height: 15px;
+            color: var(--text-light-sm);
+        }
+
+        span {
+            color: var(--text-light-sm);
+            font-size: 12px;
+        }
+
+        &.danger {
+            color: #ffd7d7;
+        }
+
+        /* ================================================
+           ACTIVE ITEM — MASK CURVE (NO SVG DISTORTION)
+        ================================================= */
+        &.active {
+            background: var(--body-bg);
+            color: var(--theme);
+            /* margin-right: -20px; */
+            /* padding-right: 40px; */
+            height: 58px;
+            border-radius: 0;
+
+            /* mask curve shape */
+            -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 164 81'><path d='M163 80.9995C162.605 74.7055 159.123 60.9187 144.412 60.1237H16C9.47472 58.4674 0 52.7324 0 41.9994C0.197736 36.368 2.31389 24.2479 17.5 21.8628H144.412C150.881 22.1816 162.552 18.6324 163 2.07042V0.0625C163.018 0.752162 163.018 1.42128 163 2.07042V80.9995Z' fill='%23000'/></svg>");
+            -webkit-mask-size: 150px 80px;
+            -webkit-mask-repeat: no-repeat;
+            -webkit-mask-position: left center;
+
+            mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-2 1.5 164 81'><path d='M163 80.9995C162.605 74.7055 159.123 60.9187 144.412 60.1237H16C9.47472 58.4674 0 52.7324 0 41.9994C0.197736 36.368 2.31389 24.2479 17.5 21.8628H144.412C150.881 22.1816 162.552 18.6324 163 2.07042V0.0625C163.018 0.752162 163.018 1.42128 163 2.07042V80.9995Z' fill='%23000'/></svg>");
+            mask-size: 155px 93px;
+            mask-repeat: no-repeat;
+            mask-position: left center;
+
+            /* transform: rotate(-0.006deg); */
+            border: 1px solid var(--background-color);
+
+            &::before {
+                content: none !important;
+            }
+
+            /* override icon + text */
+            .sidebar-icon,
+            span {
+                color: var(--theme) !important;
+                font-weight: 600;
+            }
+        }
+    }
+
+    /* ================================================
+       MOBILE SLIDE-IN LOGIC (OPEN / CLOSE SUPPORT)
+    ================================================= */
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh !important;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+    z-index: 200;
+
+    &.open {
+        transform: translateX(0);
+    }
+}
+
+/* Overlay when sidebar is open */
+.sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 150;
+    display: none;
+
+    &.show {
+        display: block;
+    }
+}
+
+/* ================================================
+   DESKTOP VIEW (SIDEBAR ALWAYS OPEN)
+================================================ */
+@media (min-width: 992px) {
+    .layout-sidebar {
+        position: relative;
+        transform: none !important;
+        z-index: 10;
+    }
+
+    .sidebar-overlay {
+        display: none !important;
+    }
+}

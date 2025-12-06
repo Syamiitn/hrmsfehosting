@@ -101,7 +101,7 @@ export default function Header({ setShowSidebar, notifications = [] }) {
                 </button>
 
                 <div className="brand-pill d-none d-lg-block">
-                    <span className="brand-name">Tetriq&nbsp;Solutions</span>
+                    <span className="brand-name">{user?.workLocation}</span>
                 </div>
             </div>
 

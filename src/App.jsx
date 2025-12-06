@@ -10,6 +10,8 @@ import EmployeeRoutes from "@routes/EmployeeRoutes";
 import HrRoutes from "@routes/HrRoutes";
 import ManagerRoute from "@routes/ManagerRoute";
 
+import TestLayout from "@layout/TestLayout";
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -31,6 +33,12 @@ export default function App() {
 
         {/* Redirecting to login */}
         <Route path="*" element={<Navigate to={'/login'} />} />
+
+        {/* Testing layout */}
+        <Route path='/test' element={<TestLayout />}>
+          <Route path="dashboard" element={<h1>Dashboard</h1>} />
+          <Route path="profile" element={<h1>Profile</h1>} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );

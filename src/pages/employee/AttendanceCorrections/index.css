@@ -1,10 +1,12 @@
 .attendance-corrections {
-    background-color: var(--background-color);
+    background-color: var(--body-bg);
 
     .submit-corrections-card {
-        background-color: var(--card-bg-color);
-        padding: 16px;
-        border-radius: 20px;
+        background-color: var(--card-bg);
+        padding: var(--padding-lg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-glassy);
+        border: 1px solid var(--border-color);
 
         .icon {
             color: var(--theme);
@@ -13,9 +15,11 @@
     }
 
     .correction-summary-card {
-        background-color: var(--card-bg-color);
-        padding: 16px;
-        border-radius: 20px;
+        background-color: var(--card-bg);
+        padding: var(--padding-lg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-glassy);
+        border: 1px solid var(--border-color);
 
         .icon {
             color: var(--theme);
@@ -28,9 +32,11 @@
     }
 
     .pending-corrections {
-        background-color: var(--card-bg-color);
-        padding: 16px;
-        border-radius: 20px;
+        background-color: var(--card-bg);
+        padding: var(--padding-lg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-glassy);
+        border: 1px solid var(--border-color);
 
         .icon {
             color: var(--theme);
@@ -47,9 +53,11 @@
                 align-items: center;
                 justify-content: space-between;
                 flex-wrap: wrap;
+                background-color: var(--card-bg);
+                padding: var(--padding-lg);
+                border-radius: var(--radius-lg);
+                box-shadow: var(--shadow-soft);
                 border: 1px solid var(--border-color);
-                padding: 20px;
-                border-radius: 10px;
             }
         }
     }

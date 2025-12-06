@@ -6,6 +6,9 @@ const BASE_URL = "https://hrmsbehosting.onrender.com/"; // base API endpoint (ht
 // Abhishek Server
 // 1. http://192.168.191.162:3000
 
+// Bhavana Server
+// 1. http://192.168.191.43:3001/
+
 // Create an axios instance (centralized configuration)
 const api = axios.create({
     baseURL: BASE_URL,

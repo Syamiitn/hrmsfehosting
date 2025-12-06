@@ -12,10 +12,10 @@ export default function EmsSubDashboard() {
         const res = SIDEBAR_MENU['hr'].find((menu) => menu.label === 'EMS').subMenu
         const emsCardsList = res.find((menu) => menu.label === 'EMS').subMenu
         setCardsList(emsCardsList)
-    })
+    }, [])
 
     return (
-        <div className='emp-management-sys'>
+        <div className='emp-sub-dashboard'>
             <div className="container-fulid">
                 <div className="row">
                     <div className="col-12">
@@ -29,7 +29,7 @@ export default function EmsSubDashboard() {
                 <ul className="cards-list row">
                     {cardsList.map((card, i) => (
                         <li className="col-12 col-md-6 col-lg-4 mt-3 d-flex" key={i}>
-                            <Link to={card.path} className="ems-route-card shadow-sm flex-fill">
+                            <Link to={card.path} className="ems-route-card  flex-fill">
                                 <card.icon className="icon" />
                                 <div>
                                     <h5>

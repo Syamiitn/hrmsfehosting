@@ -1,0 +1,6 @@
+.global-popover-wrapper {
+    background-color: var(--card-bg) !important;
+    padding: var(--padding-lg) var(--padding-xl);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+}

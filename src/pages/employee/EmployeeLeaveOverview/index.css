@@ -1,10 +1,12 @@
 .employee-leave-overview {
-    background-color: var(--background-color);
+    background-color: var(--body-bg);
 
     .stat-card {
-        background-color: var(--card-bg-color);
-        padding: 16px;
-        border-radius: 20px;
+        background-color: var(--card-bg);
+        padding: var(--padding-lg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-glassy);
+        border: 1px solid var(--border-color);
 
         .icon {
             font-size: 30px;
@@ -17,9 +19,11 @@
     }
 
     .recent-leave-request-card {
-        background-color: var(--card-bg-color);
-        padding: 20px;
-        border-radius: 16px;
+        background-color: var(--card-bg);
+        padding: var(--padding-lg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-glassy);
+        border: 1px solid var(--border-color);
 
         .icon {
             font-size: 20px;
@@ -37,9 +41,11 @@
     }
 
     .important-reminders {
-        background-color: var(--card-bg-color);
-        padding: 16px;
-        border-radius: 20px;
+        background-color: var(--card-bg);
+        padding: var(--padding-lg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-glassy);
+        border: 1px solid var(--border-color);
 
         .icon {
             color: var(--theme);

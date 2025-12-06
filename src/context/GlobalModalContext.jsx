@@ -68,12 +68,12 @@ export function ModalProvider({ children }) {
                                         ✕
                                     </button>
                                 </div>
-                                <hr />
+                                <hr className="my-1" />
                             </>
                         )}
 
                         {/* Scrollable Body */}
-                        <div className="flex-1 overflow-y-auto p-4">
+                        <div className="flex-1 overflow-y-auto p-3">
                             {typeof content === "function" ? content() : content}
                         </div>
                     </div>
@@ -82,16 +82,3 @@ export function ModalProvider({ children }) {
         </ModalContext.Provider>
     );
 }
-
-// USAGE:
-// const { openModal } = useModal();
-
-// const handleOpen = () => {
-//   openModal(
-//     <div>
-//       <p>Lots of content...</p>
-//       <p>Scroll me if overflow</p>
-//     </div>,
-//     { size: "lg", position: "center", title: "My Modal" }
-//   );
-// };

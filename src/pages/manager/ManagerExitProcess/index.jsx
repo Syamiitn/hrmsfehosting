@@ -1,22 +1,38 @@
-import React, { useMemo, useRef, useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import NoDataFound from '@components/common/NoDataFound';
-import { useApi } from '@hooks/useApi';
-import { createCommonApi, departmentsApi } from '@services/commonApi';
-import { FaArrowLeft, FaUserTimes, FaCheckCircle, FaRegCalendarAlt, FaRegClipboard, FaPlus, FaArrowUp } from 'react-icons/fa';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+    FaArrowLeft,
+    FaArrowUp,
+    FaCheckCircle,
+    FaPlus,
+    FaRegCalendarAlt,
+    FaRegClipboard,
+    FaUserTimes,
+} from "react-icons/fa";
 import { IoMdTime } from "react-icons/io";
-import './index.css';
+import Avatar from "@components/common/Avatar";
+import Button from "@components/common/Button";
+import NoDataFound from "@components/common/NoDataFound";
+import { useApi } from "@hooks/useApi";
+import { createCommonApi, departmentsApi } from "@services/commonApi";
 import { useAuth } from "@context/AuthContext";
+import { useModal } from "@context/GlobalModalContext";
+import { useTheme } from "@context/ThemeContext";
 import { showErrorToast, showSuccessToast } from "@utils/utils";
-import Button from '@components/common/Button';
+import "./index.css";
 
 const unwrapList = (payload) => {
     if (Array.isArray(payload)) return payload;
     if (!payload || typeof payload !== "object") return [];
-    if (Array.isArray(payload.data)) return payload.data;
+    const data = payload.data;
+    if (Array.isArray(data)) return data;
+    if (Array.isArray(data?.items)) return data.items;
+    if (Array.isArray(data?.data)) return data.data;
     if (Array.isArray(payload.items)) return payload.items;
     if (Array.isArray(payload.records)) return payload.records;
     if (Array.isArray(payload.result)) return payload.result;
+    if (Array.isArray(payload.result?.items)) return payload.result.items;
+    if (Array.isArray(payload.result?.data)) return payload.result.data;
     return [];
 };
 
@@ -38,19 +54,15 @@ const buildEmployeeDisplayName = (source) => {
     );
 };
 
-const isLikelyInternalId = (value) => {
-    if (!value) return true;
-    const trimmed = String(value).trim();
-    if (!trimmed) return true;
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-    const hashRegex = /^[0-9a-f]{16,}$/i;
-    return uuidRegex.test(trimmed) || hashRegex.test(trimmed);
-};
-
 const toDate = (value) => {
     if (!value) return null;
     const date = value instanceof Date ? value : new Date(value);
     return Number.isNaN(date.getTime()) ? null : date;
+};
+
+const toISODate = (value) => {
+    const date = toDate(value);
+    return date ? date.toISOString().split("T")[0] : null;
 };
 
 const formatDateDisplay = (value) => {
@@ -72,44 +84,49 @@ const calculateRemainingText = (endDate) => {
     return `${clamped} day${clamped === 1 ? "" : "s"} remaining`;
 };
 
-const getInitials = (name = "") => {
-    const parts = String(name)
-        .trim()
-        .split(/\s+/)
-        .filter(Boolean);
-    if (!parts.length) return "NA";
-    const [first, second] = parts;
-    const initials = (first?.[0] || "") + (second?.[0] || "");
-    return initials.toUpperCase();
-};
+const clampPercent = (value) =>
+    Math.min(100, Math.max(0, Math.round(Number.isFinite(value) ? value : 0)));
 
-const pickAvatarColor = (seed = "") => {
-    const colors = ["#8b5cf6", "#ec4899", "#0ea5e9", "#22c55e", "#f97316", "#6366f1"];
-    let hash = 0;
-    for (let i = 0; i < seed.length; i += 1) {
-        hash = seed.charCodeAt(i) + ((hash << 5) - hash);
+const deriveProgressPercent = (request) => {
+    if (!request || typeof request !== "object") return 0;
+    const now = new Date();
+    const endDate = toDate(request.noticePeriodEndDate || request.lastWorkingDay);
+    const startDate = toDate(request.submittedOn);
+    const totalNoticeDays = Number(request.noticePeriodDays) || null;
+
+    if (totalNoticeDays && endDate) {
+        const remaining = Math.max(0, Math.ceil((endDate - now) / (1000 * 60 * 60 * 24)));
+        const elapsed = Math.max(0, totalNoticeDays - remaining);
+        return clampPercent((elapsed / totalNoticeDays) * 100);
     }
-    const index = Math.abs(hash) % colors.length;
-    return colors[index];
+
+    if (startDate && endDate) {
+        const overall = Math.max(1, Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)));
+        const elapsed = Math.max(
+            0,
+            Math.min(overall, Math.ceil((now - startDate) / (1000 * 60 * 60 * 24)))
+        );
+        return clampPercent((elapsed / overall) * 100);
+    }
+
+    return clampPercent(35);
 };
 
-const slugifyStatus = (value) =>
-    (value || "status")
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-+|-+$/g, "") || "status";
+const DEFAULT_CHECKLIST = [
+    { id: 1, label: "Complete ongoing projects handover", role: "EMPLOYEE", done: false },
+    { id: 2, label: "Return company assets (laptop, ID card, etc.)", role: "ADMIN/IT", done: false },
+    { id: 3, label: "Complete knowledge transfer sessions", role: "MANAGER", done: false },
+    { id: 4, label: "Attend exit interview", role: "HR", done: false },
+    { id: 5, label: "Update personal details for final settlement", role: "EMPLOYEE", done: false },
+];
 
-const STATUS_PROGRESS_MAP = {
-    pending: 20,
-    submitted: 30,
-    draft: 15,
-    "hr-processing": 55,
-    "pending-approval": 45,
-    approved: 90,
-    acknowledged: 100,
-    notice: 65,
-    handover: 85,
-};
+const cloneChecklist = (list = DEFAULT_CHECKLIST) =>
+    list.map((item, idx) => ({
+        id: item.id ?? idx + 1,
+        label: item.label || item.name || `Task ${idx + 1}`,
+        role: item.role ?? "EMPLOYEE",
+        done: Boolean(item.done ?? item.status),
+    }));
 
 const EXIT_REASONS = [
     { id: "c6127ee1-13b8-4e3c-c5bb-0c0c81945c22", label: "Career Growth" },
@@ -122,167 +139,280 @@ const EXIT_REASONS = [
 
 const resolveReasonLabel = (code, fallback) => {
     if (!code) return fallback || "—";
-    const match = EXIT_REASONS.find((reason) => reason.id === code);
+    const match = EXIT_REASONS.find((reason) => reason.id === code || reason.value === code);
     if (match) return match.label;
     return fallback || code;
 };
 
-const TERMINATION_REASONS = [
-    { value: "performance-issues", label: "Performance Issues" },
-    { value: "misconduct", label: "Misconduct" },
-    { value: "position-redundancy", label: "Position Redundancy" },
-    { value: "policy-violation", label: "Policy Violation" },
-    { value: "other", label: "Other" },
-];
-
-const TERMINATION_CATEGORIES = [
-    { value: "performance", label: "Performance" },
-    { value: "misconduct", label: "Misconduct" },
-    { value: "redundancy", label: "Redundancy" },
-];
-
-const convertFileToBase64 = (file) =>
-    new Promise((resolve, reject) => {
-        if (!file) {
-            resolve(null);
-            return;
-        }
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-    });
-
-const clampPercent = (value) =>
-    Math.min(100, Math.max(0, Math.round(Number.isFinite(value) ? value : 0)));
-
-const deriveProgressPercent = (request) => {
-    if (!request || typeof request !== "object") return 0;
-    const now = new Date();
-    const endDate = toDate(request.noticePeriodEndDate || request.lastWorkingDay);
-    const startDate = toDate(request.submittedOn);
-    const totalNoticeDays = Number(request.noticePeriodDays) || null;
-
-    if (totalNoticeDays && endDate) {
-        const remaining = Math.max(
-            0,
-            Math.ceil((endDate - now) / (1000 * 60 * 60 * 24))
-        );
-        const elapsed = Math.max(0, totalNoticeDays - remaining);
-        return clampPercent((elapsed / totalNoticeDays) * 100);
-    }
-
-    if (startDate && endDate) {
-        const overall = Math.max(
-            1,
-            Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24))
-        );
-        const elapsed = Math.max(
-            0,
-            Math.min(overall, Math.ceil((now - startDate) / (1000 * 60 * 60 * 24)))
-        );
-        return clampPercent((elapsed / overall) * 100);
-    }
-
-    const statusKey = slugifyStatus(request.status);
-    if (statusKey && STATUS_PROGRESS_MAP[statusKey] !== undefined) {
-        return STATUS_PROGRESS_MAP[statusKey];
-    }
-    return clampPercent(request.status?.toLowerCase().includes("pending") ? 35 : 50);
-};
-
 const normalizeExitRequest = (item) => {
-  if (!item || typeof item !== "object") return null;
-  const employee = item.employee || item.employeeDetails || {};
-  const fallbackName =
-    item.employeeName ||
-    item.employee_name ||
-    item.employeeFullName ||
-    buildEmployeeDisplayName(employee) ||
-    item.employeeId ||
-    item.employee_id ||
-    "—";
-  const fallbackDept =
-    item.departmentName ||
-    employee.department?.name ||
-    employee.departmentName ||
-    "—";
-  const fallbackJob =
-    item.jobTitle ||
-    employee.jobTitle ||
-    employee.designation ||
-    employee.title ||
-    "—";
-  const employeeCode =
-    item.employeeCode ||
-    employee.employeeCode ||
-    employee.employeeId ||
-    item.employeeId ||
-    "";
-  const employeeId =
-    item.employeeId ||
-    item.employee_id ||
-    employee.employeeId ||
-    employee.id ||
-    "";
+    if (!item || typeof item !== "object") return null;
+    const employee = item.employee || item.employeeDetails || {};
+    const fallbackName =
+        item.employeeName ||
+        item.employee_name ||
+        item.employeeFullName ||
+        buildEmployeeDisplayName(employee) ||
+        item.employeeId ||
+        item.employee_id ||
+        "—";
+    const jobDetails = Array.isArray(item.jobDetails)
+        ? item.jobDetails
+        : Array.isArray(employee.jobDetails)
+        ? employee.jobDetails
+        : [];
+    const activeJob = jobDetails.find((job) => job.isActive) || jobDetails[0] || employee.employmentDetails || {};
+    const fallbackDept =
+        item.departmentName ||
+        activeJob.department?.name ||
+        activeJob.departmentName ||
+        employee.department?.name ||
+        employee.departmentName ||
+        "—";
+    const fallbackJob =
+        item.jobTitle ||
+        activeJob.jobTitle ||
+        activeJob.designation ||
+        employee.jobTitle ||
+        employee.designation ||
+        employee.title ||
+        "—";
+    const employeeCode =
+        item.employeeCode ||
+        employee.employeeCode ||
+        employee.employeeId ||
+        item.employeeId ||
+        "";
+    const employeeId =
+        item.employeeId ||
+        item.employee_id ||
+        employee.employeeId ||
+        employee.id ||
+        "";
 
-  const reasonCode =
-    item.reasonId ||
-    item.reasonCode ||
-    item.reason ||
-    item.reason_name ||
-    null;
-  const reasonLabel = resolveReasonLabel(
-    reasonCode,
-    item.reasonLabel || item.reasonName || item.reasonText || item.reason || "—"
-  );
-  const submittedOn =
-    item.submittedOn ||
-    item.submittedAt ||
-    item.createdAt ||
-    item.created_at ||
-    item.createdDate ||
-    null;
-  const noticePeriodDays = item.noticePeriodDays ?? item.noticePeriod ?? null;
-  const noticePeriodEndDate =
-    item.noticePeriodEndDate ||
-    item.noticePeriodEnd ||
-    item.noticePeriodEndDay ||
-    item.noticePeriodEndtime ||
-    item.noticePeriodEnd ||
-    item.noticeEndDate ||
-    "";
-  const lastWorkingDay =
-    item.approvedLastWorkingDay ||
-    item.approvedLastWorkingDate ||
-    item.proposedLastWorkingDay ||
-    item.intendedLastWorkingDate ||
-    "";
+    const rawType = String(item.type || item.exitType || item.category || "").toLowerCase();
+    const isTermination = rawType.includes("term") || rawType.includes("invol");
+    const category = isTermination ? "Termination" : "Resignation";
 
-  return {
-    id: item.id ?? item.separationId ?? Date.now(),
-    employeeName: fallbackName,
-    employeeId,
-    employeeCode,
-    status: item.status || "Submitted",
-    type: item.type || item.exitType || "Resignation",
-    departmentName: fallbackDept,
-    jobTitle: fallbackJob,
-    reasonLabel,
-    submittedOn,
-    noticePeriodDays,
-    noticePeriodEndDate,
-    lastWorkingDay,
-    proposedLastWorkingDay:
-      item.proposedLastWorkingDay || item.intendedLastWorkingDate || "",
-    approvedLastWorkingDay:
-      item.approvedLastWorkingDay || item.approvedLastWorkingDate || "",
+    const submittedOn =
+        item.submittedOn ||
+        item.submittedAt ||
+        item.createdAt ||
+        item.created_at ||
+        item.createdDate ||
+        null;
+    const noticePeriodDays = item.noticePeriodDays ?? item.noticePeriod ?? null;
+    const noticePeriodEndDate =
+        item.noticePeriodEndDate ||
+        item.noticeEndDate ||
+        item.noticePeriodEnd ||
+        item.approvedLastWorkingDay ||
+        "";
+    const lastWorkingDay =
+        item.approvedLastWorkingDay ||
+        item.approvedLastWorkingDate ||
+        item.proposedLastWorkingDay ||
+        item.intendedLastWorkingDate ||
+        "";
+
+    return {
+        id: item.id ?? item.separationId ?? Date.now(),
+        employeeName: fallbackName,
+        employeeId,
+        employeeCode,
+        status: (item.status || "submitted").toLowerCase(),
+        type: category,
+        category,
+        departmentName: fallbackDept,
+        jobTitle: fallbackJob,
+        reasonLabel: resolveReasonLabel(
+            item.reasonId || item.reasonCode || item.reason,
+            item.reasonLabel || item.reasonName || item.reason || "—"
+        ),
+        submittedOn,
+        noticePeriodDays,
+        noticePeriodEndDate,
+        lastWorkingDay,
+        proposedLastWorkingDay: item.proposedLastWorkingDay || item.intendedLastWorkingDate || "",
+        approvedLastWorkingDay:
+            item.approvedLastWorkingDay || item.approvedLastWorkingDate || "",
+        checklist: cloneChecklist(
+            (Array.isArray(item.checklist) && item.checklist.length && item.checklist) ||
+            (Array.isArray(item.checkList) && item.checkList.length && item.checkList) ||
+            DEFAULT_CHECKLIST
+        ),
         managerName: buildEmployeeDisplayName(item.manager || item.managerDetails || {}),
     };
 };
 
-export default function ManagerExitProcess() {
-    const [resignationTab, setResignationTab] = useState('RESIG');
+const cleanPayload = (payload = {}) =>
+    Object.fromEntries(
+        Object.entries(payload).filter(
+            ([, value]) => value !== undefined && value !== null && value !== ""
+        )
+    );
+
+const ChecklistModal = ({ title, initialChecklist, onSave, onClose }) => {
+    const [draft, setDraft] = useState(cloneChecklist(initialChecklist));
+    const [newTask, setNewTask] = useState("");
+
+    return (
+        <div className="checklist-modal">
+            <h5 className="mb-1">{title}</h5>
+            <p className="muted-text mb-3">Complete these steps before your last day.</p>
+            <ul className="list-unstyled checklist-list">
+                {draft.map((item) => (
+                    <li key={item.id} className="d-flex gap-2 align-items-start mb-2 checklist-row">
+                        <input
+                            type="checkbox"
+                            className="mt-1"
+                            checked={Boolean(item.done)}
+                            onChange={() =>
+                                setDraft((prev) =>
+                                    prev.map((row) =>
+                                        row.id === item.id ? { ...row, done: !row.done } : row
+                                    )
+                                )
+                            }
+                        />
+                        <div>
+                            <p className={`mb-0 fw-semibold ${item.done ? "text-decoration-line-through" : ""}`}>
+                                {item.label}
+                            </p>
+                            <span className="muted-text text-uppercase small">{item.role}</span>
+                        </div>
+                    </li>
+                ))}
+            </ul>
+            <form
+                className="d-flex gap-2 mb-3"
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    const label = newTask.trim();
+                    if (!label) return;
+                    setDraft((prev) => [
+                        ...prev,
+                        {
+                            id: Date.now(),
+                            label,
+                            role: "EMPLOYEE",
+                            done: false,
+                        },
+                    ]);
+                    setNewTask("");
+                }}
+            >
+                <input
+                    className="form-control"
+                    placeholder="Add new task"
+                    value={newTask}
+                    onChange={(e) => setNewTask(e.target.value)}
+                />
+                <Button type="submit" size="sm" variant="solid" className="pill-btn" label="Add" />
+            </form>
+            <div className="detail-modal-footer mt-3 d-flex justify-content-end gap-2">
+                <button type="button" className="btn btn-light" onClick={onClose}>
+                    Cancel
+                </button>
+                <Button
+                    variant="solid"
+                    size="sm"
+                    label="Save checklist"
+                    onClick={() => onSave(draft)}
+                />
+            </div>
+        </div>
+    );
+};
+
+const buildUpdatePayload = (req, status) => {
+    if (!req) return { status };
+    const intendedDateRaw =
+        req.intendedDate || req.noticePeriodStartDate || req.submittedOn || new Date();
+    const intendedDate = toISODate(intendedDateRaw);
+
+    const ensureAfter = (value, fallback) => {
+        const parsed = toDate(value);
+        const floor = toDate(fallback);
+        if (parsed && floor && parsed < floor) return floor;
+        return parsed || floor;
+    };
+
+    const lwd = ensureAfter(
+        req.intendedLastWorkingDate ||
+        req.noticePeriodEndDate ||
+        req.lastWorkingDay ||
+        req.approvedLastWorkingDay ||
+        req.proposedLastWorkingDay ||
+        req.approvedLastWorkingDate,
+        intendedDateRaw
+    );
+    const approved = ensureAfter(req.approvedLastWorkingDay || req.approvedLastWorkingDate, lwd);
+
+    const typeRaw = String(req.category || req.type || "").toLowerCase();
+    const type =
+        typeRaw.includes("term") || typeRaw.includes("invol") ? "involuntary" : "voluntary";
+
+    return cleanPayload({
+        status,
+        employeeId: String(req.employeeId || ""),
+        managerId: String(req.managerId || ""),
+        hrId: req.hrId ? String(req.hrId) : undefined,
+        type,
+        noticePeriodDays: req.noticePeriodDays,
+        noticePeriodEndDate: toISODate(lwd),
+        intendedDate,
+        intendedLastWorkingDate: toISODate(lwd),
+        approvedLastWorkingDate: toISODate(approved || lwd),
+    });
+};
+
+const lower = (value) => String(value || "").toLowerCase();
+
+const isTerminationRow = (req) => lower(req.type) === "termination" || lower(req.category) === "termination";
+
+const isManagerVisible = (req) => {
+    if (!req) return false;
+    if (isTerminationRow(req)) return true;
+    const status = lower(req.status);
+    return (
+        status === "draft" ||
+        status === "submitted" ||
+        status === "pending" ||
+        status === "processing" ||
+        status === "approved" ||
+        status === "rejected" ||
+        status === "finalized"
+    );
+};
+
+const isHrVisible = (req) => {
+    if (!req) return false;
+    if (isTerminationRow(req)) return true;
+    const status = lower(req.status);
+    return status === "approved" || status === "finalized";
+};
+
+export default function ManagerExitProcess({ isHrView = false }) {
+    const navigate = useNavigate();
+    const apiClient = useApi();
+    const { get, post, patch, del } = apiClient;
+    const apiTransport = useMemo(
+        () => ({
+            get,
+            post,
+            put: patch,
+            patch,
+            del,
+        }),
+        [get, post, patch, del]
+    );
+    const deptApi = useMemo(() => departmentsApi(apiTransport), [apiTransport]);
+    const commonApi = useMemo(() => createCommonApi(apiTransport), []);
+    const { user } = useAuth();
+    const { themeMode } = useTheme();
+    const { openModal, closeModal } = useModal();
+
+    const [resignationTab, setResignationTab] = useState("RESIG");
     const [departments, setDepartments] = useState([]);
     const [departmentsLoading, setDepartmentsLoading] = useState(false);
     const [requestsLoading, setRequestsLoading] = useState(false);
@@ -298,283 +428,155 @@ export default function ManagerExitProcess() {
     });
     const [reportees, setReportees] = useState([]);
     const [reporteesLoading, setReporteesLoading] = useState(false);
-    const [showTerminationModal, setShowTerminationModal] = useState(false);
     const [terminationSubmitting, setTerminationSubmitting] = useState(false);
     const [terminationForm, setTerminationForm] = useState({
         employeeId: "",
         reason: "",
-        category: "",
+        category: "Involuntary",
         details: "",
         file: null,
     });
+    const [rowActionLoading, setRowActionLoading] = useState({});
+    const requestLockRef = useRef(false);
+    const lastFetchRef = useRef(0);
+    const lastParamsRef = useRef({ managerId: null, isHrView: null });
+    const separationsRef = useRef(null);
+    const hydratedRef = useRef(new Set());
 
-    const navigate = useNavigate();
-    const apiClient = useApi();  // get client instance from context
-    const { get, post, put, patch, del } = apiClient;
-    const apiTransport = useMemo(
-        () => ({
-            get,
-            post,
-            put,
-            patch,
-            del,
-        }),
-        [get, post, put, patch, del]
-    );
-    const deptApi = useMemo(() => departmentsApi(apiTransport), [apiTransport]);  // initialize department API
-    const commonApi = useMemo(() => createCommonApi(apiTransport), [apiTransport]);
-    const { user } = useAuth();
 
-    // Fetch departments on mount
+    // Load departments
     useEffect(() => {
         const fetchDepartments = async () => {
             try {
                 setDepartmentsLoading(true);
-                const res = await deptApi.list();   // call list() method
-                if (res && Array.isArray(res)) {
-                    setDepartments(res);
-                } else if (res?.data) {
-                    setDepartments(res.data);
-                }
+                const res = await deptApi.list();
+                if (Array.isArray(res)) setDepartments(res);
+                else if (Array.isArray(res?.data)) setDepartments(res.data);
             } catch (err) {
                 console.error("Error fetching departments:", err.message);
             } finally {
                 setDepartmentsLoading(false);
             }
         };
-
         fetchDepartments();
     }, [deptApi]);
 
-    useEffect(() => {
-        let ignore = false;
-        const fetchExitRequests = async () => {
-            if (!commonApi?.separations || !user?.emp) {
-                setExitRequests([]);
-                return;
-            }
+    // Load separations
+    const fetchExitRequests = useCallback(
+        async (force = false) => {
+            if (requestLockRef.current) return;
+            if (!separationsRef.current) return;
+
+            const now = Date.now();
+            const currentParams = { managerId: isHrView ? null : user?.emp, isHrView };
+            const sameParams =
+                lastParamsRef.current.managerId === currentParams.managerId &&
+                lastParamsRef.current.isHrView === currentParams.isHrView;
+            const tooSoon = now - lastFetchRef.current < 30000; // 30s throttle
+            if (!force && sameParams && tooSoon) return;
+
+            requestLockRef.current = true;
+            setRequestsLoading(true);
             try {
-                setRequestsLoading(true);
-                const payload = await commonApi.separations.list({
-                    managerId: user.emp,
-                });
-                if (ignore) return;
-                const list = unwrapList(payload)
-                    .map(normalizeExitRequest)
-                    .filter(Boolean);
+                let payload = await separationsRef.current.list(
+                    currentParams.managerId ? { managerId: currentParams.managerId } : {}
+                );
+                let list = unwrapList(payload).map(normalizeExitRequest).filter(Boolean);
+                if (isHrView && !list.length) {
+                    payload = await separationsRef.current.list();
+                    list = unwrapList(payload).map(normalizeExitRequest).filter(Boolean);
+                }
+
                 setExitRequests(list);
-                const lower = (value) => String(value || "").toLowerCase();
-                const isPending = (status) => {
-                    const value = lower(status);
-                    return (
-                        value.includes("pending") ||
-                        value.includes("draft") ||
-                        value.includes("submitted") ||
-                        value.includes("awaiting")
-                    );
-                };
-                const isApproved = (status) => {
-                    const value = lower(status);
-                    return value.includes("approved") || value.includes("closed");
-                };
-                const isNotice = (status) => {
-                    const value = lower(status);
-                    return (
-                        value.includes("notice") ||
-                        value.includes("running") ||
-                        value.includes("in progress")
-                    );
-                };
-                const isHandover = (status) => {
-                    const value = lower(status);
-                    return value.includes("handover");
-                };
+
+                const pool = isHrView ? list.filter(isHrVisible) : list.filter(isManagerVisible);
+                const pendingCount = pool.filter((item) =>
+                    ["submitted", "draft", "pending"].includes(lower(item.status))
+                ).length;
+                const approvedCount = pool.filter((item) => lower(item.status) === "approved").length;
                 setStats({
-                    pending: list.filter((item) => isPending(item.status)).length,
-                    approved: list.filter((item) => isApproved(item.status)).length,
-                    notice: list.filter((item) => isNotice(item.status)).length,
-                    handover: list.filter((item) => isHandover(item.status)).length,
+                    pending: pendingCount,
+                    approved: approvedCount,
+                    notice: pool.length - pendingCount - approvedCount,
+                    handover: pool.filter((item) => deriveProgressPercent(item) >= 80).length,
                 });
+
+                lastFetchRef.current = now;
+                lastParamsRef.current = currentParams;
             } catch (error) {
                 console.error("Failed to load exit requests", error);
                 showErrorToast(error?.data?.message || "Failed to load exit requests");
-                if (!ignore) {
-                    setExitRequests([]);
-                    setStats({ pending: 0, approved: 0, notice: 0, handover: 0 });
-                }
+                setExitRequests([]);
+                setStats({ pending: 0, approved: 0, notice: 0, handover: 0 });
             } finally {
-                if (!ignore) setRequestsLoading(false);
+                requestLockRef.current = false;
+                setRequestsLoading(false);
             }
-        };
-
-        fetchExitRequests();
-        return () => {
-            ignore = true;
-        };
-    }, [commonApi, user?.emp]);
-
-    const namesCacheRef = useRef({});
+        },
+        [isHrView, user?.emp]
+    );
 
     useEffect(() => {
-        let ignore = false;
-        const enrichNames = async () => {
-            if (!exitRequests.length) return;
-            const missing = exitRequests.filter(
-                (req) =>
-                    req.employeeId &&
-                    (!req.employeeName ||
-                        req.employeeName === "—" ||
-                        isLikelyInternalId(req.employeeName))
-            );
-            if (!missing.length) return;
-            const uniqueIds = Array.from(
-                new Set(
-                    missing
-                        .map((req) => req.employeeId || req.employeeCode || req.id)
-                        .filter(Boolean)
-                )
-            ).filter((id) => !namesCacheRef.current[id]);
-            if (!uniqueIds.length) return;
-            try {
-                const updates = {};
-                await Promise.all(
-                    uniqueIds.map(async (empId) => {
-                        try {
-                            const profile = await get(`/employees/${empId}`);
-                            const profileSource =
-                                profile?.personalDetails ? profile : profile?.employee || profile;
-                            const resolvedName = buildEmployeeDisplayName(profileSource);
-                            const jobDetails = Array.isArray(profile?.jobDetails)
-                                ? profile.jobDetails
-                                : [];
-                            const activeJob =
-                                jobDetails.find((job) => job.isActive) ||
-                                jobDetails[0] ||
-                                profile?.employmentDetails ||
-                                {};
-                            const resolvedDepartment =
-                                activeJob.department?.name ||
-                                activeJob.departmentName ||
-                                profile?.department?.name ||
-                                profile?.departmentName ||
-                                null;
-                            const resolvedJobTitle =
-                                activeJob.jobTitle ||
-                                activeJob.designation ||
-                                profileSource?.jobTitle ||
-                                null;
-                            if (resolvedName) {
-                                updates[empId] = {
-                                    employeeName: resolvedName,
-                                    jobTitle: resolvedJobTitle,
-                                    departmentName: resolvedDepartment,
-                                };
-                                namesCacheRef.current[empId] = updates[empId];
-                            }
-                        } catch (error) {
-                            console.warn("Failed to resolve employee name", empId, error);
-                        }
-                    })
+        // Keep a stable reference to separations API to avoid recreating callbacks
+        separationsRef.current = commonApi?.separations || null;
+    }, [commonApi?.separations]);
+
+   useEffect(() => {
+    fetchExitRequests(true);
+    const interval = setInterval(() => fetchExitRequests(false), 60000);
+    return () => clearInterval(interval);
+}, []);
+
+
+    // Load reportees for termination form (SAFE VERSION)
+useEffect(() => {
+    if (!user?.emp) {
+        setReportees([]);
+        return;
+    }
+
+    let cancelled = false;
+
+    const fetchReportees = async () => {
+        try {
+            setReporteesLoading(true);
+
+            // Fetch only once per user
+            const response = await get(`employees/find?manager=${user.emp}`);
+
+            if (cancelled) return;
+
+            const list = unwrapList(response?.data || response);
+            setReportees(list);
+        } catch (error) {
+            if (!cancelled) {
+                console.error("Unable to load reportees", error);
+                showErrorToast(
+                    error?.data?.message || "Unable to load reporting employees"
                 );
-                if (!ignore && Object.keys(updates).length) {
-                    setExitRequests((prev) =>
-                        prev.map((req) => {
-                            const candidateId = req.employeeId || req.employeeCode || req.id;
-                            const resolved = candidateId
-                                ? updates[candidateId] || namesCacheRef.current[candidateId]
-                                : null;
-                            if (resolved) {
-                                return {
-                                    ...req,
-                                    employeeName: resolved.employeeName || req.employeeName,
-                                    jobTitle: resolved.jobTitle || req.jobTitle,
-                                    departmentName: resolved.departmentName || req.departmentName,
-                                };
-                            }
-                            return req;
-                        })
-                    );
-                }
-            } catch (error) {
-                console.warn("Failed to enrich employee names", error);
-            }
-        };
-        enrichNames();
-        return () => {
-            ignore = true;
-        };
-    }, [exitRequests, get]);
-
-    useEffect(() => {
-        let ignore = false;
-        const fetchReportees = async () => {
-            if (!user?.emp) {
                 setReportees([]);
-                return;
             }
-            try {
-                setReporteesLoading(true);
-                const response = await get(`employees/find?manager=${user.emp}`);
-                if (ignore) return;
-                const list = unwrapList(response?.data || response);
-                setReportees(list);
-            } catch (error) {
-                if (!ignore) {
-                    console.error("Unable to load reportees", error);
-                    showErrorToast(error?.data?.message || "Unable to load reporting employees");
-                    setReportees([]);
-                }
-            } finally {
-                if (!ignore) setReporteesLoading(false);
+        } finally {
+            if (!cancelled) {
+                setReporteesLoading(false);
             }
-        };
-        fetchReportees();
-        return () => {
-            ignore = true;
-        };
-    }, [get, user?.emp]);
+        }
+    };
 
-    const deptFilterName = useMemo(() => {
-        if (!deptFilter) return null;
-        const match = departments.find((dept) => String(dept.id) === String(deptFilter));
-        return match?.name || deptFilter;
-    }, [departments, deptFilter]);
+    fetchReportees();
 
-    const filteredRequests = useMemo(() => {
-        const term = search.trim().toLowerCase();
-        return exitRequests.filter((req) => {
-            if (resignationTab === "RESIG" && req.type !== "Resignation") return false;
-            if (resignationTab === "TERM" && req.type === "Resignation") return false;
-            if (term) {
-                const haystack = `${req.employeeName} ${req.employeeCode} ${req.jobTitle}`.toLowerCase();
-                if (!haystack.includes(term)) return false;
-            }
-            if (statusFilter && statusFilter !== "all") {
-                if (req.status !== statusFilter) return false;
-            }
-            if (deptFilterName) {
-                if (String(req.departmentName).toLowerCase() !== String(deptFilterName).toLowerCase()) {
-                    return false;
-                }
-            }
-            return true;
-        });
-    }, [exitRequests, search, statusFilter, deptFilterName, resignationTab]);
+    return () => {
+        cancelled = true;
+    };
+}, [user?.emp]);  // ⬅ REMOVE `get` from dependency (this stops infinite loops)
 
-    // Tabs list
-    const resignationTabList = [
-        { name: 'Resignation', key: 'RESIG' },
-        { name: 'Termination', key: 'TERM' },
-    ];
-
-    const statusOptions = useMemo(() => {
-        const set = new Set(exitRequests.map((item) => item.status));
-        return Array.from(set);
-    }, [exitRequests]);
 
     const handoverSummary = useMemo(() => {
-        if (!exitRequests.length) return [];
-        return exitRequests
+        const pool = exitRequests.filter((req) =>
+            isHrView ? isHrVisible(req) : isManagerVisible(req)
+        );
+
+        return pool
             .map((req) => ({
                 id: req.id,
                 name: req.employeeName || "—",
@@ -584,7 +586,7 @@ export default function ManagerExitProcess() {
             }))
             .sort((a, b) => b.progress - a.progress)
             .slice(0, 5);
-    }, [exitRequests]);
+    }, [exitRequests, isHrView]);
 
     const upcomingExits = useMemo(() => {
         return exitRequests
@@ -593,8 +595,8 @@ export default function ManagerExitProcess() {
                 name: req.employeeName || "—",
                 department: req.departmentName || "—",
                 lastWorkingDay: req.lastWorkingDay || req.noticePeriodEndDate || "",
-                status: req.status || "hr processing",
-                initials: getInitials(req.employeeName || req.employeeCode || "NA"),
+                status: req.status || "processing",
+                initials: (req.employeeName || req.employeeCode || "NA").slice(0, 2).toUpperCase(),
                 colorSeed: req.employeeName || req.employeeCode || String(req.id || ""),
             }))
             .filter((item) => toDate(item.lastWorkingDay))
@@ -605,6 +607,50 @@ export default function ManagerExitProcess() {
             })
             .slice(0, 5);
     }, [exitRequests]);
+
+    // Department filter name
+const deptFilterName = useMemo(() => {
+    if (!deptFilter) return null;
+    const match = departments.find((dept) => String(dept.id) === String(deptFilter));
+    return match?.name || deptFilter;
+}, [departments, deptFilter]);
+
+// FILTERED REQUESTS  ⬅️ REQUIRED BLOCK THAT IS MISSING
+const filteredRequests = useMemo(() => {
+    const term = search.trim().toLowerCase();
+
+    return exitRequests
+        .filter((req) => (isHrView ? isHrVisible(req) : isManagerVisible(req)))
+        .filter((req) => {
+            // Tab filters
+            if (resignationTab === "RESIG" && req.category === "Termination") return false;
+            if (resignationTab === "TERM" && req.category !== "Termination") return false;
+
+            // Search filter
+            if (term) {
+                const haystack = `${req.employeeName} ${req.employeeCode} ${req.jobTitle}`.toLowerCase();
+                if (!haystack.includes(term)) return false;
+            }
+
+            // Status Filter
+            if (statusFilter && statusFilter !== "all") {
+                if (req.status !== statusFilter) return false;
+            }
+
+            // Department filter
+            if (deptFilterName) {
+                if (
+                    String(req.departmentName).toLowerCase() !==
+                    String(deptFilterName).toLowerCase()
+                ) {
+                    return false;
+                }
+            }
+
+            return true;
+        });
+}, [deptFilterName, exitRequests, isHrView, resignationTab, search, statusFilter]);
+
 
     const reporteeOptions = useMemo(
         () =>
@@ -621,95 +667,497 @@ export default function ManagerExitProcess() {
         [reportees]
     );
 
-    const resetTerminationForm = useCallback(
-        () =>
-            setTerminationForm({
-                employeeId: "",
-                reason: "",
-                category: "",
-                details: "",
-                file: null,
-            }),
-        []
+   // Hydrate missing department / jobTitle ONLY ONCE PER EMPLOYEE
+useEffect(() => {
+    let cancelled = false;
+
+    const hydrate = async () => {
+        // Find employees that need hydration
+        const missing = exitRequests.filter((req) => {
+            const id = req.employeeId || req.employeeCode;
+            if (!id) return false;
+
+            const needsHydration =
+                !req.departmentName || req.departmentName === "—" ||
+                !req.jobTitle || req.jobTitle === "—";
+
+            // Skip if already hydrated before
+            return needsHydration && !hydratedRef.current.has(id);
+        });
+
+        if (!missing.length) return;
+
+        const updates = {};
+
+        await Promise.all(
+            missing.map(async (req) => {
+                const id = req.employeeId || req.employeeCode;
+
+                // mark as hydrated to prevent future calls
+                hydratedRef.current.add(id);
+
+                try {
+                    const profile = await get(`/employees/${id}`);
+                    const jobDetails = Array.isArray(profile?.jobDetails)
+                        ? profile.jobDetails
+                        : [];
+                    const activeJob =
+                        jobDetails.find((job) => job.isActive) ||
+                        jobDetails[0] ||
+                        profile?.employmentDetails ||
+                        {};
+
+                    updates[id] = {
+                        departmentName:
+                            activeJob.department?.name ||
+                            activeJob.departmentName ||
+                            profile?.department?.name ||
+                            profile?.departmentName ||
+                            "—",
+                        jobTitle:
+                            activeJob.jobTitle ||
+                            activeJob.designation ||
+                            profile?.jobTitle ||
+                            profile?.designation ||
+                            "—",
+                    };
+                } catch (err) {
+                    console.warn("Hydration failed for id:", id, err);
+                }
+            })
+        );
+
+        if (cancelled || !Object.keys(updates).length) return;
+
+        setExitRequests((prev) =>
+            prev.map((req) => {
+                const id = req.employeeId || req.employeeCode;
+                return updates[id]
+                    ? { ...req, ...updates[id] }
+                    : req;
+            })
+        );
+    };
+
+    hydrate();
+    return () => {
+        cancelled = true;
+    };
+}, [exitRequests]);   // ❌ remove "get" from dependencies
+
+
+    const openDetailModal = useCallback(
+        (req) => {
+            openModal(
+                <div className="detail-modal-body">
+                    <div className="detail-section">
+                        <h6>Employee Information</h6>
+                        <p><strong>Full Name:</strong> {req.employeeName || "—"}</p>
+                        <p><strong>Employee ID:</strong> {req.employeeCode || "—"}</p>
+                        <p><strong>Department:</strong> {req.departmentName || "—"}</p>
+                        <p><strong>Designation:</strong> {req.jobTitle || "—"}</p>
+                    </div>
+                    <div className="detail-section">
+                        <h6>Reason for Exit</h6>
+                        <p><strong>Type:</strong> {req.type || "—"}</p>
+                        <p><strong>Status:</strong> {req.status || "—"}</p>
+                        <p><strong>Reason:</strong> {req.reasonLabel || "—"}</p>
+                    </div>
+                    <div className="detail-section">
+                        <h6>Timeline</h6>
+                        <p><strong>Submitted On:</strong> {formatDateDisplay(req.submittedOn)}</p>
+                        <p><strong>Notice Period:</strong> {req.noticePeriodDays ? `${req.noticePeriodDays} days` : "—"}</p>
+                        <p><strong>Last Working Day:</strong> {formatDateDisplay(req.lastWorkingDay)}</p>
+                    </div>
+                </div>,
+                { title: "Exit Details" }
+            );
+        },
+        [openModal]
     );
 
-    const handleTerminationChange = (field, value) => {
-        setTerminationForm((prev) => ({ ...prev, [field]: value }));
-    };
+    const handleAssignChecklist = useCallback(
+        (req) => {
+            openModal(
+                () => (
+                    <ChecklistModal
+                        title="Exit Checklist"
+                        initialChecklist={req.checklist}
+                        onClose={closeModal}
+                        onSave={async (updatedChecklist) => {
+                            setExitRequests((prev) =>
+                                prev.map((item) =>
+                                    item.id === req.id ? { ...item, checklist: updatedChecklist } : item
+                                )
+                            );
+                            try {
+                                if (commonApi?.separations?.update) {
+                                    const apiChecklist = updatedChecklist.map((item, idx) => ({
+                                        name: item.label || item.name || `Task ${idx + 1}`,
+                                        status: Boolean(item.done ?? item.status),
+                                    }));
+                                    const payload = {
+                                        ...buildUpdatePayload({ ...req, managerId: req.managerId || user?.emp }, req.status),
+                                        checkList: apiChecklist,
+                                    };
+                                    await commonApi.separations.update(req.id, payload);
+                                }
+                                showSuccessToast("Checklist updated.");
+                            } catch (error) {
+                                showErrorToast("Failed to update checklist.");
+                            } finally {
+                                closeModal();
+                            }
+                        }}
+                    />
+                ),
+                { title: `Assign Checklist - ${req.employeeName || "—"}`, size: "lg" }
+            );
+        },
+        [closeModal, commonApi?.separations, openModal]
+    );
 
-    const handleFileChange = (event) => {
-        const file = event.target.files?.[0] || null;
-        setTerminationForm((prev) => ({ ...prev, file }));
-    };
-
-    const openTerminationModal = () => {
-        setShowTerminationModal(true);
-    };
-
-    const closeTerminationModal = () => {
-        setShowTerminationModal(false);
-        resetTerminationForm();
-    };
-
-    const handleTerminationSubmit = async (event) => {
-        event.preventDefault();
-        if (!terminationForm.employeeId) {
-            showErrorToast("Select an employee to proceed.");
-            return;
-        }
-        if (!terminationForm.reason || !terminationForm.category) {
-            showErrorToast("Reason and category are required.");
-            return;
-        }
-        try {
-            setTerminationSubmitting(true);
-            const filePayload = await convertFileToBase64(terminationForm.file);
-            const payload = {
-                type: "Termination",
-                employeeId: terminationForm.employeeId,
-                managerId: user?.emp,
-                reasonCode: terminationForm.reason,
-                category: terminationForm.category,
-                notes: terminationForm.details,
-                supportingFile: filePayload,
-                supportingFileName: terminationForm.file?.name,
+    const updateRequestStatus = useCallback(
+        async (req, nextStatus, successMessage) => {
+            if (!req?.id) return;
+            const previousStatus = req.status;
+            setRowActionLoading((prev) => ({ ...prev, [req.id]: true }));
+            const applyStatus = (status) => {
+                setExitRequests((prev) =>
+                    prev.map((item) => (item.id === req.id ? { ...item, status } : item))
+                );
             };
-            const created = await commonApi?.separations?.create(payload);
-            if (created) {
-                const normalized = normalizeExitRequest(created);
-                if (normalized) {
-                    setExitRequests((prev) => [normalized, ...prev]);
+            applyStatus(nextStatus);
+            try {
+                if (commonApi?.separations?.update) {
+                    const payload = buildUpdatePayload(
+                        { ...req, managerId: req.managerId || user?.emp },
+                        nextStatus
+                    );
+                    await commonApi.separations.update(req.id, payload);
                 }
+                if (successMessage) showSuccessToast(successMessage);
+            } catch (error) {
+                applyStatus(previousStatus);
+                showErrorToast(error?.data?.message || "Failed to update status.");
+            } finally {
+                setRowActionLoading((prev) => ({ ...prev, [req.id]: false }));
             }
-            showSuccessToast("Termination request submitted.");
-            closeTerminationModal();
-        } catch (error) {
-            console.error("Failed to submit termination request", error);
-            showErrorToast(error?.data?.message || "Unable to submit termination request");
-        } finally {
-            setTerminationSubmitting(false);
+        },
+        [commonApi, user?.emp]
+    );
+
+    const handleManagerApprove = useCallback(
+        (req) => updateRequestStatus(req, "approved", "Sent to HR."),
+        [updateRequestStatus]
+    );
+
+    const handleManagerReject = useCallback(
+        (req) => updateRequestStatus(req, "rejected", "Request rejected."),
+        [updateRequestStatus]
+    );
+
+    const handleHrApprove = useCallback(
+        (req) => updateRequestStatus(req, "finalized", "Request approved."),
+        [updateRequestStatus]
+    );
+
+    const handleHrReject = useCallback(
+        (req) => updateRequestStatus(req, "rejected", "Request rejected."),
+        [updateRequestStatus]
+    );
+
+    const handleExitInterview = useCallback(
+        (req) => updateRequestStatus(req, "finalized", "Exit interview scheduled."),
+        [updateRequestStatus]
+    );
+
+    const handleDeleteRequest = useCallback(
+        async (req) => {
+            if (!req?.id) return;
+            const confirmed = window.confirm("Delete this exit request?");
+            if (!confirmed) return;
+            setRowActionLoading((prev) => ({ ...prev, [req.id]: true }));
+            const previousList = exitRequests;
+            setExitRequests((prev) => prev.filter((item) => item.id !== req.id));
+            try {
+                if (commonApi?.separations?.remove) {
+                    await commonApi.separations.remove(req.id);
+                }
+                showSuccessToast("Request deleted.");
+            } catch (error) {
+                showErrorToast(error?.data?.message || "Failed to delete request.");
+                setExitRequests(previousList);
+            } finally {
+                setRowActionLoading((prev) => ({ ...prev, [req.id]: false }));
+            }
+        },
+        [commonApi, exitRequests]
+    );
+
+    const openTerminationModal = useCallback(() => {
+        openModal(
+            () => (
+                <form
+                    className="termination-form"
+                    onSubmit={async (event) => {
+                        event.preventDefault();
+                        if (!terminationForm.employeeId) {
+                            showErrorToast("Select an employee to proceed.");
+                            return;
+                        }
+                        if (!terminationForm.reason || !terminationForm.category) {
+                            showErrorToast("Reason and category are required.");
+                            return;
+                        }
+                        try {
+                            setTerminationSubmitting(true);
+                            const payload = {
+                                type: "Termination",
+                                category: "Involuntary",
+                                employeeId: terminationForm.employeeId,
+                                managerId: user?.emp,
+                                reasonCode: terminationForm.reason,
+                                notes: terminationForm.details,
+                                status: "submitted",
+                            };
+                            const created = await commonApi?.separations?.create(payload);
+                            if (created) {
+                                const normalized = normalizeExitRequest(created);
+                                if (normalized) {
+                                    setExitRequests((prev) => [normalized, ...prev]);
+                                }
+                            }
+                            showSuccessToast("Termination request submitted.");
+                            closeModal();
+                        } catch (error) {
+                            console.error("Failed to submit termination request", error);
+                            showErrorToast(error?.data?.message || "Unable to submit termination request");
+                        } finally {
+                            setTerminationSubmitting(false);
+                        }
+                    }}
+                >
+                    <div className="form-group">
+                        <label>Select Employee</label>
+                        <select
+                            className="form-control"
+                            value={terminationForm.employeeId}
+                            onChange={(event) =>
+                                setTerminationForm((prev) => ({ ...prev, employeeId: event.target.value }))
+                            }
+                        >
+                            <option value="">
+                                {reporteesLoading ? "Loading employees..." : "Choose employee..."}
+                            </option>
+                            {reporteeOptions.map((option) => (
+                                <option key={option.id} value={option.id}>
+                                    {option.name} {option.department && `- ${option.department}`}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="form-group">
+                        <label>Reason</label>
+                        <select
+                            className="form-control"
+                            value={terminationForm.reason}
+                            onChange={(event) =>
+                                setTerminationForm((prev) => ({ ...prev, reason: event.target.value }))
+                            }
+                        >
+                            <option value="">Select reason...</option>
+                            <option value="performance-issues">Performance Issues</option>
+                            <option value="misconduct">Misconduct</option>
+                            <option value="position-redundancy">Position Redundancy</option>
+                            <option value="policy-violation">Policy Violation</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div className="form-group">
+                        <label>Category</label>
+                        <input className="form-control" value="Involuntary" disabled />
+                    </div>
+                    <div className="form-group">
+                        <label>Supporting Details</label>
+                        <textarea
+                            className="form-control"
+                            placeholder="Provide detailed explanation and supporting information..."
+                            rows={4}
+                            value={terminationForm.details}
+                            onChange={(event) =>
+                                setTerminationForm((prev) => ({ ...prev, details: event.target.value }))
+                            }
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Upload Supporting File (Optional)</label>
+                        <label className="upload-dropzone">
+                            <input type="file" hidden disabled />
+                            <span className="upload-icon">
+                                <FaArrowUp />
+                            </span>
+                            <div>
+                                <p className="upload-title">Upload a file or drag and drop</p>
+                                <p className="upload-meta">PDF, DOC, DOCX up to 10MB</p>
+                            </div>
+                        </label>
+                    </div>
+                    <div className="modal-actions">
+                        <Button
+                            type="submit"
+                            variant="solid"
+                            size="md"
+                            label="Submit Termination Request"
+                            isLoading={terminationSubmitting}
+                        />
+                        <button type="button" className="btn btn-light" onClick={closeModal}>
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            ),
+            { title: "Initiate Termination Request", size: "lg" }
+        );
+    }, [
+        closeModal,
+        commonApi?.separations,
+        openModal,
+        reporteeOptions,
+        reporteesLoading,
+        terminationForm,
+        terminationSubmitting,
+        user?.emp,
+    ]);
+
+    const renderActions = (req) => {
+        const status = lower(req.status);
+        const rowBusy = Boolean(rowActionLoading[req.id]);
+        const isTermination = isTerminationRow(req);
+
+        if (isHrView) {
+            const isFinalized = status === "finalized";
+            const showHrActions = isTermination || status === "approved" || isFinalized;
+            if (!showHrActions) return null;
+            return (
+                <div className="d-flex align-items-center gap-2 flex-wrap justify-content-center action-cell">
+                    <Button
+                        size="sm"
+                        variant="outline"
+                        className="pill-btn"
+                        label="View"
+                        onClick={() => openDetailModal(req)}
+                    />
+                    {!isFinalized ? (
+                        <>
+                            <Button
+                                size="sm"
+                                variant="solid"
+                                className="pill-btn"
+                                label="Approve"
+                                disabled={rowBusy}
+                                onClick={() => handleHrApprove(req)}
+                            />
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                className="pill-btn"
+                                label="Reject"
+                                disabled={rowBusy}
+                                onClick={() => handleHrReject(req)}
+                            />
+                        </>
+                    ) : (
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            className="pill-btn"
+                            label="Conduct Exit Interview"
+                            disabled={rowBusy}
+                            onClick={() => handleExitInterview(req)}
+                        />
+                    )}
+                </div>
+            );
         }
+
+        // Manager view
+        if (isTermination) {
+            return (
+                <div className="d-flex align-items-center gap-2 flex-wrap justify-content-center action-cell">
+                    <Button size="sm" variant="outline" className="pill-btn" label="View" onClick={() => openDetailModal(req)} />
+                </div>
+            );
+        }
+
+        if (status === "submitted" || status === "draft") {
+            return (
+                <div className="d-flex align-items-center gap-2 flex-wrap justify-content-center action-cell">
+                    <Button size="sm" variant="outline" className="pill-btn" label="View" onClick={() => openDetailModal(req)} />
+                    <Button
+                        size="sm"
+                        variant="solid"
+                        className="pill-btn"
+                        label="Approve"
+                        disabled={rowBusy}
+                        onClick={() => handleManagerApprove(req)}
+                    />
+                    <Button
+                        size="sm"
+                        variant="outline"
+                        className="pill-btn"
+                        label="Reject"
+                        disabled={rowBusy}
+                        onClick={() => handleManagerReject(req)}
+                    />
+                    <Button
+                        size="sm"
+                        variant="outline"
+                        className="pill-btn"
+                        label="Delete"
+                        disabled={rowBusy}
+                        onClick={() => handleDeleteRequest(req)}
+                    />
+                </div>
+            );
+        }
+
+        return (
+            <div className="d-flex align-items-center gap-2 flex-wrap justify-content-center action-cell">
+                <Button size="sm" variant="outline" className="pill-btn" label="View" onClick={() => openDetailModal(req)} />
+                <Button
+                    size="sm"
+                    variant="solid"
+                    className="pill-btn"
+                    label="Assign Checklist"
+                    disabled={rowBusy}
+                    onClick={() => handleAssignChecklist(req)}
+                />
+            </div>
+        );
     };
 
     return (
-        <div className='manager-exit-process'>
+        <div className={`manager-exit-process theme-${themeMode}`}>
             <div className="container-fulid">
                 <div className="row">
-                    {/* Header Bar */}
                     <div className="col-12">
                         <div className="header-container shadow-sm">
                             <div>
-                                <button className='back-btn' onClick={() => navigate('/manager/dashboard')}>
+                                <button
+                                    className="back-btn"
+                                    onClick={() => navigate(isHrView ? "/hr/dashboard" : "/manager/dashboard")}
+                                >
                                     <FaArrowLeft /> Back to Dashboard
                                 </button>
                             </div>
-                            <div className='info-container'>
-                                <div className='icon-container'>
-                                    <FaUserTimes className='icon' />
+                            <div className="info-container">
+                                <div className="icon-container">
+                                    <FaUserTimes className="icon" />
                                 </div>
                                 <div>
                                     <h5>Exit Management</h5>
-                                    <p className='p4'>
+                                    <p className="p4">
                                         Manage resignations, terminations, and exit processes
                                     </p>
                                 </div>
@@ -725,7 +1173,7 @@ export default function ManagerExitProcess() {
                                 <h3>{stats.pending}</h3>
                             </div>
                             <div>
-                                <IoMdTime className='icon' />
+                                <IoMdTime className="icon" />
                             </div>
                         </div>
                     </div>
@@ -737,7 +1185,7 @@ export default function ManagerExitProcess() {
                                 <h3>{stats.approved}</h3>
                             </div>
                             <div>
-                                <FaCheckCircle className='icon' />
+                                <FaCheckCircle className="icon" />
                             </div>
                         </div>
                     </div>
@@ -749,7 +1197,7 @@ export default function ManagerExitProcess() {
                                 <h3>{stats.notice}</h3>
                             </div>
                             <div>
-                                <FaRegCalendarAlt className='icon' />
+                                <FaRegCalendarAlt className="icon" />
                             </div>
                         </div>
                     </div>
@@ -761,7 +1209,7 @@ export default function ManagerExitProcess() {
                                 <h3>{stats.handover}</h3>
                             </div>
                             <div>
-                                <FaRegClipboard className='icon' />
+                                <FaRegClipboard className="icon" />
                             </div>
                         </div>
                     </div>
@@ -770,18 +1218,20 @@ export default function ManagerExitProcess() {
                     <div className="col-12 my-3">
                         <div className="exit-request-overview shadow-sm">
                             <div className="d-flex align-items-center gap-2">
-                                <FaUserTimes className='icon' />
+                                <FaUserTimes className="icon" />
                                 <h5>Exit Requests Overview</h5>
                             </div>
                             <hr />
 
-                            {/* Tabs */}
                             <ul className="tabs-container">
-                                {resignationTabList.map((tab, i) => (
+                                {[
+                                    { name: "Resignation", key: "RESIG" },
+                                    { name: "Termination", key: "TERM" },
+                                ].map((tab) => (
                                     <li
-                                        key={i}
-                                        className={`tab-item ${resignationTab === tab.key ? 'active' : ''}`}
-                                        role='button'
+                                        key={tab.key}
+                                        className={`tab-item ${resignationTab === tab.key ? "active" : ""}`}
+                                        role="button"
                                         onClick={() => setResignationTab(tab.key)}
                                     >
                                         {tab.name}
@@ -789,25 +1239,24 @@ export default function ManagerExitProcess() {
                                 ))}
                             </ul>
 
-                            {/* Filters */}
                             <div className="filters row">
                                 <div className="col-12 col-md-6">
                                     <input
                                         type="search"
-                                        className='form-control'
-                                        placeholder='Search employees...'
+                                        className="form-control"
+                                        placeholder="Search employees..."
                                         value={search}
                                         onChange={(e) => setSearch(e.target.value)}
                                     />
                                 </div>
                                 <div className="col-12 col-md-3">
                                     <select
-                                        className='form-control'
+                                        className="form-control"
                                         value={statusFilter}
                                         onChange={(e) => setStatusFilter(e.target.value)}
                                     >
                                         <option value="">All Status</option>
-                                        {statusOptions.map((status) => (
+                                        {Array.from(new Set(exitRequests.map((item) => item.status))).map((status) => (
                                             <option key={status} value={status}>
                                                 {status}
                                             </option>
@@ -816,7 +1265,7 @@ export default function ManagerExitProcess() {
                                 </div>
                                 <div className="col-12 col-md-3">
                                     <select
-                                        className='form-control'
+                                        className="form-control"
                                         value={deptFilter}
                                         onChange={(e) => setDeptFilter(e.target.value)}
                                     >
@@ -830,7 +1279,6 @@ export default function ManagerExitProcess() {
                                 </div>
                             </div>
 
-                            {/* No Data State */}
                             <div className="exit-table-wrapper my-3">
                                 {requestsLoading ? (
                                     <p>Loading exit requests...</p>
@@ -845,25 +1293,24 @@ export default function ManagerExitProcess() {
                                                     <th>Notice Period</th>
                                                     <th>Last Working Day</th>
                                                     <th>Status</th>
+                                                    <th className="text-end">Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 {filteredRequests.map((req) => {
-                                                    const initials = getInitials(req.employeeName || req.employeeCode || "NA");
-                                                    const avatarColor = pickAvatarColor(req.employeeName || req.employeeCode || "");
                                                     const remainingText =
                                                         calculateRemainingText(req.noticePeriodEndDate || req.lastWorkingDay);
-                                                    const statusClass = `status-pill status-${slugifyStatus(req.status)}`;
+                                                    const statusClass = `status-pill status-${lower(req.status)}`;
                                                     return (
                                                         <tr key={req.id}>
                                                             <td>
                                                                 <div className="employee-cell">
-                                                                    <span
-                                                                        className="avatar-badge"
-                                                                        style={{ backgroundColor: avatarColor }}
-                                                                    >
-                                                                        {initials}
-                                                                    </span>
+                                                                    <Avatar
+                                                                        name={req.employeeName || "—"}
+                                                                        firstName={req.employeeName?.split(" ")[0]}
+                                                                        lastName={req.employeeName?.split(" ")[1]}
+                                                                        size={40}
+                                                                    />
                                                                     <div className="employee-meta">
                                                                         <p className="emp-name">{req.employeeName || "—"}</p>
                                                                         <p className="emp-role">
@@ -889,6 +1336,7 @@ export default function ManagerExitProcess() {
                                                             <td>
                                                                 <span className={statusClass}>{req.status || "—"}</span>
                                                             </td>
+                                                            <td className="text-end">{renderActions(req)}</td>
                                                         </tr>
                                                     );
                                                 })}
@@ -897,7 +1345,7 @@ export default function ManagerExitProcess() {
                                     </div>
                                 ) : (
                                     <div className="d-flex justify-content-center">
-                                        <NoDataFound type='access' message='No requests found' maxWidth='200px' />
+                                        <NoDataFound type="access" message="No requests found" maxWidth="200px" />
                                     </div>
                                 )}
                             </div>
@@ -956,19 +1404,14 @@ export default function ManagerExitProcess() {
                                         {upcomingExits.length ? (
                                             upcomingExits.map((item) => (
                                                 <div className="upcoming-row" key={item.id}>
-                                                    <span
-                                                        className="avatar-badge"
-                                                        style={{ backgroundColor: pickAvatarColor(item.colorSeed) }}
-                                                    >
-                                                        {item.initials}
-                                                    </span>
+                                                    <Avatar name={item.name} size={36} />
                                                     <div className="upcoming-details">
                                                         <p className="upcoming-name">{item.name}</p>
                                                         <p className="upcoming-meta">{item.department}</p>
                                                     </div>
                                                     <div className="upcoming-date">
                                                         <p>{formatDateDisplay(item.lastWorkingDay)}</p>
-                                                        <span className={`status-chip status-${slugifyStatus(item.status)}`}>
+                                                        <span className={`status-chip status-${lower(item.status)}`}>
                                                             {item.status}
                                                         </span>
                                                     </div>
@@ -987,116 +1430,16 @@ export default function ManagerExitProcess() {
                     </div>
                 </div>
             </div>
-            <button
-                type="button"
-                className="floating-action-btn"
-                aria-label="Initiate termination request"
-                onClick={openTerminationModal}
-            >
-                <FaPlus />
-            </button>
-            {showTerminationModal && (
-                <div className="termination-modal-overlay" role="dialog" aria-modal="true">
-                    <div className="termination-modal shadow-lg">
-                        <div className="termination-modal-header">
-                            <div>
-                                <h4>Initiate Termination Request</h4>
-                                <p className="muted-text">Submit a termination request for HR review</p>
-                            </div>
-                            <button className="close-modal-btn" type="button" onClick={closeTerminationModal}>
-                                X
-                            </button>
-                        </div>
-                        <form className="termination-form" onSubmit={handleTerminationSubmit}>
-                            <div className="form-group">
-                                <label>Select Employee</label>
-                                <select
-                                    className="form-control"
-                                    value={terminationForm.employeeId}
-                                    onChange={(event) => handleTerminationChange("employeeId", event.target.value)}
-                                >
-                                    <option value="">
-                                        {reporteesLoading ? "Loading employees..." : "Choose employee..."}
-                                    </option>
-                                    {reporteeOptions.map((option) => (
-                                        <option key={option.id} value={option.id}>
-                                            {option.name} {option.department && `- ${option.department}`}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="form-group">
-                                <label>Reason</label>
-                                <select
-                                    className="form-control"
-                                    value={terminationForm.reason}
-                                    onChange={(event) => handleTerminationChange("reason", event.target.value)}
-                                >
-                                    <option value="">Select reason...</option>
-                                    {TERMINATION_REASONS.map((reason) => (
-                                        <option key={reason.value} value={reason.value}>
-                                            {reason.label}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="form-group">
-                                <label>Category</label>
-                                <select
-                                    className="form-control"
-                                    value={terminationForm.category}
-                                    onChange={(event) => handleTerminationChange("category", event.target.value)}
-                                >
-                                    <option value="">Select category...</option>
-                                    {TERMINATION_CATEGORIES.map((category) => (
-                                        <option key={category.value} value={category.value}>
-                                            {category.label}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="form-group">
-                                <label>Supporting Details</label>
-                                <textarea
-                                    className="form-control"
-                                    placeholder="Provide detailed explanation and supporting information..."
-                                    rows={4}
-                                    value={terminationForm.details}
-                                    onChange={(event) => handleTerminationChange("details", event.target.value)}
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Upload Supporting File (Optional)</label>
-                                <label className="upload-dropzone">
-                                    <input type="file" onChange={handleFileChange} hidden />
-                                    <span className="upload-icon">
-                                        <FaArrowUp />
-                                    </span>
-                                    <div>
-                                        <p className="upload-title">Upload a file or drag and drop</p>
-                                        <p className="upload-meta">PDF, DOC, DOCX up to 10MB</p>
-                                        {terminationForm.file ? (
-                                            <p className="upload-file-name">{terminationForm.file.name}</p>
-                                        ) : null}
-                                    </div>
-                                </label>
-                            </div>
-                            <div className="modal-actions">
-                                <Button
-                                    type="submit"
-                                    variant="solid"
-                                    size="md"
-                                    label="Submit Termination Request"
-                                    isLoading={terminationSubmitting}
-                                />
-                                <button type="button" className="btn btn-light" onClick={closeTerminationModal}>
-                                    Cancel
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
+            {!isHrView ? (
+                <button
+                    type="button"
+                    className="floating-action-btn"
+                    aria-label="Initiate termination request"
+                    onClick={openTerminationModal}
+                >
+                    <FaPlus />
+                </button>
+            ) : null}
         </div>
     );
 }

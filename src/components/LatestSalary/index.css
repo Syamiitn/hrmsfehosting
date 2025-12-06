@@ -1,12 +1,13 @@
 /* ========== Latest Salary Card ========== */
 .latest-salary-card {
-    background: var(--card-bg-color);
-    border-radius: 20px;
-    padding: 16px;
+    background-color: var(--card-bg);
+    padding: var(--padding-lg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-glassy);
+    border: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
     height: 100%;
-    transition: box-shadow 0.2s ease, transform 0.2s ease;
 
     /* Header */
     .latest-salary__header {
@@ -28,12 +29,12 @@
         text-align: center;
         font-size: 25px;
         font-weight: 700;
-        color: #0f172a;
+        color: var(--text-muted);
     }
 
     .latest-salary__sub {
         text-align: center;
-        color: #64748b;
+        color: var(--text-muted);
         margin: 4px 0 16px;
         font-size: 15px;
     }

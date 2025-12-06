@@ -1,8 +1,9 @@
 .jobinfo-card {
-  background: var(--card-bg-color);
-  border-radius: 16px;
-  box-shadow: var(--sh-1);
-  padding: 16px;
+  background-color: var(--card-bg);
+  padding: var(--padding-lg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-glassy);
+  border: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
 
@@ -12,5 +13,6 @@
 
   .jobinfo-cell {
     border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-soft);
   }
 }

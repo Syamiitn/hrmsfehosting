@@ -1,61 +1,84 @@
-import React from "react";
+import React, { useMemo } from "react";
+import { format, parseISO, isValid } from "date-fns";
 import { Wallet } from "lucide-react";
 import Button from "@components/common/Button";
-import generatePayslip from "@data/mockData"; // your function that builds payslip data
+import generatePayslip from "@data/mockData";
 import { PayslipPDF } from "@components/common/PayslipPDF";
 import { PDFDownloadLink } from "@react-pdf/renderer";
-import logo from '../../assets/TetriqSolutionsLogo.png'
+import logo from "../../assets/TetriqSolutionsLogo.png";
 import "./index.css";
 
 export default function LatestSalary({ data }) {
     if (!data) return null;
 
-    // Generate payslip data from util
-    const payslip = generatePayslip({
-        name: "Kurme Pavan",
-        employeeId: "TSPL000001",
-        joiningDate: "22 Jul 2025",
-        department: "IT",
-        subDepartment: "N/A",
-        designation: "Software Developer",
-        year: parseInt(2025),
-        month: "August",
-        salary: 35000,
-    });
+    /* ---------------------------------------------------------
+       1. Safe Date Formatting (prevents split undefined error)
+    ----------------------------------------------------------- */
+    const formattedPayDate = useMemo(() => {
+        if (!data?.payDate) return "-";
+        try {
+            const d = parseISO(data.payDate);
+            return isValid(d) ? format(d, "MMMM dd") : "-";
+        } catch (e) {
+            return "-";
+        }
+    }, [data?.payDate]);
+
+    /* ---------------------------------------------------------
+       2. Generate Payslip Data (memoized)
+    ----------------------------------------------------------- */
+    const payslip = useMemo(() => {
+        return generatePayslip({
+            name: data?.employeeName || "Employee",
+            employeeId: data?.employeeId || "EMP-0001",
+            joiningDate: data?.joiningDate || "-",
+            department: data?.department || "N/A",
+            designation: data?.designation || "N/A",
+            month: data?.monthName || "Unknown",
+            year: data?.year || new Date().getFullYear(),
+            salary: data?.net || 0,
+        });
+    }, [data]);
 
     return (
         <section className="latest-salary-card flex-fill">
+
             {/* Header */}
             <div className="latest-salary__header">
                 <span className="latest-salary__icon">
-                    <Wallet size={16} />
+                    <Wallet size={16} className="icon" />
                 </span>
                 <span className="latest-salary__title">Latest Salary</span>
             </div>
 
-            {/* Amount */}
+            {/* Salary Amount */}
             <div className="latest-salary__amount">
-                <h1>{data.net}</h1>
+                <h1>{data.netPay ?? 0}</h1>
             </div>
-            <div className="latest-salary__sub">Credited on {data.month}</div>
+
+            {/* Pay Date */}
+            <div className="latest-salary__sub">
+                Credited on {formattedPayDate}
+            </div>
 
             {/* Grid */}
             <div className="latest-salary__grid">
                 <div className="cell">
                     <span className="label">Gross</span>
-                    <span className="value">{data.gross}</span>
+                    <span className="value">{data?.grossSalary ?? "--"}</span>
                 </div>
+
                 <div className="cell">
                     <span className="label">Deductions</span>
-                    <span className="value neg">{data.deductions}</span>
+                    <span className="value neg">{data?.deductions ?? "--"}</span>
                 </div>
             </div>
 
-            {/* Footer Button */}
+            {/* Download Button */}
             <div className="latest-salary__footer">
                 <PDFDownloadLink
                     document={<PayslipPDF payslip={payslip} logo={logo} />}
-                    fileName={`Payslip.pdf`}
+                    fileName={`Payslip-${data?.monthName || "Month"}.pdf`}
                 >
                     {({ loading }) => (
                         <Button

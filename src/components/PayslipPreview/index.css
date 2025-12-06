@@ -1,0 +1,71 @@
+.payslip-preview-container {
+    padding: 24px;
+    background: var(--body-bg);
+    border-radius: 12px;
+    box-shadow: var(--shadow-glassy);
+    max-width: 700px;
+    margin: auto;
+}
+
+.payslip-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.payslip-section {
+    margin-bottom: 25px;
+}
+
+.pp-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: 10px;
+    column-gap: 20px;
+}
+
+.pp-grid label {
+    font-weight: 600;
+    margin-right: 6px;
+}
+
+.pp-table .pp-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px dashed var(--border-color);
+}
+
+.pp-row label {
+    font-weight: 600;
+}
+
+.pp-total span {
+    font-weight: 700;
+}
+
+.payslip-netpay {
+    text-align: center;
+    padding: 16px;
+    background: var(--card-bg);
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.payslip-netpay h4 {
+    margin-bottom: 5px;
+}
+
+.pp-download-btn {
+    width: 100%;
+    padding: 12px;
+    background: var(--theme);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.pp-download-btn:hover {
+    background: var(--theme);
+}

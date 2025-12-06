@@ -7,9 +7,11 @@ import { showErrorToast, showSuccessToast } from "@utils/utils";
 import { useApi } from "@hooks/useApi";
 import { createCommonApi } from "@services/commonApi";
 
+// Lightweight helper so drafts get a readable code even before persisting
 const generatePolicyCode = () =>
   `POL-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
 
+// Normalizes category payloads returned by the backend API
 const normalizeCategoryOption = (item) => {
   if (!item || typeof item !== "object") return null;
   const name = item.name ?? item.categoryName ?? item.title ?? item.code ?? "";
@@ -18,6 +20,7 @@ const normalizeCategoryOption = (item) => {
   return { id, name };
 };
 
+// Pulls out arrays regardless of how the backend wraps responses
 const unwrapList = (payload) => {
   if (Array.isArray(payload)) return payload;
   if (!payload || typeof payload !== "object") return [];
@@ -29,9 +32,11 @@ const unwrapList = (payload) => {
   return [];
 };
 
+// Standardizes toast messages without duplicating fallback logic
 const getErrorMessage = (error, fallback) =>
   error?.data?.message || error?.data?.error || error?.message || fallback;
 
+// Shared org-list parsing borrowed from other Global Settings steps
 const parseOrganizationList = (payload) => {
   const raw = Array.isArray(payload)
     ? payload
@@ -51,6 +56,7 @@ const parseOrganizationList = (payload) => {
     .filter((org) => (org.id && org.name) || org.name);
 };
 
+// Converts checkbox selections into the structure our API expects
 const formatCompaniesForPayload = (selectedKeys = [], options = []) => {
   if (!Array.isArray(selectedKeys)) return [];
   return selectedKeys
@@ -75,6 +81,7 @@ const formatCompaniesForPayload = (selectedKeys = [], options = []) => {
     .filter(Boolean);
 };
 
+// Full-screen modal that handles both creating and editing policy records
 export default function AddPolicyModal({
   onClose,
   initialData = {},
@@ -115,6 +122,7 @@ export default function AddPolicyModal({
     return [];
   });
 
+  // Track mount state so async fetches can bail out safely
   useEffect(() => {
     isMountedRef.current = true;
     return () => {
@@ -122,12 +130,14 @@ export default function AddPolicyModal({
     };
   }, []);
 
+  // When categories are provided from parent, hydrate option list immediately
   useEffect(() => {
     if (Array.isArray(initialCategories) && initialCategories.length) {
       setCategoryOptions(initialCategories);
     }
   }, [initialCategories]);
 
+  // Normalize company list whenever the parent passes a new one
   useEffect(() => {
     if (Array.isArray(companiesList) && companiesList.length) {
       const seen = new Set();
@@ -141,6 +151,7 @@ export default function AddPolicyModal({
     }
   }, [companiesList]);
 
+  // If no options were passed, fetch organizations from the API
   useEffect(() => {
     let ignore = false;
     if (!organizationService?.list || organizationOptions.length) return;
@@ -169,6 +180,7 @@ export default function AddPolicyModal({
     };
   }, [organizationService, organizationOptions.length]);
 
+  // Fetches policy categories scoped to the selected organization
   const loadCategories = useCallback(async () => {
     if (!categoryService || !organizationId) return;
     setCategoryLoading(true);
@@ -331,6 +343,7 @@ export default function AddPolicyModal({
     }
   }, [formik.errors]);
 
+  // Keeps the multi-select "Applies To" chips in sync with Formik state
   const handleCheckbox = (value) => {
     const current = formik.values.appliesTo;
     const updated = current.includes(value)

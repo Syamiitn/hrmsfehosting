@@ -1127,7 +1127,7 @@ export default function LeaveManagement() {
 
                     {/* Header */}
                     <div className="col-12 mt-2">
-                        <div className="header-container shadow-sm">
+                        <div className="header-container ">
                             <button className='back-btn' onClick={() => navigate('/hr/ems/ems/overview')}>
                                 <FaArrowLeft /> Back to Dashboard
                             </button>
@@ -1145,7 +1145,7 @@ export default function LeaveManagement() {
 
                     {/* Stat Cards */}
                     <div className="col-12 col-md-6 col-lg-3 mt-3">
-                        <div className="stat-card shadow-sm">
+                        <div className="stat-card ">
                             <div>
                                 <p>Today's Requests</p>
                                 <h4>{todayReq}</h4>
@@ -1155,7 +1155,7 @@ export default function LeaveManagement() {
                     </div>
 
                     <div className="col-12 col-md-6 col-lg-3 mt-3">
-                        <div className="stat-card shadow-sm">
+                        <div className="stat-card ">
                             <div>
                                 <p>Pending</p>
                                 <h4>{pendingReq.length}</h4>
@@ -1165,7 +1165,7 @@ export default function LeaveManagement() {
                     </div>
 
                     <div className="col-12 col-md-6 col-lg-3 mt-3">
-                        <div className="stat-card shadow-sm">
+                        <div className="stat-card ">
                             <div>
                                 <p>Approved</p>
                                 <h4>{approvedReq.length}</h4>
@@ -1175,7 +1175,7 @@ export default function LeaveManagement() {
                     </div>
 
                     <div className="col-12 col-md-6 col-lg-3 mt-3">
-                        <div className="stat-card shadow-sm">
+                        <div className="stat-card ">
                             <div>
                                 <p>Rejected</p>
                                 <h4>{rejectedReq.length}</h4>
@@ -1186,7 +1186,7 @@ export default function LeaveManagement() {
 
                     {/* Leave Requests */}
                     <div className="col-12 my-3">
-                        <div className="leave-requests shadow-sm">
+                        <div className="leave-requests ">
                             <div className="d-flex align-items-center gap-2">
                                 <FaCheckCircle className='icon' />
                                 <h5>Leave Requests</h5>
@@ -1243,7 +1243,7 @@ export default function LeaveManagement() {
 
                     {/* Action Center */}
                     <div className="col-12 mb-3">
-                        <div className="action-center-container shadow-sm">
+                        <div className="action-center-container ">
                             <div className="d-flex align-items-center gap-2">
                                 <MdOutlineManageAccounts className='icon' />
                                 <h5>Action Center</h5>

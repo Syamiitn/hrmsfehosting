@@ -16,6 +16,7 @@ import { useLoading } from "@context/LoadingContext";
 import { subDays } from "date-fns";
 import { showErrorToast } from "@utils/utils";
 import { leaveTypesApi } from "@services/commonApi"; // Added import
+import NoDataFound from "@components/common/NoDataFound";
 
 import { importantReminders } from "@data/mockData";
 import "./index.css";
@@ -137,7 +138,7 @@ export default function EmployeeLeaveOverview() {
 
               return (
                 <div className={`${colClass} mt-3`} key={index}>
-                  <div className="stat-card shadow-sm">
+                  <div className="stat-card ">
                     <h5 className="mb-2">{lev.leaveName}</h5>
                     <div className="d-flex align-items-center justify-content-between mb-2">
                       <h3>{lev.usedDays}/{lev.totalDays}</h3>
@@ -155,7 +156,7 @@ export default function EmployeeLeaveOverview() {
         <div className="row">
           {/* Recent Requests */}
           <div className="col-12 col-md-6 mt-3 d-flex">
-            <div className="recent-leave-request-card shadow-sm flex-fill">
+            <div className="recent-leave-request-card  flex-fill">
               <div className="d-flex align-items-center gap-2">
                 <LuClock className="icon" />
                 <h5>Recent Requests (Last 7 Days)</h5>
@@ -163,7 +164,7 @@ export default function EmployeeLeaveOverview() {
               <hr />
               <ul className="recent-request-list mb-2">
                 {leaveHistory.length === 0 ? (
-                  <p>No leave requests found.</p>
+                  <NoDataFound message="No leave requests found." />
                 ) : (
                   leaveHistory.map((req, i) => (
                     <li key={i}>
@@ -185,7 +186,7 @@ export default function EmployeeLeaveOverview() {
 
           {/* Important Reminders */}
           <div className="col-12 col-md-6 mt-3 d-flex">
-            <div className="important-reminders flex-fill shadow-sm">
+            <div className="important-reminders flex-fill ">
               <div className="d-flex align-items-center gap-2">
                 <IoWarningOutline className="icon" />
                 <h5>Important Reminders</h5>

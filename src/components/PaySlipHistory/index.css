@@ -2,11 +2,11 @@
    Payslip History Card
    ========================== */
 .payslip-history-card {
-    background: var(--card-bg-color);
-    border-radius: 16px;
-    box-shadow: 0 6px 18px rgba(16, 24, 40, 0.06);
-    padding: 16px;
-    transition: box-shadow 0.2s ease, transform 0.2s ease;
+    background-color: var(--card-bg);
+    padding: var(--padding-lg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-glassy);
+    border: 1px solid var(--border-color);
 
     /* Header */
     .payslip-history__header {

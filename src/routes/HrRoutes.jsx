@@ -33,6 +33,8 @@ import EmployeeLeaveHistory from '@pages/employee/EmployeeLeaveHistory'
 import LeaveManagement from '@pages/hr/LeaveManagement'
 import EmsOverview from '@pages/hr/EmsOverview'
 import EmsDocuments from '@pages/hr/EmsDocuments'
+import EmsAttendanceTracking from '@pages/hr/EmsAttendanceTracking'
+import HrExitProcess from '@pages/hr/HrExitProcess'
 
 export default [
     // <Route element={<ProtectedRoute roles={['hr', 'manager']} />}>
@@ -69,11 +71,12 @@ export default [
                     <Route index path='overview' element={<EmsSubDashboard />} />
                     <Route path='directory' element={<h4>EMS Sub Menu</h4>} />
                     <Route path='leave-management' element={<LeaveManagement />} />
-                    <Route path='attendance-tracking' element={<h4>attendance-tracking</h4>} />
+                    <Route path='attendance-tracking' element={<EmsAttendanceTracking />} />
                     <Route path='performace-reviews' element={<h4>performace-reviews</h4>} />
                     <Route path='onboarding' element={<EmpOnboardingForm />} />
                     <Route path='documents' element={<EmsDocuments />} />
                 </Route>
+                <Route path='exit-process' element={<HrExitProcess />} />
                 <Route path='directory/:id' element={<EmployeeProfile />}>
                     <Route path='personal-details' element={<MePersonal />} />
                     <Route path='job-details' element={<EmployeeJob />} />

@@ -2,12 +2,14 @@
    Team Attendance Card Styles
    ============================== */
 .team-attendance-card {
-    background-color: var(--card-bg-color);
+    background-color: var(--card-bg);
     padding: 16px;
     border-radius: 20px;
     max-height: 550px;
     display: flex;
     flex-direction: column;
+    box-shadow: var(--shadow-glassy);
+    border: 1px solid var(--border-color);
 
     .icon {
         color: var(--theme);
@@ -21,12 +23,19 @@
         overflow-y: auto;
 
         .team-member {
-            background-color: var(--background-color);
+            background-color: transparent;
+            /* border: 1px solid var(--border-color); */
             display: flex;
             align-items: center;
+            justify-content: flex-start;
             gap: 10px;
             padding: 10px;
             border-radius: 12px;
+
+            .avatar-col {
+                border-radius: 50%;
+                border: 3px solid var(--bg-transparent);
+            }
         }
     }
 }

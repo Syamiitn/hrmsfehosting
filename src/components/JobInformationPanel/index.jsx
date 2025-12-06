@@ -81,7 +81,7 @@ export default function JobInformationPanel({ jobInfo, handleEditJob, handleCrea
   ];
 
   return (
-    <div className="jobinfo-card shadow-sm p-3 flex-fill">
+    <div className="jobinfo-card  p-3 flex-fill">
       {/* Header */}
       <div className="d-flex align-items-center justify-content-between gap-2 mb-2">
         <div className="d-flex align-items-center gap-2">

@@ -1,0 +1,51 @@
+.fin-expences {
+    background-color: var(--body-bg);
+
+    .expense-claim-form {
+        background-color: var(--card-bg);
+        padding: var(--padding-lg);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-glassy);
+        border: 1px solid var(--border-color);
+    }
+
+    .expense-summary {
+        background-color: var(--card-bg);
+        padding: var(--padding-lg);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-glassy);
+        border: 1px solid var(--border-color);
+
+        .summary-details {
+            padding: 0px;
+
+            li {
+                margin-bottom: 5px;
+            }
+        }
+
+        .note-container {
+            border: 1px solid var(--green-dark);
+            background-color: var(--green-light);
+            padding: 10px;
+            border-radius: 14px;
+        }
+    }
+
+    .recent-expense-claims {
+        background-color: var(--card-bg);
+        padding: var(--padding-lg);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-glassy);
+        border: 1px solid var(--border-color);
+    }
+
+    .edit-mode-highlight {
+        border: 2px solid var(--theme) !important;
+        box-shadow: var(--shadow-shadow);
+        border-radius: var(--radius-md);
+        transition: all 0.3s ease;
+        padding: var(--padding-lg);
+    }
+
+}

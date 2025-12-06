@@ -22,6 +22,7 @@ import EmployeeLeaveDashboard from '@pages/employee/EmployeeLeaveDashboard'
 import EmployeeLeaveOverview from '@pages/employee/EmployeeLeaveOverview'
 import EmployeeApplyLeave from '@pages/employee/EmployeeApplyLeave'
 import EmployeeLeaveHistory from '@pages/employee/EmployeeLeaveHistory'
+import FinanceDashboard from '@pages/employee/FinanceDashboard'
 
 export default [
 
@@ -49,6 +50,7 @@ export default [
             </Route>
             <Route path='profile' element={<h3>Profile</h3>} />
             <Route path='inbox' element={<h5>Inbox</h5>} />
+            <Route path='finance' element={<FinanceDashboard />} />
         </Route>
     // </Route>
 ]

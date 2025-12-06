@@ -1,0 +1,103 @@
+.fin-payslip {
+    background-color: var(--body-bg);
+
+    .fin-payslip-history {
+        background-color: var(--card-bg);
+        padding: var(--padding-lg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-glassy);
+
+
+        .icon {
+            color: var(--theme);
+        }
+    }
+
+    .detailed-breakdown {
+        background-color: var(--card-bg);
+        padding: var(--padding-lg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-glassy);
+
+        .earnings-container {
+            border: 1px solid var(--border-color);
+            padding: var(--padding-lg);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-soft);
+
+            h5 {
+                margin-bottom: 10px;
+                color: var(--theme);
+            }
+
+            .earning-details {
+                padding: 0px;
+
+                li {
+                    display: flex;
+                    justify-content: space-between;
+                    margin-bottom: 5px;
+                }
+            }
+        }
+
+        .deductions-container {
+            border: 1px solid var(--border-color);
+            border: 1px solid var(--border-color);
+            padding: var(--padding-lg);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-soft);
+
+            h5 {
+                margin-bottom: 10px;
+                color: var(--theme);
+            }
+
+            .deduction-details {
+                padding: 0px;
+
+                li {
+                    display: flex;
+                    justify-content: space-between;
+                    margin-bottom: 5px;
+                }
+            }
+        }
+    }
+
+    .calendar-container {
+        background-color: var(--card-bg);
+        padding: var(--padding-lg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-glassy);
+    }
+}
+
+.payslip-modal {
+    background-color: var(--card-bg);
+
+    .tab-bar {
+        background-color: var(--body-bg);
+        display: flex;
+        justify-content: space-around;
+        padding: 0px;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-glassy);
+
+        .tab-item {
+            background-color: var(--card-bg);
+            flex-grow: 1;
+            text-align: center;
+            margin: 5px;
+            border-radius: var(--radius-lg);
+            font-size: 14px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--border-color);
+
+            &.active {
+                background-color: var(--theme);
+                color: var(--color-white);
+            }
+        }
+    }
+}

@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useParams } from "react-router-dom";
 import { useAuth } from "@context/AuthContext";
 import Button from "@components/common/Button";
+import Loading from "@components/common/Loading";
 import { useApi } from "@hooks/useApi";
 import { createCommonApi } from "@services/commonApi";
 import { showErrorToast, showSuccessToast } from "@utils/utils";
@@ -33,13 +34,23 @@ const STATUS_ORDER = [
     "Closed",
 ];
 
+const getStatusStepIndex = (status) => {
+    const value = String(status || "").toLowerCase();
+    if (value.includes("closed")) return 5;
+    if (value.includes("final")) return 4;
+    if (value.includes("checklist") || value.includes("handover")) return 3;
+    if (value.includes("hr") || value.includes("approved") || value.includes("accept")) return 2;
+    if (value.includes("manager")) return 1;
+    return 0; // submitted/draft
+};
+
 const DEFAULT_CONTACTS = {
     it: { email: "it-support@company.com", label: "IT Support" },
     finance: { email: "finance@company.com", label: "Finance Team" },
 };
 
 const SEPERATION_API_ENABLED = true;
-const SEPERATION_FETCH_ENABLED = false;
+const SEPERATION_FETCH_ENABLED = true;
 
 const UUID_REGEX = /^[0-9a-fA-F-]{36}$/;
 
@@ -72,9 +83,9 @@ const getErrorMessage = (error, fallback) =>
 const cloneChecklist = (list = DEFAULT_CHECKLIST) =>
     list.map((item, idx) => ({
         id: item.id ?? idx + 1,
-        label: item.label ?? `Task ${idx + 1}`,
+        label: item.label || item.name || `Task ${idx + 1}`,
         role: item.role ?? "EMPLOYEE",
-        done: Boolean(item.done),
+        done: Boolean(item.done ?? item.status),
     }));
 
 const unwrapList = (payload) => {
@@ -110,9 +121,19 @@ const buildPersonDisplayName = (source) => {
 
 const normalizeCase = (item, fallback = {}) => {
     if (!item || typeof item !== "object") return null;
-    const checklist = cloneChecklist(
-        Array.isArray(item.checklist) && item.checklist.length ? item.checklist : DEFAULT_CHECKLIST
-    );
+    const resolveEmail = (source) =>
+        source?.workEmail ||
+        source?.email ||
+        source?.contactEmail ||
+        source?.personalEmail ||
+        source?.personal_email ||
+        source?.userEmail;
+
+    const rawChecklist =
+        (Array.isArray(item.checklist) && item.checklist.length && item.checklist) ||
+        (Array.isArray(item.checkList) && item.checkList.length && item.checkList) ||
+        DEFAULT_CHECKLIST;
+    const checklist = cloneChecklist(rawChecklist);
     const createdAt = item.createdAt ?? fallback.createdAt ?? toISODate(new Date());
     const status = item.status ?? fallback.status ?? "Submitted";
     const timeline =
@@ -131,6 +152,27 @@ const normalizeCase = (item, fallback = {}) => {
         fallback.approvedLastWorkingDay ??
         proposed;
 
+    const hrProfile = item.hr || item.hrDetails;
+    const hrEmailDirect =
+        item.hrEmail ||
+        item.hr_email ||
+        item.hrWorkEmail ||
+        item.hr_work_email ||
+        item.hrContactEmail ||
+        item.hr_contact_email;
+    const hrNameDirect =
+        item.hrName ||
+        item.hr_name ||
+        item.hrFullName ||
+        item.hr_full_name;
+    const hrEmail =
+        resolveEmail(hrProfile) ||
+        hrEmailDirect ||
+        item.contacts?.hr ||
+        fallback.contacts?.hr ||
+        "hr@company.com";
+    const hrName = buildPersonDisplayName(hrProfile) || hrNameDirect || fallback.contacts?.hrName;
+
     return {
         id: item.id ?? fallback.id ?? null,
         status,
@@ -146,11 +188,12 @@ const normalizeCase = (item, fallback = {}) => {
         noticePeriodStartDate: item.noticePeriodStartDate ?? fallback.noticePeriodStartDate ?? intendedDate,
         noticePeriodEndDate: item.noticePeriodEndDate ?? fallback.noticePeriodEndDate ?? approved,
         managerId: item.managerId ?? fallback.managerId ?? null,
-        hrId: item.hrId ?? fallback.hrId ?? null,
+        hrId: item.hrId ?? fallback.hrId ?? hrProfile?.id ?? hrProfile?.employeeId ?? null,
         checklist,
         timeline,
         contacts: {
-            hr: item.contacts?.hr ?? fallback.contacts?.hr ?? "hr@company.com",
+            hr: hrEmail,
+            hrName,
             it: item.contacts?.it ?? fallback.contacts?.it ?? DEFAULT_CONTACTS.it.email,
             finance: item.contacts?.finance ?? fallback.contacts?.finance ?? DEFAULT_CONTACTS.finance.email,
         },
@@ -164,7 +207,11 @@ export default function EmployeeResignation() {
     const employeeId = id || user?.emp;
     const apiClient = useApi();
     const { get, post } = apiClient;
-    const commonApi = useMemo(() => createCommonApi(apiClient), [apiClient]);
+    const commonApiRef = useRef(createCommonApi(apiClient));
+
+    useEffect(() => {
+        commonApiRef.current = createCommonApi(apiClient);
+    }, [apiClient]);
 
     const [form, setForm] = useState({
         proposedLastWorkingDay: "",
@@ -188,9 +235,6 @@ export default function EmployeeResignation() {
   const managerRef = useRef(managerContact);
   const hrRef = useRef(hrContact);
   const contactCacheRef = useRef({});
-  const [supportDocs, setSupportDocs] = useState([
-    { id: "doc-1", name: "ResignationLetter.pdf", status: "Uploaded" },
-  ]);
   const [finalDocs, setFinalDocs] = useState([
     { id: "payslip", name: "Final Payslip", available: false },
     { id: "relieving", name: "Relieving Letter", available: false },
@@ -306,11 +350,38 @@ export default function EmployeeResignation() {
                 "Reporting Manager"
             );
             const hrId = latestJob?.hrId || profile?.hrId;
-            const baseHr = parseContact(
+            const hrEmailFromJob =
+                latestJob?.workEmail ||
+                latestJob?.hrEmail ||
+                latestJob?.hr_email ||
+                latestJob?.hrWorkEmail ||
+                latestJob?.hr_work_email;
+            const hrNameFromJob =
+                latestJob?.hr ||
+                latestJob?.hrName ||
+                latestJob?.hr_name ||
+                latestJob?.hrFullName ||
+                latestJob?.hr_full_name;
+            const hrPhoneFromJob =
+                latestJob?.hrPhone ||
+                latestJob?.workPhone ||
+                latestJob?.hr_phone ||
+                latestJob?.hr_contact;
+
+            let baseHr = parseContact(
                 latestJob?.hr || latestJob?.hrDetails,
                 hrId,
                 "HR Partner"
             );
+            // If HR is stored as plain name + email on the job record, build/enrich contact from there
+            if (hrEmailFromJob || hrNameFromJob || hrPhoneFromJob) {
+                baseHr = {
+                    id: baseHr?.id || hrId || hrEmailFromJob || hrNameFromJob,
+                    name: baseHr?.name || hrNameFromJob || "HR Partner",
+                    email: baseHr?.email || hrEmailFromJob || "",
+                    workPhone: baseHr?.workPhone || hrPhoneFromJob,
+                };
+            }
             const [manager, hrPartner] = await Promise.all([
                 resolveContactDetails(baseManager, managerId, "Reporting Manager"),
                 resolveContactDetails(baseHr, hrId, "HR Partner"),
@@ -331,7 +402,7 @@ export default function EmployeeResignation() {
             !SEPERATION_FETCH_ENABLED ||
             !SEPERATION_API_ENABLED ||
             !employeeId ||
-            !commonApi?.separations
+            !commonApiRef.current?.separations
         ) {
             setActiveCase(null);
             setCaseLoading(false);
@@ -339,8 +410,8 @@ export default function EmployeeResignation() {
         }
         setCaseLoading(true);
         try {
-            const response = await commonApi?.separations?.list
-                ? await commonApi.separations.list({ employeeId })
+            const response = commonApiRef.current?.separations?.list
+                ? await commonApiRef.current.separations.list({ employeeId })
                 : [];
             const list = unwrapList(response).sort(
                 (a, b) => new Date(b?.createdAt || 0) - new Date(a?.createdAt || 0)
@@ -351,16 +422,20 @@ export default function EmployeeResignation() {
                 it: DEFAULT_CONTACTS.it.email,
                 finance: DEFAULT_CONTACTS.finance.email,
             };
-            setActiveCase(
-                latest
-                    ? normalizeCase(latest, {
-                          noticePeriodDays: noticeRef.current,
-                          managerId: managerRef.current?.id,
-                          hrId: hrRef.current?.id,
-                          contacts: fallbackContacts,
-                      })
-                    : null
-            );
+            if (latest && String(latest.status || "").toLowerCase().includes("withdraw")) {
+                setActiveCase(null);
+            } else {
+                setActiveCase(
+                    latest
+                        ? normalizeCase(latest, {
+                              noticePeriodDays: noticeRef.current,
+                              managerId: managerRef.current?.id,
+                              hrId: hrRef.current?.id,
+                              contacts: fallbackContacts,
+                          })
+                        : null
+                );
+            }
             loadErrorRef.current = false;
         } catch (error) {
             if (!loadErrorRef.current) {
@@ -371,17 +446,56 @@ export default function EmployeeResignation() {
         } finally {
             setCaseLoading(false);
         }
-    }, [employeeId, commonApi?.separations]);
+    }, [employeeId]);
 
     useEffect(() => {
         loadEmployeeContext();
     }, [loadEmployeeContext]);
 
     useEffect(() => {
-    if (SEPERATION_API_ENABLED && SEPERATION_FETCH_ENABLED) {
-        loadActiveCase();
-    }
-  }, [loadActiveCase]);
+        if (SEPERATION_API_ENABLED && SEPERATION_FETCH_ENABLED) {
+            loadActiveCase();
+        }
+    }, [loadActiveCase]);
+
+    // Ensure HR contact email is hydrated from separation or employee profile
+    useEffect(() => {
+        const hrId = activeCase?.hrId;
+        const hasEmail = Boolean(hrContact?.email);
+        const contactEmail = activeCase?.contacts?.hr;
+        const contactName = activeCase?.contacts?.hrName || hrContact?.name;
+        // If separation already provides an email, use it
+        if (!hasEmail && contactEmail) {
+            const patched = {
+                id: hrContact?.id || hrId || contactEmail,
+                name: contactName || "HR Partner",
+                email: contactEmail,
+                phone: hrContact?.phone,
+            };
+            setHrContact(patched);
+            hrRef.current = patched;
+            return;
+        }
+        // Otherwise hydrate from employee profile when hrId exists
+        if (!hrId || hasEmail) return;
+        let cancelled = false;
+        const hydrateHr = async () => {
+            try {
+                const profile = await get(`/employees/${hrId}`);
+                const parsed = parseContact(profile, hrId, "HR Partner");
+                if (parsed && !cancelled) {
+                    setHrContact(parsed);
+                    hrRef.current = parsed;
+                }
+            } catch (error) {
+                console.warn("[Resignation] Failed to hydrate HR contact", hrId, error);
+            }
+        };
+        hydrateHr();
+        return () => {
+            cancelled = true;
+        };
+    }, [activeCase?.contacts?.hr, activeCase?.hrId, get, hrContact?.email, hrContact?.id, hrContact?.name, parseContact]);
 
     async function submitResignation(e) {
         e.preventDefault();
@@ -413,10 +527,10 @@ export default function EmployeeResignation() {
                 toISODate(form.noticeStartDate) || intendedDate;
             const noticeEndISO =
                 toISODate(form.noticeEndDate) || approvedLwdISO;
-            const tenantIdRaw = user?.tenantId || user?.organizationId || "";
-            const tenantId = UUID_REGEX.test(tenantIdRaw)
-                ? tenantIdRaw
-                : "00000000-0000-0000-0000-000000000000";
+            //const tenantIdRaw = user?.tenantId || user?.organizationId || "";
+            //const tenantId = UUID_REGEX.test(tenantIdRaw)
+            //    ? tenantIdRaw
+            //    : "00000000-0000-0000-0000-000000000000";
             const reasonIdValue = UUID_REGEX.test(form.reasonId) ? form.reasonId : null;
             if (!reasonIdValue) {
                 showErrorToast("Select a valid resignation reason.");
@@ -437,8 +551,9 @@ export default function EmployeeResignation() {
                 intendedDate,
                 intendedLastWorkingDate: intendedLwdISO,
                 approvedLastWorkingDate: approvedLwdISO,
-                status: "draft",
-                tenantId,
+                status: "submitted",
+                type: "voluntary",
+               // tenantId,
                 reasonId: reasonIdValue,
                 reasonNote: form.reasonNote || "",
                 noticePeriodDays,
@@ -459,8 +574,8 @@ export default function EmployeeResignation() {
                 )
             );
             console.log("[Separation] Creating request", payload);
-            const response = commonApi?.separations
-                ? await commonApi.separations.create(sanitizedPayload)
+            const response = commonApiRef.current?.separations
+                ? await commonApiRef.current.separations.create(sanitizedPayload)
                 : await post("/separations", sanitizedPayload);
             console.log("[Separation] Response", response);
             const normalized =
@@ -530,138 +645,191 @@ function PostSubmissionLayout({
   statusOrder,
   toggleChecklist,
   checklistToggleDisabled,
-  supportDocs,
-  handleSupportDocUpload,
   finalDocs,
   managerName,
   hrContact,
   noticePeriodDays,
   availableStatus,
 }) {
-  const statusIndex = statusOrder.findIndex((status) => status === activeCase.status);
+  const statusIndex = getStatusStepIndex(activeCase.status);
   const safeStatusIndex = statusIndex >= 0 ? statusIndex : 0;
   const checklist = activeCase.checklist?.length ? activeCase.checklist : cloneChecklist();
   const timeline = Array.isArray(activeCase.timeline) ? activeCase.timeline : [];
 
-  return (
-    <div className="post-grid">
-      <section className="card post-card status-card">
-        <div className="card-head">
-          <h5>Status Tracker</h5>
-          <span className="pill">{activeCase.status}</span>
-        </div>
-        <div className="status-track">
-          {statusOrder.map((step, idx) => {
-            const isDone = idx < safeStatusIndex;
-            const isActive = idx === safeStatusIndex;
-            return (
-              <div className={`status-step ${isDone ? "done" : ""} ${isActive ? "active" : ""}`} key={step}>
-                <span className="dot">{isDone ? "✔" : idx + 1}</span>
-                <div>
-                  <p className="step-label">{step}</p>
-                  <p className="step-time">
-                    {timeline.find((t) => t.label === step)?.at
-                      ? formatDateDisplay(timeline.find((t) => t.label === step)?.at)
-                      : "Pending"}
-                  </p>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-        <div className="grid-two">
-          <div className="info-block">
-            <p className="label">Proposed LWD</p>
-            <p className="value">{formatDateDisplay(activeCase.proposedLastWorkingDay)}</p>
-          </div>
-          <div className="info-block">
-            <p className="label">Approved LWD</p>
-            <p className="value">{formatDateDisplay(activeCase.approvedLastWorkingDay)}</p>
-          </div>
-          <div className="info-block">
-            <p className="label">Notice Period</p>
-            <p className="value">{noticePeriodDays} days</p>
-          </div>
-          <div className="info-block">
-            <p className="label">Manager</p>
-            <p className="value">{managerName}</p>
-          </div>
-        </div>
-      </section>
+  const steps = [
+    { label: "Submitted" },
+    { label: "Manager Review" },
+    { label: "HR Review" },
+    { label: "Exit Checklist" },
+    { label: "Completed" },
+  ];
 
-      <section className="card post-card checklist-card">
+  const checklistDone = checklist.filter((c) => c.done).length;
+  const checklistPct = Math.round((checklistDone / (checklist.length || 1)) * 100);
+  const hrEmail =
+    hrContact?.email || activeCase?.contacts?.hr || "hr@company.com";
+  const handleContactHr = () => {
+    if (!hrEmail) {
+      showErrorToast("HR email not available.");
+      return;
+    }
+    const target = hrEmail.startsWith("mailto:") ? hrEmail : `mailto:${hrEmail}`;
+    window.location.href = target;
+  };
+
+  return (
+    <div className="resignation-grid">
+      <div className="card-wrapper status-card-wrapper">
+        <section className="status-ribbon tall">
+          <div className="ribbon-header">
+            <div>
+              <h5>Resignation Status</h5>
+              <p className="p4 text-muted">
+                Proposed LWD: <strong>{formatDateDisplay(activeCase.proposedLastWorkingDay)}</strong> · Notice Period:{" "}
+                <strong>{noticePeriodDays} days</strong>
+              </p>
+            </div>
+            <span className="status-badge">{activeCase.status}</span>
+          </div>
+          <div className="ribbon-steps">
+            {steps.map((step, idx) => {
+              const isDone = idx < safeStatusIndex;
+              const isActive = idx === safeStatusIndex;
+              const showConnector = idx < steps.length - 1;
+              return (
+                <div key={step.label} className="ribbon-step-wrapper">
+                  <div className={`ribbon-step ${isDone ? "done" : ""} ${isActive ? "active" : ""}`}>
+                    <div className="step-dot">{isDone ? "✓" : idx + 1}</div>
+                    <p className="p4 fw-600">{step.label}</p>
+                  </div>
+                  {showConnector && <div className={`step-connector ${isDone ? "done" : ""} ${isActive ? "active" : ""}`} />}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      </div>
+
+      <div className="card-wrapper checklist-wrapper">
         <div className="card-head">
           <h5>Exit Checklist</h5>
-          <span className="hint">Complete these steps before your last day.</span>
+          <span className="hint">
+            {checklistDone}/{checklist.length} completed
+          </span>
         </div>
-        <ul className="checklist-list">
+        <div className="checklist-progress">
+          <div className="checklist-bar" style={{ width: `${checklistPct}%` }} />
+        </div>
+        <ul className="checklist-list large scrollable">
           {checklist.map((item) => (
-            <li key={item.id}>
+            <li key={item.id} className="check-item">
               <label className="check-row">
                 <input
                   type="checkbox"
-                  disabled={checklistToggleDisabled}
+                  disabled
                   checked={Boolean(item.done)}
-                  onChange={() => toggleChecklist(item.id)}
+                  onChange={() => {}}
                 />
                 <div>
                   <p className={`item-label ${item.done ? "done" : ""}`}>{item.label}</p>
-                  <span className="role-tag">{item.role}</span>
+                  <div className="tag-row">
+                    <span className="role-tag">{item.role}</span>
+                    <span className={`status-tag ${item.done ? "completed" : "pending"}`}>
+                      {item.done ? "Completed" : "Pending"}
+                    </span>
+                  </div>
                 </div>
               </label>
             </li>
           ))}
         </ul>
-      </section>
+      </div>
 
-      <section className="card post-card uploads-card">
+      <div className="card-wrapper assets-card">
         <div className="card-head">
-          <h5>Supporting Documents</h5>
-          <span className="hint">Upload any additional confirmations or approvals.</span>
+          <h5>Asset Return Status</h5>
+          <span className="hint">Please return assets before your last working day.</span>
         </div>
-        <div className="upload-list">
-          {supportDocs.map((doc) => (
-            <div key={doc.id} className="upload-item">
-              <div>
-                <p className="doc-name">{doc.name}</p>
-                <p className="doc-meta">{doc.status}</p>
+        <ul className="asset-list">
+          {[
+            {
+              label: "Laptop",
+              icon: (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+                  <rect x="3" y="5" width="18" height="11" rx="1.5" />
+                  <path d="M2 16h20M9 19h6" strokeWidth="1.6" />
+                </svg>
+              ),
+            },
+            {
+              label: "Mobile Phone",
+              icon: (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+                  <rect x="8" y="3" width="8" height="18" rx="2" />
+                  <circle cx="12" cy="17" r="0.8" fill="currentColor" />
+                </svg>
+              ),
+            },
+            {
+              label: "ID Card",
+              icon: (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+                  <rect x="4" y="5" width="16" height="14" rx="2" />
+                  <circle cx="9" cy="11" r="1.4" />
+                  <path d="M13 10h4M13 13h4" />
+                  <path d="M8 14.5c1-.6 2.2-.6 3.2 0" strokeLinecap="round" />
+                </svg>
+              ),
+            },
+            {
+              label: "Access Cards",
+              icon: (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+                  <path d="M12 4 4 9v6l8 5 8-5V9l-8-5Z" />
+                  <path d="M12 8v4" />
+                  <circle cx="12" cy="14.5" r="1" fill="currentColor" />
+                </svg>
+              ),
+            },
+          ].map((asset) => (
+            <li key={asset.label} className="asset-row">
+              <div className="asset-meta">
+                <span className="asset-ico">{asset.icon}</span>
+                <div className="asset-name">{asset.label}</div>
               </div>
-              <Button
-                variant="outline"
-                size="xs"
-                label={"View"}
-                radius={5}
-                onClick={() => showSuccessToast("Document preview coming soon.")}
-              />
-            </div>
+              <span className="asset-status pending">Pending</span>
+            </li>
           ))}
+        </ul>
+        <div className="asset-note">
+          <strong>Note:</strong> Please return all assets to IT department before your last working day.
         </div>
-        <label className="upload-field">
-          <input
-            type="file"
-            multiple
-            onChange={(e) => handleSupportDocUpload(e.target.files)}
-          />
-          <span>+ Upload Documents</span>
-        </label>
-      </section>
+      </div>
 
-      <section className="card post-card docs-card">
+      <div className="card-wrapper docs-card">
         <div className="card-head">
           <h5>Final Documents</h5>
-          <span className="hint">HR will provide these before closure.</span>
+          <span className="hint">Download your exit documents</span>
         </div>
-        <ul className="final-docs">
+        <ul className="final-docs grid">
           {finalDocs.map((doc) => (
-            <li key={doc.id}>
-              <div>
-                <p className="doc-name">{doc.name}</p>
-                <p className="doc-meta">{availableStatus(doc.available)}</p>
+            <li key={doc.id} className="doc-card">
+              <div className="doc-meta-wrap">
+                <span className="doc-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+                    <path d="M7 3h7l5 5v13H7z" />
+                    <path d="M14 3v5h5" />
+                  </svg>
+                </span>
+                <div>
+                  <p className="doc-name">{doc.name}</p>
+                  <p className="doc-meta">{availableStatus(doc.available)}</p>
+                </div>
               </div>
               <Button
                 variant="outline"
-                size="xs"
-                label={"Download"}
+                size="sm"
+                label={doc.available ? "Download" : "Pending"}
                 radius={5}
                 disabled={!doc.available}
                 onClick={() =>
@@ -673,14 +841,47 @@ function PostSubmissionLayout({
             </li>
           ))}
         </ul>
-        <div className="contact-note">
-          For clarifications, reach out to{" "}
-          <a href={`mailto:${hrContact?.email || "hr@company.com"}`}>
-            {hrContact?.name || "HR Partner"}
-          </a>
-          .
+      </div>
+
+      <div className="card-wrapper support-card">
+        <div className="card-head">
+          <h5>Support & Contact</h5>
         </div>
-      </section>
+        <div className="support-grid">
+          <div className="support-block">
+            <p className="p3 text-muted">HR Contact Person</p>
+            <h6>{hrContact?.name || "HR Partner"}</h6>
+            <p className="p4">
+              <a href={hrEmail.startsWith("mailto:") ? hrEmail : `mailto:${hrEmail}`}>
+                {hrEmail}
+              </a>
+            </p>
+            <p className="p4">
+              {hrContact?.phone ||
+                hrContact?.mobile ||
+                hrContact?.workPhone ||
+                hrContact?.contactNumber ||
+                hrContact?.contact_number ||
+                "Not provided"}
+            </p>
+          </div>
+          <div className="support-block">
+            <p className="p3 text-muted">Quick Links</p>
+            <ul className="p4">
+              <li>Notice Period Policy</li>
+              <li>Exit Process FAQs</li>
+              <li>Asset Return Guide</li>
+            </ul>
+          </div>
+        </div>
+        <Button
+          variant="solid"
+          size="md"
+          label="Contact HR"
+          className="contact-hr-btn"
+          onClick={handleContactHr}
+        />
+      </div>
     </div>
   );
 }
@@ -707,41 +908,46 @@ function PostSubmissionLayout({
     }
 
     async function toggleChecklist(id) {
-        if (!activeCase) return;
-        const updatedChecklist = activeCase.checklist.map((item) =>
-            item.id === id ? { ...item, done: !item.done } : item
-        );
-        setActiveCase((prev) => (prev ? { ...prev, checklist: updatedChecklist } : prev));
-        if (SEPERATION_API_ENABLED && activeCase.id && commonApi?.separations) {
-            try {
-                await commonApi.separations.update(activeCase.id, { checklist: updatedChecklist });
-                await loadActiveCase();
-            } catch (error) {
-                showErrorToast(getErrorMessage(error, "Failed to update checklist."));
-                await loadActiveCase();
-            }
-        }
+        // Employee view is read-only for checklist; only manager/HR updates server state.
+        return;
     }
 
-    async function resetDemo() {
-        if (SEPERATION_API_ENABLED && activeCase?.id && commonApi?.separations) {
+    async function withdrawResignation() {
+        if (!activeCase) return;
+        const intended = toISODate(
+            activeCase.intendedDate ||
+            activeCase.noticePeriodStartDate ||
+            activeCase.proposedLastWorkingDay ||
+            new Date()
+        );
+        const intendedLwd = toISODate(
+            activeCase.intendedLastWorkingDate ||
+            activeCase.approvedLastWorkingDay ||
+            activeCase.proposedLastWorkingDay ||
+            intended
+        );
+        const payload = {
+            status: "withdrawn",
+            intendedDate: intended,
+            intendedLastWorkingDate: intendedLwd,
+        };
+        if (SEPERATION_API_ENABLED && activeCase.id && commonApiRef.current?.separations) {
             try {
-                await commonApi.separations.remove(activeCase.id);
+                await commonApiRef.current.separations.update(activeCase.id, payload);
                 showSuccessToast("Resignation withdrawn.");
             } catch (error) {
                 showErrorToast(getErrorMessage(error, "Failed to withdraw resignation."));
                 return;
             }
         }
-    setActiveCase(null);
-    setSupportDocs([{ id: "doc-1", name: "ResignationLetter.pdf", status: "Uploaded" }]);
-    setFinalDocs([
-      { id: "payslip", name: "Final Payslip", available: false },
-      { id: "relieving", name: "Relieving Letter", available: false },
-      { id: "experience", name: "Experience Letter", available: false },
-    ]);
-    setForm({
-      proposedLastWorkingDay: "",
+        setActiveCase(null);
+        setFinalDocs([
+            { id: "payslip", name: "Final Payslip", available: false },
+            { id: "relieving", name: "Relieving Letter", available: false },
+            { id: "experience", name: "Experience Letter", available: false },
+        ]);
+        setForm({
+            proposedLastWorkingDay: "",
             approvedLastWorkingDay: "",
             reasonId: REASONS[0].id,
             reasonNote: "",
@@ -749,9 +955,10 @@ function PostSubmissionLayout({
             noticeStartDate: "",
             noticeEndDate: "",
         });
+        setCaseLoading(false);
     }
 
-    const currentStatusClass = (activeCase ? activeCase.status : employmentStatus)
+  const currentStatusClass = (activeCase ? activeCase.status : employmentStatus)
         .replaceAll(" ", "-")
         .toLowerCase();
     const noticeDisplay = activeCase?.noticePeriodDays ?? noticePeriodDays;
@@ -760,21 +967,19 @@ function PostSubmissionLayout({
     const financeEmail = activeCase?.contacts?.finance || DEFAULT_CONTACTS.finance.email;
   const managerName = managerContact?.name || "Reporting Manager";
   const isLoadingState = contextLoading || caseLoading;
-  const handleSupportDocUpload = (files) => {
-    const list = Array.isArray(files) ? files : Array.from(files || []);
-    if (!list.length) return;
-    setSupportDocs((prev) => [
-      ...prev,
-      ...list.map((file) => ({
-        id: `${Date.now()}-${file.name}`,
-        name: file.name,
-        status: "Uploaded",
-      })),
-    ]);
-  };
+const availableStatus = (status) =>
+  status ? "Ready for Download" : "Pending from HR";
 
-  const availableStatus = (status) =>
-    status ? "Ready for Download" : "Pending from HR";
+const getStatusStepIndex = (status) => {
+  const value = String(status || "").toLowerCase();
+  if (value.includes("withdraw")) return 0;
+  if (value.includes("closed")) return 5;
+  if (value.includes("final")) return 4;
+  if (value.includes("checklist") || value.includes("handover")) return 3;
+  if (value.includes("hr") || value.includes("approved") || value.includes("accept")) return 2;
+  if (value.includes("manager")) return 1;
+  return 0; // submitted/draft
+};
 
   if (!employeeId) {
     return (
@@ -800,38 +1005,24 @@ function PostSubmissionLayout({
             <div className="res-actions">
               {activeCase.status !== "Closed" && (
                 <Button
-                  variant="solid"
-                  label={"Advance Status"}
+                  variant="outline"
+                  label={"Withdraw"}
                   size="sm"
                   radius={5}
-                  onClick={advanceStatus}
+                  onClick={withdrawResignation}
                   disabled={caseLoading}
                 />
               )}
-              <Button
-                variant="outline"
-                label={"Withdraw"}
-                size="sm"
-                radius={5}
-                onClick={resetDemo}
-                disabled={caseLoading}
-              />
             </div>
           </div>
 
-          {isLoadingState && (
-            <div className="res-sync p4" role="status">
-              Syncing latest resignation data…
-            </div>
-          )}
+          {isLoadingState && <Loading type="dots" message="Syncing latest resignation data…" />}
 
           <PostSubmissionLayout
             activeCase={activeCase}
             statusOrder={STATUS_ORDER}
             toggleChecklist={toggleChecklist}
             checklistToggleDisabled={caseLoading}
-            supportDocs={supportDocs}
-            handleSupportDocUpload={handleSupportDocUpload}
             finalDocs={finalDocs}
             managerName={managerName}
             hrContact={hrContact}
@@ -849,26 +1040,10 @@ function PostSubmissionLayout({
                 {/* Header */}
                 <div className="res-header">
                     <h5 className="res-title">Employee Resignation</h5>
-                    <div className="res-actions">
-                        {activeCase && activeCase.status !== "Closed" && (
-                            <Button
-                                variant="outline"
-                                label={'Advance Status'}
-                                size="sm"
-                                radius={5}
-                                onClick={advanceStatus}
-                                disabled={caseLoading}
-                                title="Move to next step"
-                            />
-                        )}
-                    </div>
+                    <div className="res-actions" />
                 </div>
 
-                {isLoadingState && (
-                    <div className="res-sync p4" role="status">
-                        Syncing latest resignation data…
-                    </div>
-                )}
+                {isLoadingState && <Loading type="dots" message="Syncing latest resignation data…" />}
 
                 <div className="res-layout">
                     {/* Left column: Resignation Info */}
@@ -1019,7 +1194,7 @@ function PostSubmissionLayout({
                                 </div>
                             </form>
                         ) : (
-                            <div className="submitted-wrap">
+                            <div className="submitted-wrap ">
                                 {/* Key values */}
                                 <div className="kv">
                                     <span className="p3 kv-label">Proposed LWD</span>
@@ -1065,12 +1240,12 @@ function PostSubmissionLayout({
                                     role="progressbar"
                                     aria-valuemin={0}
                                     aria-valuemax={STATUS_ORDER.length - 1}
-                                    aria-valuenow={STATUS_ORDER.indexOf(activeCase.status)}
+                                    aria-valuenow={getStatusStepIndex(activeCase.status)}
                                 >
                                     {STATUS_ORDER.map((s, i) => {
-                                        const current = activeCase.status;
-                                        const isDone = STATUS_ORDER.indexOf(current) > i;
-                                        const isActive = current === s;
+                                        const currentIndex = getStatusStepIndex(activeCase.status);
+                                        const isDone = currentIndex > i;
+                                        const isActive = currentIndex === i;
                                         return (
                                             <div
                                                 className={`step ${isDone ? "done" : ""} ${isActive ? "active" : ""
@@ -1129,9 +1304,9 @@ function PostSubmissionLayout({
                                         <label className="check-row">
                                             <input
                                                 type="checkbox"
-                                                disabled={caseLoading}
+                                                disabled
                                                 checked={!!(activeCase ? item.done : false)}
-                                                onChange={() => toggleChecklist(item.id)}
+                                                onChange={() => {}}
                                                 className="checkbox"
                                             />
                                             <div className="check-text">

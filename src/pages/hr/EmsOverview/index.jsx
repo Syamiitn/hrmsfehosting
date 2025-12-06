@@ -42,7 +42,7 @@ export default function EmsOverview() {
                 {/* Stat Cards */}
                 <div className="row">
                     <div className="col-12 col-md-6 col-lg-4 mt-2 d-flex">
-                        <div className="stat-card shadow-sm flex-fill">
+                        <div className="stat-card  flex-fill">
                             <div>
                                 <p className='p3'>Total Employees</p>
                                 <h4>
@@ -57,7 +57,7 @@ export default function EmsOverview() {
                     {/* Card End */}
 
                     <div className="col-12 col-md-6 col-lg-4 mt-2 d-flex">
-                        <div className="stat-card shadow-sm flex-fill">
+                        <div className="stat-card  flex-fill">
                             <div>
                                 <p className='p3'>Pending Onboarding</p>
                                 <h4>
@@ -72,7 +72,7 @@ export default function EmsOverview() {
                     {/* Card End */}
 
                     <div className="col-12 col-md-6 col-lg-4 mt-2 d-flex">
-                        <div className="stat-card shadow-sm flex-fill">
+                        <div className="stat-card  flex-fill">
                             <div>
                                 <p className='p3'>Leave Requests</p>
                                 <h4>
@@ -90,7 +90,7 @@ export default function EmsOverview() {
                 <div className="row">
                     {/* Recent Activities */}
                     <div className="col-12 col-md-6 mt-3 d-flex">
-                        <div className="recent-activities-container shadow-sm flex-fill">
+                        <div className="recent-activities-container  flex-fill">
                             <div className="d-flex align-items-center gap-2">
                                 <Clock className='icon' size={20} />
                                 <h5>Recent Activities</h5>
@@ -120,7 +120,7 @@ export default function EmsOverview() {
 
                     {/* Quick Actions */}
                     <div className="col-12 col-md-6 mt-3 d-flex">
-                        <div className="quick-actions shadow-sm flex-fill">
+                        <div className="quick-actions  flex-fill">
                             <div className="d-flex align-items-center gap-2">
                                 <Zap className='icon' size={18} />
                                 <h5>Quick Actions</h5>
@@ -146,7 +146,7 @@ export default function EmsOverview() {
                                     </button>
                                 </div>
                                 <div className="col-12 col-md-6 my-1 d-flex">
-                                    <button className="quick-action flex-fill" onClick={() => alert('navigate to exit management')}>
+                                    <button className="quick-action flex-fill" onClick={() => navigate('/hr/ems/exit-process')}>
                                         <LogOut className='icon' />
                                         <h6>Exit Management</h6>
                                     </button>

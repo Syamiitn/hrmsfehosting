@@ -1,0 +1,306 @@
+.layout-header {
+    background-color: var(--body-bg);
+    height: auto !important;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .logo-container {
+        background-color: var(--theme);
+        height: 72px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 180px;
+        border-top-right-radius: 25px;
+        border-bottom-right-radius: 25px;
+        color: var(--text-white);
+        position: relative;
+
+        h1 {
+            color: var(--text-white);
+        }
+    }
+
+    @media (max-width: 700px) {
+        .logo-container {
+            height: 50px;
+            width: 136px;
+
+            h1 {
+                font-size: 20px;
+            }
+        }
+    }
+
+    .client-name {
+        h5 {
+            font-weight: 500;
+            font-size: 16px;
+        }
+    }
+
+    .search-container {
+        min-width: 441px;
+        max-width: 500px;
+
+        .seach-input {
+            border-radius: var(--radius-xl) !important;
+            box-shadow: var(--shadow-soft);
+        }
+
+        @media (max-width: 1024px) {
+            min-width: 280px;
+            max-width: 320px;
+        }
+
+        @media (max-width: 992px) {
+            min-width: 280px;
+            max-width: 320px;
+        }
+
+        @media (max-width: 768px) {
+            display: none;
+        }
+    }
+
+
+    .notifications-container {
+        min-height: 48px;
+        min-width: 49px;
+        background-color: var(--card-bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius-full);
+        box-shadow: var(--shadow-soft);
+        position: relative;
+
+        .icon {
+            color: var(--theme);
+        }
+
+        .indecator {
+            position: absolute;
+            height: 15px;
+            width: 15px;
+            background-color: var(--theme-green);
+            top: 0px;
+            right: 0px;
+            border-radius: var(--radius-full);
+        }
+    }
+
+    .menu-container {
+        width: auto;
+
+        .icon {
+            color: var(--theme);
+        }
+    }
+}
+
+/* Base popover wrapper */
+.popover-wrapper {
+    position: absolute;
+    z-index: 9999;
+    background: var(--card-bg);
+    box-shadow: var(--shadow-soft);
+    border-radius: 16px;
+    padding: 16px;
+    min-width: 250px;
+}
+
+/* Position bottom-right relative to header */
+.bottom-right {
+    top: 72px;
+    /* below header */
+    right: 10px;
+}
+
+/* NOTIFICATION POPOVER */
+.notif-popover h4 {
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.notif-item {
+    padding: 10px;
+    border-radius: 12px;
+    background: var(--bg-card);
+}
+
+/* PROFILE POPOVER */
+.profile-popover {
+
+    .logout-option {
+        display: flex;
+        gap: 5px;
+        font-size: 14px;
+        color: var(--text-secondary);
+
+        .icon {
+            height: 18px;
+            width: 18px;
+            margin-top: 2px;
+            color: var(--theme);
+        }
+    }
+
+    .colors-container {
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+        gap: 10px;
+        padding: 0px;
+    }
+
+    .box {
+        height: 22px;
+        width: 22px;
+        border-radius: var(--radius-full);
+    }
+
+    .box-purple {
+        background-color: var(--theme-purple);
+    }
+
+    .box-violet {
+        background-color: var(--theme-violet);
+    }
+
+    .box-rose {
+        background-color: var(--theme-rose);
+    }
+
+    .box-blue {
+        background-color: var(--theme-blue);
+    }
+
+    .box-green {
+        background-color: var(--theme-green);
+    }
+
+    .box-orange {
+        background-color: var(--theme-orange);
+    }
+
+    .box-red {
+        background-color: var(--theme-red);
+    }
+
+    /* ==========================================================
+        SOGO SWITCH (Fully Isolated Toggle Component)
+    ========================================================== */
+
+    .sogo-switch {
+        position: relative;
+        width: 48px;
+        height: 26px;
+        display: inline-block;
+
+        /* Hidden input */
+        input {
+            width: 0;
+            height: 0;
+            opacity: 0;
+        }
+
+        /* Track */
+        .sogo-switch-track {
+            position: absolute;
+            inset: 0;
+            background: var(--border-light);
+            border-radius: 50px;
+            transition: background 0.3s ease;
+            cursor: pointer;
+
+            /* Thumb */
+            .sogo-switch-thumb {
+                position: absolute;
+                height: 22px;
+                width: 22px;
+                top: 2px;
+                left: 2px;
+                border-radius: 50%;
+                background: var(--text-white);
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+                transition: transform 0.3s ease, background 0.3s ease;
+            }
+        }
+
+        /* Checked State */
+        input:checked+.sogo-switch-track {
+            background: var(--theme);
+
+            .sogo-switch-thumb {
+                transform: translateX(22px);
+            }
+        }
+
+        /* Focus-visible for keyboard */
+        input:focus-visible+.sogo-switch-track {
+            outline: 2px solid rgba(var(--theme-rgb), 0.4);
+            outline-offset: 3px;
+        }
+
+        /* Disabled */
+        input:disabled+.sogo-switch-track {
+            opacity: 0.6;
+            cursor: not-allowed;
+
+            .sogo-switch-thumb {
+                background: #ccc;
+            }
+        }
+    }
+
+    /* ---------- DARK MODE ---------- */
+    [data-mode="dark"] {
+        .sogo-switch {
+
+            .sogo-switch-track {
+                background: rgba(255, 255, 255, 0.15);
+            }
+
+            input:checked+.sogo-switch-track {
+                background: var(--theme-primary-light);
+            }
+        }
+    }
+
+    .sun {
+        color: var(--text-secondary);
+    }
+
+    .moon {
+        color: var(--text-secondary);
+    }
+}
+
+.logout-container {
+    background-color: var(--card-bg);
+
+    .logout-modal-card {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+        .icon {
+            height: 50px;
+            width: 50px;
+            color: rgb(184, 6, 6);
+            margin-bottom: 12px;
+        }
+
+        .logout-actions {
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            gap: 5px;
+            margin-top: 10px;
+        }
+    }
+}

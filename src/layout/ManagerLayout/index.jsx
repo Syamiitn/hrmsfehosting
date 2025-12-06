@@ -77,7 +77,7 @@ export default function HrLayout() {
                 />
 
                 {/*  Only content scrolls */}
-                <main className="flex-1 min-h-[80vh] max-h-[90vh] overflow-y-auto px-4">
+                <main className="flex-1 min-h-[80vh] max-h-[90vh] overflow-y-auto px-4" style={{background: 'var(--body-bg)'}}>
                     <Outlet />
                 </main>
             </div>

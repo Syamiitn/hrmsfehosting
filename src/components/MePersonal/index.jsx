@@ -11,6 +11,7 @@ import DateInput from "@components/common/DateInput";
 import CustomPhoneInput from "@components/common/PhoneInput";
 import { parse, format, isValid } from "date-fns";
 import { showErrorToast, showSuccessToast } from "@utils/utils";
+import Loading from "@components/common/Loading";
 import noDataFound from "@assets/no-data-found.png";
 import { FaUpload } from "react-icons/fa";
 import "./index.css";
@@ -331,10 +332,12 @@ export default function MePersonal() {
 
     const [profile, setProfile] = useState(null);
     const [documents, setDocuments] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     /** Fetch employee data */
     const fetchProfile = useCallback(async () => {
         try {
+            setIsLoading(true)
             showLoading({ type: "spinner", message: "Loading Personal Information", size: "md" });
             if (!empId) return;
             const res = await get(`/employees/${empId}`);
@@ -346,8 +349,9 @@ export default function MePersonal() {
             showErrorToast("Failed to load profile data.");
         } finally {
             hideLoading();
+            setIsLoading(false);
         }
-    }, [empId, get, showLoading, hideLoading]);
+    }, [empId, showLoading, hideLoading]);
 
     useEffect(() => {
         fetchProfile();
@@ -606,9 +610,13 @@ export default function MePersonal() {
     return (
         <div className="personal-info-page">
             {!profile ? (
-                <div className="w-100 d-flex flex-column justify-content-center align-items-center">
-                    <img src={noDataFound} alt="No data found" style={{ width: "240px", opacity: 0.8 }} />
-                    <p className="text-muted mt-3">No employee data found</p>
+                <div>
+                    {!isLoading && (
+                        <div className="w-100 d-flex flex-column justify-content-center align-items-center">
+                            <img src={noDataFound} alt="No data found" style={{ maxWidth: "240px", opacity: 0.8 }} />
+                            <p className="text-muted mt-3">No employee data found</p>
+                        </div>
+                    )}
                 </div>
             ) : (
                 <div className="container-fluid">

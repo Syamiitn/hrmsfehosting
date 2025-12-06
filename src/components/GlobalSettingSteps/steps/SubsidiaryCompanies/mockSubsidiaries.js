@@ -1,3 +1,4 @@
+// Lightweight mock store powering the Subsidiary Companies UI until APIs exist
 const DATASET = {
   "c1a2b3d4-e5f6-7890-abcd-1234567890ab": {
     orgName: "TechNova Global Holdings Pvt Ltd",
@@ -37,11 +38,13 @@ const DATASET = {
   },
 };
  
+// Mimics an async GET call to return all subsidiaries
 export async function fetchCompaniesFull() {
   await new Promise((r) => setTimeout(r, 200));
   return Object.entries(DATASET).map(([id, details]) => ({ id, ...details }));
 }
  
+// Mimics a DELETE call and removes the entry from the in-memory dataset
 export async function deleteCompany(companyId) {
   await new Promise((r) => setTimeout(r, 200));
   console.log("Mock DELETE company ->", companyId);

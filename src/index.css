@@ -41,6 +41,12 @@
   --gray-900: #212529;
   --gray-main-background: #e1d4f5;
   --gray-card-background: #f2eef9;
+
+
+  /* ledges colors */
+
+  --green-dark: #2e7d32;
+  --green-light: #e4ffe5;
 }
 
 [data-theme="violet"] {
@@ -673,6 +679,10 @@ hr {
   color: var(--muted-text-color) !important;
 }
 
+textarea {
+  font-size: 14px;
+}
+
 
 /* ==============================
    Attendance Legends
@@ -777,15 +787,25 @@ hr {
   background-color: var(--weekend-bg);
 }
 
+.text-capitalize {
+  text-transform: capitalize !important;
+}
+
 /* Badge style */
 .badge {
   border-radius: 20px;
   font-size: 12px;
   font-weight: 600;
   padding: 0.25rem 0.6rem;
+  text-transform: capitalize !important;
 }
 
 .badge-on-time {
+  background-color: var(--on-time-bg);
+  color: var(--on-time-text);
+}
+
+.badge-present {
   background-color: var(--on-time-bg);
   color: var(--on-time-text);
 }
@@ -824,3 +844,4 @@ hr {
   background-color: var(--weekend-bg);
   color: var(--weekend-text);
 }
+

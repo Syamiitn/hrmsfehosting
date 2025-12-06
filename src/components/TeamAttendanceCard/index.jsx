@@ -6,19 +6,13 @@ import NoDataFound from "@components/common/NoDataFound";
 import { FaUsers } from "react-icons/fa";
 import "./index.css";
 
-const getTodayStatus = (attendanceLogs) => {
-    if (!attendanceLogs || !Array.isArray(attendanceLogs)) return null;
-    const today = new Date().toISOString().split("T")[0];
-    return attendanceLogs.find((log) => log.date === today) || null;
-};
-
 export default function TeamAttendanceCard({ teamPulse = [], isLoading = false }) {
     if (!Array.isArray(teamPulse)) {
         return <p>No attendance data available</p>;
     }
 
     return (
-        <div className="team-attendance-card shadow-sm">
+        <div className="team-attendance-card">
             {isLoading ? (
                 <div className="w-100 d-flex justify-content-center align-items-center my-4">
                     <Loading type="dots" message="Loading Team Pulse" />
@@ -35,17 +29,16 @@ export default function TeamAttendanceCard({ teamPulse = [], isLoading = false }
                         <hr />
                         <ul className="team-attendance-list row">
                             {teamPulse.map((data, i) => {
-                                const todayLog = getTodayStatus(data.attendanceLogs);
-
                                 return (
                                     <li key={i} className="col-12 col-md-6 mb-2 d-flex">
                                         <div className="team-member flex-fill">
-                                            <div className="avatar-col">
+                                            <div className={`avatar-col`}>
                                                 <Avatar
                                                     firstName={data?.firstName}
                                                     lastName={data?.lastName}
                                                     imgUrl={data?.profilePicUrl}
-                                                    size={40}
+                                                    size={50}
+                                                    className={`border-3 rounded-5 border-${getConditionClassName(data?.status)}`}
                                                 />
                                             </div>
 
@@ -53,17 +46,15 @@ export default function TeamAttendanceCard({ teamPulse = [], isLoading = false }
                                                 <h6 className="member-name">{data?.name}</h6>
                                                 <p className="p4">{data?.jobTitle}</p>
 
-                                                {todayLog ? (
-                                                    <p
-                                                        className={`p4 text-${getConditionClassName(
-                                                            todayLog.status?.toLowerCase() || "null"
-                                                        )}`}
-                                                    >
-                                                        {todayLog.status}
-                                                    </p>
+                                                {/* {data?.status ? (
+                                                    <span className={`badge badge-${getConditionClassName(data?.status)}`}>
+                                                        {data?.status}
+                                                    </span>
                                                 ) : (
-                                                    <span className="p4">No Logs</span>
-                                                )}
+                                                    <span className="badge badge-leave">
+                                                        NOT IN
+                                                    </span>
+                                                )} */}
                                             </div>
                                         </div>
                                     </li>

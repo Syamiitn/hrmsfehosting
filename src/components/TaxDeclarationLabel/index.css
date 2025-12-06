@@ -1,0 +1,11 @@
+.tax-declaration-label {
+    border: 1px solid var(--border-color);
+    padding: 14px;
+    border-radius: 14px;
+
+    .badges {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+}

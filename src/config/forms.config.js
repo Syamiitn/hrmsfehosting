@@ -3,6 +3,7 @@ export const API_ENDPOINTS = {
     leaveTypes: (employeeId) => `/leave-balances/findAll?employeeId=${employeeId}`,
     wfhReasons: "/wfh-reasons",
     attendanceTypes: "/attendance-types",
+    expenseTypes: "/expense-types"
 };
 
 // apply leave form config file

@@ -8,6 +8,7 @@ import { showErrorToast, showSuccessToast } from "@utils/utils";
 /* ============================================================
    🔄 Helpers
    ============================================================ */
+// Safely pulls the category array regardless of API envelope
 const extractCategoryList = (payload) => {
   if (Array.isArray(payload)) return payload;
   if (!payload || typeof payload !== "object") return [];
@@ -23,6 +24,7 @@ const extractCategoryList = (payload) => {
   return [];
 };
 
+// Ensures each category has a predictable shape for the UI
 const normalizeCategory = (item) => {
   if (!item || typeof item !== "object") return null;
 
@@ -73,6 +75,7 @@ const normalizeCategory = (item) => {
   };
 };
 
+// Shapes modal values back into the payload the API expects
 const buildCategoryPayload = (form) => {
   const payload = {
     name: form.name?.trim() || "",
@@ -102,6 +105,7 @@ export default function CategoriesTab({ selectedOrg }) {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  // Loads the categories list for the selected organization
   const loadCategories = useCallback(
     async ({ withLoader = true } = {}) => {
       if (!categoriesService || !organizationId) {
@@ -159,6 +163,7 @@ export default function CategoriesTab({ selectedOrg }) {
     };
   }, [loadCategories]);
 
+  // Opens the modal for creating a brand new category
   const handleAddCategory = () => {
     openModal(
       <CategoryModal
@@ -171,6 +176,7 @@ export default function CategoriesTab({ selectedOrg }) {
     );
   };
 
+  // Launches the modal pre-filled with the record being edited
   const handleEditCategory = (category) => {
     openModal(
       <CategoryModal
@@ -184,6 +190,7 @@ export default function CategoriesTab({ selectedOrg }) {
     );
   };
 
+  // Shared create/update handler wired into the modal
   const handleSaveCategory = async (formData) => {
     if (!organizationId) {
       showErrorToast("Select an organization to manage categories.");
@@ -280,6 +287,7 @@ export default function CategoriesTab({ selectedOrg }) {
 /* ============================================================
    🧩 Category Modal (Add/Edit)
    ============================================================ */
+// Modal component responsible for create + edit forms
 function CategoryModal({ title, description, category, onSave, onCancel }) {
   const [form, setForm] = useState(
     category || {
